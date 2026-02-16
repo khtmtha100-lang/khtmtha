@@ -51,6 +51,8 @@ import {
   HelpCircle,
   Gamepad2
 } from 'lucide-react';
+import BattleGame from './battle-game';
+import GameLectures from './game-lectures';
 
 // --- 1. المكونات المساعدة والتعريفات ---
 
@@ -404,6 +406,17 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName }) =>
 
     let firstScoreFound = false;
 
+    // If a chapter is selected, show the BattleGame component
+    if (selectedChapter) {
+        return (
+            <BattleGame 
+                selectedChapter={selectedChapter}
+                onClose={() => setSelectedChapter(null)}
+                isDarkMode={isDarkMode}
+            />
+        );
+    }
+
     return (
         <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 font-['Cairo'] backdrop-blur-sm transition-colors duration-500 ${isDarkMode ? 'bg-slate-900/80' : 'bg-slate-200/50'}`}>
             <div className={`relative w-full max-w-sm md:max-w-md p-6 pb-8 rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-300 animate-pop-in ${bgCard} ${isDarkMode ? 'shadow-black/50 border border-slate-700' : 'shadow-xl border border-slate-100'}`}>
@@ -533,14 +546,18 @@ const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick }) => {
 };
 
 // واجهة الفصول (ChaptersView)
-const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin }) => {
+const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin, onStartGame }) => {
     const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
     
     const handleChapterClick = (num) => {
         if (isGuest && num > 1) {
             onShowLogin(); 
         } else {
-            onChapterClick(num);
+            if (onStartGame) {
+                onStartGame(num);
+            } else {
+                onChapterClick(num);
+            }
         }
     };
 
@@ -708,9 +725,15 @@ const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin }) =>
 };
 
 // واجهة المراجعات
-const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick }) => {
+const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick, onStartGame }) => {
     const [expandedReview, setExpandedReview] = useState(null); // 'midyear' or 'comprehensive' or chapterId
     const toggleReview = (id) => setExpandedReview(expandedReview === id ? null : id);
+    
+    const handlePartClick = (chapterNum, partId) => {
+        if (onStartGame) {
+            onStartGame(chapterNum);
+        }
+    };
     
     // قائمة الفصول
     const chapters = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -756,6 +779,7 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
                     {parts.map((part) => (
                         <TactileButton
                             key={part.id}
+                            onClick={() => handlePartClick(type === 'midyear' ? 4 : 8, part.id)}
                             className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden`}
                             colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
                             borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}
@@ -877,7 +901,7 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
                             {expandedReview === chapterNum && (
                                 <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
                                     {chapterParts.map((part) => (
-                                        <TactileButton key={part.id} disabled={part.status === 'locked'} className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`} colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')} borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}>
+                                        <TactileButton key={part.id} disabled={part.status === 'locked'} onClick={() => part.status !== 'locked' && handlePartClick(chapterNum, part.id)} className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`} colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')} borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}>
                                             <div className="flex items-center gap-4 z-10">
                                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
                                                     {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
@@ -911,6 +935,8 @@ export default function App() {
   const [userName, setUserName] = useState(''); 
   const [currentView, setCurrentView] = useState('home');
   const [selectedChapterForLevels, setSelectedChapterForLevels] = useState(1);
+  const [showGameLectures, setShowGameLectures] = useState(false);
+  const [gameLecturesChapter, setGameLecturesChapter] = useState(null);
   const [subjectOpen, setSubjectOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState({ name: 'English', icon: EnIcon });
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -1201,6 +1227,10 @@ export default function App() {
                             setSelectedChapterForLevels(chapterNum);
                             setCurrentView('levels');
                         }}
+                        onStartGame={(chapterNum) => {
+                            setGameLecturesChapter(chapterNum);
+                            setShowGameLectures(true);
+                        }}
                         isGuest={isGuest}
                         onShowLogin={() => setShowLoginModal(true)}
                     />
@@ -1211,7 +1241,18 @@ export default function App() {
                 )}
                 
                 {currentView === 'reviews' && (
-                    <ReviewsView isDarkMode={isDarkMode} onBack={setCurrentView} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} />
+                    <ReviewsView 
+                        isDarkMode={isDarkMode} 
+                        onBack={setCurrentView} 
+                        isGuest={isGuest} 
+                        onShowLogin={() => setShowLoginModal(true)} 
+                        onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} 
+                        onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)}
+                        onStartGame={(chapterNum) => {
+                            setGameLecturesChapter(chapterNum);
+                            setShowGameLectures(true);
+                        }}
+                    />
                 )}
             </div>
 
@@ -1255,6 +1296,19 @@ export default function App() {
             )}
 
             {monsterSheetOpen && <BattleArenaModal isDarkMode={isDarkMode} onClose={() => setMonsterSheetOpen(false)} chapterScores={chapterScores} playerName={userName || 'البطل'} />}
+
+            {showGameLectures && gameLecturesChapter && (
+                <div className="fixed inset-0 z-[200]">
+                    <GameLectures 
+                        chapterNum={gameLecturesChapter}
+                        onClose={() => {
+                            setShowGameLectures(false);
+                            setGameLecturesChapter(null);
+                        }}
+                        isDarkMode={isDarkMode}
+                    />
+                </div>
+            )}
 
             {feedbackOpen && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
