@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import AdminDashboard from './AdminDashboard.jsx';
+import {
+  supabase,
+  signInWithGoogle, signOut, getSession,
+  getUserProfile, createUserProfile, updateLastLogin,
+  addUserXP,
+} from './lib/supabase.js';
 import { 
   ArrowLeft,
   Baby,
@@ -67,14 +74,22 @@ import {
 
 export default function App() {
   const [activeGame, setActiveGame] = useState(null);
-  
+  const [activeSubject, setActiveSubject] = useState('english');
+  const [activeUserProfile, setActiveUserProfile] = useState(null);
+
+  const handleStartGame = (mode, subject = 'english', userProfile = null) => {
+    setActiveSubject(subject);
+    setActiveUserProfile(userProfile);
+    setActiveGame(mode);
+  };
+
   if (activeGame === 'monster') {
-    return <MonsterGameScreen onExit={() => setActiveGame(null)} />;
+    return <MonsterGameScreen onExit={() => setActiveGame(null)} subject={activeSubject} userProfile={activeUserProfile} />;
   }
   if (activeGame === 'chapter') {
-    return <ChapterGameScreen onExit={() => setActiveGame(null)} />;
+    return <ChapterGameScreen onExit={() => setActiveGame(null)} subject={activeSubject} userProfile={activeUserProfile} />;
   }
-  return <HubScreen onStartGame={(mode) => setActiveGame(mode)} />;
+  return <HubScreen onStartGame={handleStartGame} />;
 }
 
 // ╔═══════════════════════════════════════════════════════════╗
@@ -333,10 +348,10 @@ const LoginView = ({ isDarkMode, onLoginSuccess }) => {
 };
 
 // --- كبسولة الإحصائيات ---
-const StatsHUD = ({ isDarkMode, compact = false, onFlameClick, onQuestionsClick, isGuest }) => {
-  const displayDays = isGuest ? 0 : 7;
-  const displayQuestions = isGuest ? 0 : 54;
-  const displayXP = isGuest ? 0 : 1250;
+const StatsHUD = ({ isDarkMode, compact = false, onFlameClick, onQuestionsClick, isGuest, userProfile }) => {
+  const displayDays = isGuest ? 0 : (userProfile?.current_streak ?? 0);
+  const displayQuestions = isGuest ? 0 : (userProfile?.english_questions_answered ?? 0);
+  const displayXP = isGuest ? 0 : (userProfile?.total_xp ?? 0);
 
   if (compact) {
     return (
@@ -411,7 +426,7 @@ const MonsterCard = ({ isDarkMode, onClick, isGuest }) => (
 );
 
 // --- واجهة ساحة المعركة (BattleArenaModal) ---
-const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onStartGame }) => {
+const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onStartGame, subject = 'english' }) => {
     const [showVsTutorial, setShowVsTutorial] = useState(true); // State for tutorial
     const bgCard = isDarkMode ? 'bg-[#1E293B]' : 'bg-white'; 
     const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
@@ -450,7 +465,7 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
 
                         return (
                             <div key={num} className="relative group h-28">
-                                <TactileButton onClick={() => onStartGame('monster')} className={`w-full h-full flex-col !gap-0 !rounded-[20px] border-none transition-all ${isSelected ? `${primaryColor} text-white shadow-lg shadow-blue-500/30 translate-y-[-4px]` : hasScore ? (isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200') : (isDarkMode ? 'bg-[#1E293B]' : 'bg-slate-50')}`}>
+                                <TactileButton onClick={() => onStartGame('monster', subject)} className={`w-full h-full flex-col !gap-0 !rounded-[20px] border-none transition-all ${isSelected ? `${primaryColor} text-white shadow-lg shadow-blue-500/30 translate-y-[-4px]` : hasScore ? (isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200') : (isDarkMode ? 'bg-[#1E293B]' : 'bg-slate-50')}`}>
                                     <div className="flex-1 flex flex-col items-center justify-center w-full"><span className={`text-[10px] font-bold mb-0.5 ${!isSelected && !hasScore ? 'opacity-30' : 'opacity-80'}`}>الفصل</span><span className={`text-3xl font-black leading-none mb-1 ${!isSelected && !hasScore && 'opacity-30'}`}>{num}</span>
                                         <div className="mt-2 h-5 flex items-center justify-center">{hasScore ? (<div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}><Star className={`w-2.5 h-2.5 ${isSelected ? 'text-yellow-300 fill-current' : 'text-yellow-500 fill-current'}`} /><span className={`text-[9px] font-black ${isSelected ? 'text-white' : (isDarkMode ? 'text-slate-300' : 'text-slate-600')}`}>{score > 999 ? (score/1000).toFixed(1) + 'k' : score}</span></div>) : (<Lock className={`w-3 h-3 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`} />)}</div>
                                     </div>
@@ -483,7 +498,7 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
                         );
                     })}
                 </div>
-                <div className="relative w-full mt-2"><TactileButton className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none ${isDarkMode ? 'bg-[#6366F1]' : 'bg-[#818CF8]'}`} onClick={() => onStartGame('monster')}><div className="w-full p-5 flex items-center justify-between z-10 relative"><div className="flex items-center gap-4"><div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center"><InfinityIcon className="w-7 h-7 text-white" /></div><div className="text-right"><div className="flex items-center gap-2 mb-1"><span className="text-xl font-black text-white">التحدي الشامل</span></div><div className="flex items-center gap-1.5 text-white/90"><Star className="w-3.5 h-3.5 text-yellow-300 fill-current" /><span className="text-xs font-bold">Max XP: <span className="text-white font-black">12,500</span></span></div></div></div><div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform text-[#6366F1]"><Play className="w-5 h-5 fill-current ml-0.5" /></div></div></TactileButton></div>
+                <div className="relative w-full mt-2"><TactileButton className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none ${isDarkMode ? 'bg-[#6366F1]' : 'bg-[#818CF8]'}`} onClick={() => onStartGame('monster', subject)}><div className="w-full p-5 flex items-center justify-between z-10 relative"><div className="flex items-center gap-4"><div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center"><InfinityIcon className="w-7 h-7 text-white" /></div><div className="text-right"><div className="flex items-center gap-2 mb-1"><span className="text-xl font-black text-white">التحدي الشامل</span></div><div className="flex items-center gap-1.5 text-white/90"><Star className="w-3.5 h-3.5 text-yellow-300 fill-current" /><span className="text-xs font-bold">Max XP: <span className="text-white font-black">12,500</span></span></div></div></div><div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform text-[#6366F1]"><Play className="w-5 h-5 fill-current ml-0.5" /></div></div></TactileButton></div>
             </div>
         </div>
     );
@@ -554,7 +569,7 @@ const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick }) => {
 };
 
 // واجهة الفصول (ChaptersView)
-const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin }) => {
+const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin, userProfile }) => {
     const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
     
     const handleChapterClick = (num) => {
@@ -575,7 +590,7 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
 
     return (
         <div className="animate-fade-in-up pb-32">
-            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} />
+            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} />
             <div className="flex items-center gap-4 mb-6">
                 <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
                     <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
@@ -644,7 +659,7 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
 };
 
 // واجهة المراحل (LevelsView)
-const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onStartGame}) => {
+const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onStartGame, subject = 'english' }) => {
      // مرحلة الديمو فقط في الفصل الأول 
      const hasDemo = chapterNum === 1;
      
@@ -664,11 +679,11 @@ const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onSt
 
     const handleLevelClick = (level) => {
         if (level.isDemo) {
-            onStartGame('chapter');
-        } else if (level.locked) { 
-            onShowLogin(); 
-        } else { 
-            onStartGame('chapter'); 
+            onStartGame('chapter', subject);
+        } else if (level.locked) {
+            onShowLogin();
+        } else {
+            onStartGame('chapter', subject);
         }
     };
 
@@ -728,7 +743,7 @@ const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onSt
 };
 
 // واجهة المراجعات
-const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick, onStartGame }) => {
+const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick, onStartGame, subject = 'english', userProfile }) => {
     const [expandedReview, setExpandedReview] = useState(null); // 'midyear' or 'comprehensive' or chapterId
     const toggleReview = (id) => setExpandedReview(expandedReview === id ? null : id);
     
@@ -799,7 +814,7 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
 
     return (
         <div className="animate-fade-in-up pb-32">
-            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} />
+            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} />
             <div className="flex items-center gap-4 mb-6">
                 <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
                     <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
@@ -847,7 +862,7 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
                             {expandedReview === chapterNum && (
                                 <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
                                     {chapterParts.map((part) => (
-                                        <TactileButton onClick={() => onStartGame('chapter')} key={part.id} disabled={part.status === 'locked'} className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`} colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')} borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}>
+                                        <TactileButton onClick={() => onStartGame('chapter', subject)} key={part.id} disabled={part.status === 'locked'} className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`} colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')} borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}>
                                             <div className="flex items-center gap-4 z-10">
                                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
                                                     {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
@@ -874,22 +889,38 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
 };
 
 // --- التطبيق الرئيسي ---
-function HubScreen({ onStartGame }) {
+function HubScreen({ onStartGame: _onStartGame }) {
+  // wrapper يضيف userProfile تلقائياً لكل استدعاء onStartGame
+  const onStartGame = (mode, subj = 'english') => _onStartGame(mode, subj, userProfile);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isGuest, setIsGuest] = useState(false); 
-  const [userName, setUserName] = useState(''); 
+  const [isGuest, setIsGuest] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userProfile, setUserProfile] = useState(null);
   const [currentView, setCurrentView] = useState('home');
   const [selectedChapterForLevels, setSelectedChapterForLevels] = useState(1);
   const [subjectOpen, setSubjectOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState({ name: 'English', icon: EnIcon });
+  const subject = selectedSubject.name === 'الأحياء' ? 'biology' : 'english';
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [monsterSheetOpen, setMonsterSheetOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false); 
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info', icon: null });
-  
+  const [adminTapCount, setAdminTapCount] = useState(0);
+  const adminTapTimer = useRef(null);
+
+  const handleAdminTap = () => {
+    setAdminTapCount(prev => {
+      const next = prev + 1;
+      clearTimeout(adminTapTimer.current);
+      if (next >= 7) { setCurrentView('admin'); return 0; }
+      adminTapTimer.current = setTimeout(() => setAdminTapCount(0), 2000);
+      return next;
+    });
+  };
+
   const [showTutorial, setShowTutorial] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null); 
   const [seenTooltips, setSeenTooltips] = useState({
@@ -937,6 +968,26 @@ function HubScreen({ onStartGame }) {
         if (document.exitFullscreen) document.exitFullscreen();
      }
   };
+
+  // ── مراقبة جلسة Supabase عند تحميل التطبيق
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const profile = await getUserProfile(session.user.id);
+        if (profile) {
+          setUserProfile(profile);
+          setUserName(profile.full_name || session.user.email || '');
+          setIsLoggedIn(true);
+          setIsGuest(false);
+          updateLastLogin(session.user.id);
+        }
+      } else {
+        setUserProfile(null);
+        setIsLoggedIn(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -1065,7 +1116,7 @@ function HubScreen({ onStartGame }) {
                 {currentView === 'home' && (
                     <div className="animate-fade-in-up">
                         <div className="text-center mt-6 mb-6">
-                            <h1 className={`text-5xl font-black mb-1 tracking-tight ${themeText}`}>هلا بالبطل</h1>
+                            <h1 onClick={handleAdminTap} className={`text-5xl font-black mb-1 tracking-tight ${themeText} select-none cursor-default`}>هلا بالبطل</h1>
                             <p className={`text-lg font-medium opacity-60 ${themeText}`}>{isGuest ? 'نسخة التجربة (ضيف)' : 'جاهز تكسر الرقم القياسي؟'}</p>
                         </div>
 
@@ -1112,7 +1163,7 @@ function HubScreen({ onStartGame }) {
 
                         {!isGuest && (
                             <>
-                                <StatsHUD isDarkMode={isDarkMode} isGuest={isGuest} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} /> 
+                                <StatsHUD isDarkMode={isDarkMode} isGuest={isGuest} userProfile={userProfile} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} /> 
                                 
                                 <div className="relative">
                                     <MonsterCard 
@@ -1174,15 +1225,20 @@ function HubScreen({ onStartGame }) {
                         }}
                         isGuest={isGuest}
                         onShowLogin={() => setShowLoginModal(true)}
+                        userProfile={userProfile}
                     />
                 )}
-                
+
                 {currentView === 'levels' && (
-                    <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} />
+                    <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} subject={subject} />
                 )}
                 
                 {currentView === 'reviews' && (
-                    <ReviewsView isDarkMode={isDarkMode} onBack={setCurrentView}  onStartGame={onStartGame} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} />
+                    <ReviewsView isDarkMode={isDarkMode} onBack={setCurrentView} onStartGame={onStartGame} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} subject={subject} userProfile={userProfile} />
+                )}
+
+                {currentView === 'admin' && (
+                    <AdminDashboard onBack={() => setCurrentView('home')} />
                 )}
             </div>
 
@@ -1225,7 +1281,7 @@ function HubScreen({ onStartGame }) {
                 </div>
             )}
 
-            {monsterSheetOpen && <BattleArenaModal isDarkMode={isDarkMode} onClose={() => setMonsterSheetOpen(false)} chapterScores={chapterScores} playerName={userName || 'البطل'} onStartGame={onStartGame} />}
+            {monsterSheetOpen && <BattleArenaModal isDarkMode={isDarkMode} onClose={() => setMonsterSheetOpen(false)} chapterScores={chapterScores} playerName={userName || 'البطل'} onStartGame={onStartGame} subject={subject} />}
 
             {feedbackOpen && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
@@ -1451,50 +1507,98 @@ const CH_MESSAGES = {
 };
 
 // Sample Questions with Explanation
-const CH_QUESTIONS = [
-  { 
-    id: 1, 
-    q: "I ______ to the store yesterday.", 
-    options: ["go", "went", "gone", "going"], 
-    a: "went", 
-    explanation: "نستخدم الماضي البسيط (went) لأن الجملة تحتوي على 'yesterday'.",
-    golden: false 
-  },
-  { 
-    id: 2, 
-    q: "She ______ glasses before.", 
-    options: ["wear", "used to wear", "wears", "wearing"], 
-    a: "used to wear", 
+// أسئلة الفصول - إنجليزي (3 ذهبية، 2 عادية)
+const CH_QUESTIONS_EN = [
+  {
+    id: 1,
+    q: "She ______ glasses before she had surgery.",
+    options: ["wear", "used to wear", "wears", "wearing"],
+    a: "used to wear",
     explanation: "نستخدم 'used to' للتعبير عن عادة في الماضي لم تعد موجودة.",
-    golden: true 
+    golden: false
   },
-  { 
-    id: 3, 
-    q: "How ______ exercise does he take?", 
-    options: ["many", "much", "more", "most"], 
-    a: "much", 
-    explanation: "كلمة 'exercise' هنا غير معدودة (uncountable)، فنستخدم 'much'.",
-    golden: false 
+  {
+    id: 2,
+    q: "How ______ water does a camel store in its hump?",
+    options: ["many", "much", "more", "few"],
+    a: "much",
+    explanation: "كلمة 'water' غير معدودة (uncountable)، فنستخدم 'much' وليس 'many'.",
+    golden: false
   },
-  { 
-    id: 4, 
-    q: "If I ______ you, I would study.", 
-    options: ["am", "was", "were", "be"], 
-    a: "were", 
-    explanation: "في الحالة الشرطية الثانية للنصيحة، نستخدم 'If I were you'.",
-    golden: true 
+  {
+    id: 3,
+    q: "If I ______ you, I would study harder for the exam.",
+    options: ["am", "was", "were", "be"],
+    a: "were",
+    explanation: "في الجملة الشرطية النوع الثاني للنصيحة نستخدم 'If I were you'.",
+    golden: true
   },
-  { 
-    id: 5, 
-    q: "The story was ______ written.", 
-    options: ["beautiful", "beautifully", "beauty", "beautify"], 
-    a: "beautifully", 
-    explanation: "نحتاج لظرف (Adverb) لوصف الفعل 'written'، لذا نختار 'beautifully'.",
-    golden: false 
+  {
+    id: 4,
+    q: "The story was ______ written by a famous author.",
+    options: ["beautiful", "beautifully", "beauty", "beautify"],
+    a: "beautifully",
+    explanation: "نحتاج ظرفاً (Adverb) لوصف الفعل 'written'، لذا نختار 'beautifully'.",
+    golden: true
+  },
+  {
+    id: 5,
+    q: "By the time she arrived, he ______ the report.",
+    options: ["finish", "finished", "had finished", "was finishing"],
+    a: "had finished",
+    explanation: "نستخدم Past Perfect (had + V3) للحدث الذي اكتمل قبل حدث آخر في الماضي.",
+    golden: true
   },
 ];
 
-function ChapterGameScreen({ onExit }) {
+// أسئلة الفصول - أحياء (3 ذهبية، 2 عادية)
+const CH_QUESTIONS_BIO = [
+  {
+    id: 1,
+    q: "ما العضية المسؤولة عن إنتاج الطاقة (ATP) في الخلية؟",
+    options: ["النواة", "الميتوكوندريا", "جهاز گولجي", "الريبوسومات"],
+    a: "الميتوكوندريا",
+    explanation: "الميتوكوندريا هي 'مصنع الطاقة' في الخلية، تُنتج ATP عبر التنفس الخلوي.",
+    golden: false
+  },
+  {
+    id: 2,
+    q: "ما العملية التي تصنع فيها النباتات غذاءها باستخدام ضوء الشمس؟",
+    options: ["التنفس", "التركيب الضوئي", "الهضم", "النتح"],
+    a: "التركيب الضوئي",
+    explanation: "التركيب الضوئي (Photosynthesis) يحوّل ثاني أكسيد الكربون والماء والضوء إلى غلوكوز وأكسجين.",
+    golden: false
+  },
+  {
+    id: 3,
+    q: "DNA اختصار لـ ______.",
+    options: ["Deoxyribose Nucleic Acid", "Deoxyribonucleic Acid", "Di-nitrogen Amino Acid", "Dynamic Nucleic Atom"],
+    a: "Deoxyribonucleic Acid",
+    explanation: "DNA اختصار لـ Deoxyribonucleic Acid وهي المادة الوراثية في خلايا الكائنات الحية.",
+    golden: true
+  },
+  {
+    id: 4,
+    q: "كم عدد كروموسومات الإنسان الطبيعية في الخلية الجسدية؟",
+    options: ["23", "46", "48", "44"],
+    a: "46",
+    explanation: "تحتوي الخلية الجسدية الإنسانية على 46 كروموسوماً (23 زوجاً) في الحالة الثنائية.",
+    golden: true
+  },
+  {
+    id: 5,
+    q: "أي من التالي هو مثال على الانتقاء الطبيعي؟",
+    options: ["تهجين نباتين", "نمو الكائنات المتكيفة وتكاثرها أكثر", "استنساخ حيوان", "التلقيح الصناعي"],
+    a: "نمو الكائنات المتكيفة وتكاثرها أكثر",
+    explanation: "الانتقاء الطبيعي: الكائنات ذات الصفات الملائمة للبيئة تتكاثر أكثر وتنقل صفاتها للأجيال.",
+    golden: true
+  },
+];
+
+// اختيار أسئلة الفصول بحسب المادة
+const getCHQuestions = (subject) => subject === 'biology' ? CH_QUESTIONS_BIO : CH_QUESTIONS_EN;
+
+function ChapterGameScreen({ onExit, subject = 'english', userProfile }) {
   const [gameState, setGameState] = useState('menu');
   const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -1645,7 +1749,7 @@ function ChapterGameScreen({ onExit }) {
   // Initialize Game
   const startGame = () => {
     initAudio(); // Initialize audio context on first interaction
-    const preparedQuestions = CH_QUESTIONS.map(q => ({
+    const preparedQuestions = getCHQuestions(subject).map(q => ({
       ...q,
       options: [...q.options].sort(() => Math.random() - 0.5) 
     }));
@@ -1866,6 +1970,7 @@ function ChapterGameScreen({ onExit }) {
     setTimeout(() => {
       setFeedback({ show: false, correct: false, message: '' });
       if (lives <= 1 && !correct) {
+        giveXPForChapter(correctAnswers.length, questions.length);
         setGameState('results');
       } else {
         nextQuestion();
@@ -1873,10 +1978,18 @@ function ChapterGameScreen({ onExit }) {
     }, 1000);
   };
 
+  const giveXPForChapter = (correct, total) => {
+    if (!userProfile?.id || correct === 0) return;
+    const pct = total > 0 ? correct / total : 0;
+    const xp = pct === 1 ? 150 : pct >= 0.6 ? 100 : 50;
+    addUserXP(userProfile.id, xp);
+  };
+
   const nextQuestion = () => {
     const nextIdx = qIndex + 1;
     setProgress((nextIdx / questions.length) * 100);
     if (nextIdx >= questions.length) {
+      giveXPForChapter(correctAnswers.length + 1, questions.length);
       setGameState('results');
     } else {
       setQIndex(nextIdx);
@@ -2545,50 +2658,188 @@ const MN_MESSAGES = {
 };
 
 // Sample Questions with Explanation
-const MN_QUESTIONS = [
-  { 
-    id: 1, 
-    q: "I ______ to the store yesterday.", 
-    options: ["go", "went", "gone", "going"], 
-    a: "went", 
+// أسئلة الوحش - إنجليزي
+const MN_QUESTIONS_EN = [
+  {
+    id: 1,
+    q: "I ______ to the store yesterday.",
+    options: ["go", "went", "gone", "going"],
+    a: "went",
     explanation: "نستخدم الماضي البسيط (went) لأن الجملة تحتوي على 'yesterday'.",
-    golden: false 
+    golden: false
   },
-  { 
-    id: 2, 
-    q: "She ______ glasses before.", 
-    options: ["wear", "used to wear", "wears", "wearing"], 
-    a: "used to wear", 
+  {
+    id: 2,
+    q: "She ______ glasses before she had surgery.",
+    options: ["wear", "used to wear", "wears", "wearing"],
+    a: "used to wear",
     explanation: "نستخدم 'used to' للتعبير عن عادة في الماضي لم تعد موجودة.",
-    golden: true 
+    golden: true
   },
-  { 
-    id: 3, 
-    q: "How ______ exercise does he take?", 
-    options: ["many", "much", "more", "most"], 
-    a: "much", 
-    explanation: "كلمة 'exercise' هنا غير معدودة (uncountable)، فنستخدم 'much'.",
-    golden: false 
+  {
+    id: 3,
+    q: "How ______ exercise does he take every day?",
+    options: ["many", "much", "more", "most"],
+    a: "much",
+    explanation: "كلمة 'exercise' غير معدودة (uncountable)، فنستخدم 'much'.",
+    golden: false
   },
-  { 
-    id: 4, 
-    q: "If I ______ you, I would study.", 
-    options: ["am", "was", "were", "be"], 
-    a: "were", 
-    explanation: "في الحالة الشرطية الثانية للنصيحة، نستخدم 'If I were you'.",
-    golden: true 
+  {
+    id: 4,
+    q: "If I ______ you, I would study harder.",
+    options: ["am", "was", "were", "be"],
+    a: "were",
+    explanation: "في الجملة الشرطية النوع الثاني للنصيحة نستخدم 'If I were you'.",
+    golden: true
   },
-  { 
-    id: 5, 
-    q: "The story was ______ written.", 
-    options: ["beautiful", "beautifully", "beauty", "beautify"], 
-    a: "beautifully", 
-    explanation: "نحتاج لظرف (Adverb) لوصف الفعل 'written'، لذا نختار 'beautifully'.",
-    golden: false 
+  {
+    id: 5,
+    q: "The report was ______ prepared before the deadline.",
+    options: ["careful", "carefully", "careless", "care"],
+    a: "carefully",
+    explanation: "نحتاج ظرفاً (Adverb) لوصف الفعل 'prepared'، لذا نختار 'carefully'.",
+    golden: false
+  },
+  {
+    id: 6,
+    q: "By the time they arrived, we ______ dinner.",
+    options: ["finish", "finished", "had finished", "have finished"],
+    a: "had finished",
+    explanation: "Past Perfect يُستخدم للحدث المكتمل قبل حدث آخر في الماضي.",
+    golden: true
+  },
+  {
+    id: 7,
+    q: "She asked me where ______ the day before.",
+    options: ["I had been", "had I been", "I was", "was I"],
+    a: "I had been",
+    explanation: "في الكلام غير المباشر (Reported Speech) نحوّل المضارع إلى ماضٍ.",
+    golden: true
+  },
+  {
+    id: 8,
+    q: "The book ______ by millions of readers worldwide.",
+    options: ["read", "reads", "has been read", "is reading"],
+    a: "has been read",
+    explanation: "نستخدم المبني للمجهول (Passive) مع Present Perfect للتعبير عن فعل مكتمل.",
+    golden: false
+  },
+  {
+    id: 9,
+    q: "He suggested ______ to the cinema that evening.",
+    options: ["to go", "going", "go", "went"],
+    a: "going",
+    explanation: "بعد 'suggest' نستخدم الفعل بصيغة الـ gerund (V+ing).",
+    golden: true
+  },
+  {
+    id: 10,
+    q: "Neither the students nor the teacher ______ ready yet.",
+    options: ["are", "is", "were", "have been"],
+    a: "is",
+    explanation: "مع 'neither...nor' يتبع الفعل الاسم الأقرب إليه، وهو 'the teacher' (مفرد).",
+    golden: false
   },
 ];
 
-function MonsterGameScreen({ onExit }) {
+// أسئلة الوحش - أحياء
+const MN_QUESTIONS_BIO = [
+  {
+    id: 1,
+    q: "ما العضية المسؤولة عن تصنيع البروتينات في الخلية؟",
+    options: ["النواة", "الميتوكوندريا", "الريبوسومات", "جهاز گولجي"],
+    a: "الريبوسومات",
+    explanation: "الريبوسومات هي موقع تصنيع البروتينات بقراءة رسالة mRNA.",
+    golden: false
+  },
+  {
+    id: 2,
+    q: "ما المعادلة الصحيحة للتركيب الضوئي؟",
+    options: [
+      "CO₂ + H₂O → C₆H₁₂O₆ + O₂",
+      "O₂ + H₂O → CO₂ + ATP",
+      "C₆H₁₂O₆ + O₂ → CO₂ + H₂O",
+      "ATP + H₂O → ADP + Pi"
+    ],
+    a: "CO₂ + H₂O → C₆H₁₂O₆ + O₂",
+    explanation: "التركيب الضوئي: ثاني أكسيد الكربون + الماء + ضوء = غلوكوز + أكسجين.",
+    golden: true
+  },
+  {
+    id: 3,
+    q: "كم عدد الكروموسومات في الخلية الجنسية (gamete) لدى الإنسان؟",
+    options: ["46", "23", "48", "22"],
+    a: "23",
+    explanation: "الخلايا الجنسية أحادية الصيغة الكروموسومية (haploid) تحتوي على 23 كروموسوماً.",
+    golden: false
+  },
+  {
+    id: 4,
+    q: "ما اسم عملية تضاعف DNA؟",
+    options: ["الترجمة", "النسخ", "التضاعف", "الانقسام"],
+    a: "التضاعف",
+    explanation: "Replication (التضاعف) هي العملية التي يُنسخ فيها DNA لإنتاج نسختين متطابقتين.",
+    golden: true
+  },
+  {
+    id: 5,
+    q: "أي من التالي يصف الوراثة المشتركة السيادة (Codominance)؟",
+    options: [
+      "ظهور الصفة الوسطى بين الأبوين",
+      "ظهور كلتا الصفتين معاً في النسل",
+      "طغيان الصفة السائدة على المتنحية",
+      "اختفاء الصفتين في النسل"
+    ],
+    a: "ظهور كلتا الصفتين معاً في النسل",
+    explanation: "في السيادة المشتركة (Codominance) تُعبَّر عن كلتا الصفتين الأليليتين معاً في الفرد.",
+    golden: true
+  },
+  {
+    id: 6,
+    q: "ما الجزيء الذي يحمل المعلومات الوراثية من النواة إلى الريبوسومات؟",
+    options: ["DNA", "mRNA", "tRNA", "rRNA"],
+    a: "mRNA",
+    explanation: "الـ mRNA (رسالة RNA) ينقل الشفرة الوراثية من DNA في النواة إلى الريبوسومات.",
+    golden: false
+  },
+  {
+    id: 7,
+    q: "في أي مرحلة من الانقسام المتساوي (Mitosis) تتراصف الكروموسومات في منتصف الخلية؟",
+    options: ["الطور التمهيدي", "الطور الاستوائي", "الطور الانفصالي", "الطور النهائي"],
+    a: "الطور الاستوائي",
+    explanation: "في الطور الاستوائي (Metaphase) تتراصف الكروموسومات على الصفيحة الاستوائية للخلية.",
+    golden: true
+  },
+  {
+    id: 8,
+    q: "ما وظيفة جهاز گولجي في الخلية؟",
+    options: ["إنتاج الطاقة", "تصنيع البروتينات", "تعبئة البروتينات وإفرازها", "تخزين الماء"],
+    a: "تعبئة البروتينات وإفرازها",
+    explanation: "جهاز گولجي يعمل كـ'مكتب البريد' — يُعدّل البروتينات ويُعبّئها ويُرسلها لوجهتها.",
+    golden: false
+  },
+  {
+    id: 9,
+    q: "أي نوع من الطفرات يُسبب تغيّراً في إطار القراءة بأكمله؟",
+    options: ["الاستبدال", "الإضافة أو الحذف", "الانعكاس", "الانتقال"],
+    a: "الإضافة أو الحذف",
+    explanation: "إضافة أو حذف قاعدة نيتروجينية يُزعزع إطار القراءة (Frameshift mutation) ويؤثر على كل البروتين.",
+    golden: true
+  },
+  {
+    id: 10,
+    q: "ما الطاقة الناتجة عن أكسدة جزيء واحد من الغلوكوز كاملاً؟",
+    options: ["2 ATP", "4 ATP", "36-38 ATP", "10 ATP"],
+    a: "36-38 ATP",
+    explanation: "التنفس الهوائي الكامل لجزيء الغلوكوز ينتج 36-38 جزيء ATP عبر الگليكوليز ودورة كربس والفسفرة التأكسدية.",
+    golden: true
+  },
+];
+
+// اختيار أسئلة الوحش بحسب المادة
+const getMNQuestions = (subject) => subject === 'biology' ? MN_QUESTIONS_BIO : MN_QUESTIONS_EN;
+
+function MonsterGameScreen({ onExit, subject = 'english', userProfile }) {
   const [gameState, setGameState] = useState('menu');
   const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -2739,7 +2990,7 @@ function MonsterGameScreen({ onExit }) {
   // Initialize Game
   const startGame = () => {
     initAudio(); // Initialize audio context on first interaction
-    const preparedQuestions = MN_QUESTIONS.map(q => ({
+    const preparedQuestions = getMNQuestions(subject).map(q => ({
       ...q,
       options: [...q.options].sort(() => Math.random() - 0.5) 
     }));
@@ -2958,6 +3209,9 @@ function MonsterGameScreen({ onExit }) {
     setTimeout(() => {
       setFeedback({ show: false, correct: false, message: '' });
       if (lives <= 1 && !correct) {
+        if (userProfile?.id && correctAnswers.length > 0) {
+          addUserXP(userProfile.id, correctAnswers.length * 10);
+        }
         setGameState('results');
       } else {
         nextQuestion();
@@ -2978,7 +3232,7 @@ function MonsterGameScreen({ onExit }) {
     if (nextIdx >= questions.length) {
        // If all answered correctly and array ended (unlikely with retry logic unless perfect)
        // Let's reshuffle and restart index to keep it going "Infinite"
-       const reShuffled = MN_QUESTIONS.map(q => ({
+       const reShuffled = getMNQuestions(subject).map(q => ({
           ...q,
           options: [...q.options].sort(() => Math.random() - 0.5) 
        })).sort(() => Math.random() - 0.5); // Shuffle order too
@@ -3008,7 +3262,7 @@ function MonsterGameScreen({ onExit }) {
     // Correct approach for infinite stream:
     // When near end, append more.
     if (nextIdx >= questions.length - 1) {
-         const moreQuestions = MN_QUESTIONS.map(q => ({
+         const moreQuestions = getMNQuestions(subject).map(q => ({
             ...q,
             id: q.id + Date.now(), // Unique ID
             options: [...q.options].sort(() => Math.random() - 0.5) 
