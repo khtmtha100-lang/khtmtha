@@ -106,22 +106,13 @@ const EnIcon = (props) => (
 );
 
 // مكون اليد الموجهة (من الجانب)
-const TutorialHand = ({ text = "اضغط هنا", direction = "left" }) => (
-  <div className={`absolute z-50 pointer-events-none animate-pulse-ring
-    ${direction === 'left' ? 'top-1/2 -right-6 -translate-y-1/2' : 'top-1/2 -left-6 -translate-y-1/2'}
-  `}>
-    <div className={`relative flex items-center ${direction === 'left' ? 'flex-row' : 'flex-row-reverse'}`}>
-        <div className={`w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(0,0,0,0.3)] border-4 border-yellow-400 z-10
-            ${direction === 'left' ? 'rotate-[-90deg]' : 'rotate-[90deg]'}
-        `}>
-             <MousePointer2 className="w-6 h-6 text-yellow-600 fill-yellow-600 animate-bounce" />
-        </div>
-        <span className={`bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-xl shadow-lg whitespace-nowrap border-2 border-yellow-100 absolute top-1/2 -translate-y-1/2
-            ${direction === 'left' ? 'right-10' : 'left-10'}
-        `}>
-            {text}
-        </span>
+const TutorialHand = ({ text = "اضغط هنا" }) => (
+  <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center animate-bounce">
+    <div className="bg-yellow-400 text-yellow-900 text-sm font-black px-4 py-2 rounded-2xl shadow-lg border-2 border-yellow-200 whitespace-nowrap">
+      {text}
     </div>
+    {/* سهم يشير للأسفل */}
+    <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-yellow-400 mt-0.5" />
   </div>
 );
 
@@ -922,15 +913,13 @@ function HubScreen({ onStartGame: _onStartGame }) {
   };
 
   const [showTutorial, setShowTutorial] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState(null); 
-  const [seenTooltips, setSeenTooltips] = useState({
-      monster: false,
-      chapters: false,
-      reviews: false,
-      daily: false,
-      mistakes: false,
-      fingerprint: false,
-      subject: false
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const [seenTooltips, setSeenTooltips] = useState(() => {
+      try {
+          const saved = localStorage.getItem('seen_tooltips');
+          if (saved) return JSON.parse(saved);
+      } catch {}
+      return { monster: false, chapters: false, reviews: false, daily: false, mistakes: false, fingerprint: false, subject: false };
   });
 
   const showToast = (message, type = 'info', icon = null) => {
@@ -949,8 +938,8 @@ function HubScreen({ onStartGame: _onStartGame }) {
           showToast('أهلاً بك كضيف! جرب المرحلة الأولى مجاناً 🎁', 'info', Star);
       }
       
-      // Trigger Main Tutorial Hand
-      setTimeout(() => setShowTutorial(true), 500);
+      // التيتوريال يظهر فقط للضيف
+      if (guestMode) setTimeout(() => setShowTutorial(true), 500);
   };
 
   const handleLogout = () => {
@@ -995,13 +984,17 @@ function HubScreen({ onStartGame: _onStartGame }) {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const handleFeatureClick = (featureName, callback) => {
-      if (!seenTooltips[featureName] && !isGuest) { 
+  const handleFeatureClick = (featureName) => {
+      if (!seenTooltips[featureName] && !isGuest) {
           setActiveTooltip(featureName);
-          setSeenTooltips(prev => ({ ...prev, [featureName]: true }));
-          return false; 
+          setSeenTooltips(prev => {
+              const updated = { ...prev, [featureName]: true };
+              try { localStorage.setItem('seen_tooltips', JSON.stringify(updated)); } catch {}
+              return updated;
+          });
+          return false;
       }
-      return true; 
+      return true;
   };
 
   const closeTooltip = () => setActiveTooltip(null);
@@ -1120,23 +1113,19 @@ function HubScreen({ onStartGame: _onStartGame }) {
                             <p className={`text-lg font-medium opacity-60 ${themeText}`}>{isGuest ? 'نسخة التجربة (ضيف)' : 'جاهز تكسر الرقم القياسي؟'}</p>
                         </div>
 
-                        <div className="relative">
-                            {/* إعادة إضافة يد التعليم (TutorialHand) وتأثيرات الإضاءة لزر التحدي */}
-                            {showTutorial && (
-                                <TutorialHand 
-                                    text={isGuest ? "جرب مجاناً هنا" : "ابدأ رحلتك من هنا"} 
-                                    direction="left"
-                                />
+                        <div className="relative mt-4">
+                            {/* التيتوريال يظهر فوق الزر فقط للضيف */}
+                            {showTutorial && isGuest && (
+                                <TutorialHand text="جرب مجاناً — اضغط هنا! 🎮" />
                             )}
-                            <TactileButton 
+                            <TactileButton
                                 onClick={() => {
                                     setShowTutorial(false);
-                                    // تم إزالة البوب أب "قريباً"
-                                }} 
+                                }}
                                 className={`w-full mb-6 p-6 rounded-[32px] group border-2 relative overflow-hidden
-                                    ${showTutorial ? 'animate-pulse-ring z-40' : ''}
+                                    ${showTutorial && isGuest ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}
                                 `}
-                                colorClass="bg-gradient-to-br from-indigo-500 to-blue-600" 
+                                colorClass="bg-gradient-to-br from-indigo-500 to-blue-600"
                                 borderClass="border-indigo-700"
                             >
                                 <div className="w-full flex items-center justify-between z-20 relative">
@@ -1157,8 +1146,6 @@ function HubScreen({ onStartGame: _onStartGame }) {
                                 </div>
                             </TactileButton>
                             
-                            {/* خلفية معتمة لإبراز الزر */}
-                            {showTutorial && <div className="fixed inset-0 bg-black/40 z-30 pointer-events-none transition-opacity duration-500 rounded-[3rem]"></div>}
                         </div>
 
                         {!isGuest && (
