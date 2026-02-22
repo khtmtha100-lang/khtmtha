@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(ls:*)",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" tag --sort=-creatordate)",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" show 49b65b7 --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" show 2b4819c --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" show b1c8724 --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" show 49b65b7:src/App.jsx)",
+      "Bash(# مقارنة App.jsx الحالي مع commit 49b65b7 \\(النسخة الكبيرة\\) git -C \"\"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\"\" diff 49b65b7 HEAD -- src/App.jsx)",
+      "Bash(# البحث في سجل المحادثة عن ذكر tutorial أو تيتوريال أو تعديلات ديزاين grep -i \"\"tutorial\\\\|تيتوريال\\\\|design\\\\|ديزاين\\\\|onboarding\\\\|seen_tooltips\"\" /c/Users/aliqa/.claude/projects/c--Users-aliqa-Downloads-Telegram-Desktop-khatemtha-app-3-khatemtha-app/736d35d7-c049-4839-9c43-81faae0b21b7.jsonl | python3 -c \"\" import sys, json for line in sys.stdin: try: obj = json.loads\\(line\\) if obj.get\\(''type''\\) == ''user'': content = obj.get\\(''message'', {}\\).get\\(''content'', ''''\\) if isinstance\\(content, list\\): for c in content: if isinstance\\(c, dict\\) and ''text'' in c: txt = c[''text''] if any\\(k in txt.lower\\(\\) for k in [''tutorial'',''تيتوريال'',''ديزاين'',''design'',''seen_tooltip'',''onboard'']\\): print\\(''USER:'', txt[:200]\\) except: pass \"\")",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" show b1c8724:src/App.jsx)",
+      "Bash(# البحث عن 50 مرحلة في جميع commits for commit in b1c8724 2b4819c 49b65b7 1da11e8; do echo \"\"=== $commit ===\"\" git -C \"\"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\"\" show $commit:src/App.jsx)",
+      "Bash(done)",
+      "Bash(__NEW_LINE_ef604c461eaa50e0__ grep -n \"50\\\\|مرحلة\\\\|stage\\\\|level\" \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\\\\src_backup_2026-02-17_15-18\\\\game-lectures.jsx\")",
+      "Bash(find \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\"\" -name \"*.jsx\" 2>/dev/null | grep -v \"node_modules|khatemtha-app 3 \")",
+      "Bash(wc -l \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\\\\.claude\\\\worktrees\\\\beautiful-mccarthy\\\\src\\\\App.jsx\" grep -n \"Array.*length\\\\|levelsList\\\\|LevelsView\" \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\\\\.claude\\\\worktrees\\\\beautiful-mccarthy\\\\src\\\\App.jsx\")",
+      "Bash(git -C \"c:\\\\Users\\\\aliqa\\\\Downloads\\\\Telegram Desktop\\\\khatemtha-app 3\\\\khatemtha-app\" branch -a)",
+      "mcp__claude_ai_Supabase__get_advisors",
+      "Bash(git commit:*)",
+      "Bash(npx vite build:*)",
+      "mcp__claude_ai_Supabase__list_migrations",
+      "Bash(cd:*)",
+      "Bash(grep:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx vite:*)",
+      "mcp__claude_ai_Supabase__execute_sql",
+      "mcp__claude_ai_Supabase__list_tables",
+      "mcp__claude_ai_Supabase__apply_migration",
+      "Bash(npm run build:*)",
+      "mcp__claude_ai_Vercel__deploy_to_vercel",
+      "Bash(vercel deploy:*)",
+      "mcp__claude_ai_Supabase__get_project",
+      "mcp__claude_ai_Supabase__get_publishable_keys"
+    ]
+  }
+}

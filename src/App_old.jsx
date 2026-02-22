@@ -1,84 +1,3 @@
-/*
-================================================================================
-                        📑 فهرس منظم لملف App.jsx (4716 سطر)
-================================================================================
-
-1️⃣  استيرادات - IMPORTS                                  📌 السطور: 1-65
-    ✓ Import من React و مكتبات الواجهة
-    ✓ استيراد icons من lucide-react
-
-2️⃣  بيانات الأسئلة - QUESTION DATA                      📌 السطور: 67-121
-    ✓ questionData object (English و Biology chapters)
-
-3️⃣  المكون الرئيسي App - MAIN APP COMPONENT            📌 السطر: 122
-    ✓ دالة App الرئيسية و إدارة الحالة
-
-4️⃣  المكونات الصغيرة - UI COMPONENTS                   📌 السطور: 245-346
-    📌 EnIcon (245)                 | 📌 TactileButton (299)
-    📌 TutorialHand (253)           | 📌 ToastNotification (325)
-    📌 TooltipOverlay (264)         | 📌 handleShareChallenge (346)
-    📌 SoftBackground (291)
-
-5️⃣  LoginView - شاشة تسجيل الدخول                       📌 السطر: 365
-    ✓ تسجيل الدخول العادي + Google + وضع الضيف
-
-6️⃣  StatsHUD - عرض الإحصائيات                           📌 السطر: 653
-    ✓ النقاط والمستوى والشعلة والأسئلة
-
-7️⃣  MonsterCard - بطاقة التحدي                          📌 السطر: 712
-    ✓ عرض وضع التحدي الشامل
-
-8️⃣  BattleArenaModal - نافذة اختيار التحدي              📌 السطر: 763
-    ✓ اختيار الفصل للتحدي وعرض الدرجات
-
-9️⃣  BottomDock - قائمة الأسفل                           📌 السطر: 873
-    ✓ أزرار المهام والأخطاء وحقيبة الأخطاء
-
-🔟  ChaptersView - شاشة الفصول                          📌 السطر: 1016
-    ✓ قائمة الفصول (1-8) مع النجوم والقفل
-
-1️⃣1️⃣  LevelsView - شاشة المراحل                          📌 السطر: 1112
-    ✓ عرض مراحل الفصل والديمو والنجوم المحفوظة
-
-1️⃣2️⃣  ReviewsView - شاشة المراجعة                        📌 السطر: 1234
-    ✓ مراجعة أجزاء الفصول
-
-1️⃣3️⃣  HubScreen - شاشة المركز الرئيسية                   📌 السطر: 1390
-    ✓ التنقل بين الفصول والتحديات والمراجعة
-
-1️⃣4️⃣  ChapterPauseMenuModal - قائمة الإيقاف             📌 السطر: 2024
-    ✓ خيارات الإيقاف والاستئناف والإعدادات
-
-1️⃣5️⃣  CH_MESSAGES - رسائل الفصول                        📌 السطر: 2179
-    ✓ رسائل الإجابة الصحيحة والخاطئة والنهاية
-
-1️⃣6️⃣  أسئلة الفصول - CHAPTER QUESTIONS
-    📌 CH_QUESTIONS_EN (2218)   | 📌 CH_QUESTIONS_BIO (2262)
-    ✓ أسئلة اللغة الإنجليزية والأحياء
-
-1️⃣7️⃣  ChapterGameScreen - شاشة لعبة الفصول              📌 السطر: 2377
-    ✓ إدارة الأسئلة والإجابات وحساب الدرجات والنجوم
-    
-    دوال مهمة:
-    ├─ showFeedbackModal (2770)      | ├─ giveXPForChapter (2883)
-    ├─ saveSessionToSupabase (2902)  | ├─ nextQuestion (2922)
-    ├─ useFreeze (2932)              | ├─ useBomb (2944)
-    └─ startGame (3041)
-
-1️⃣8️⃣  MonsterGameScreen - شاشة لعبة التحدي              📌 السطر: 3751
-    ✓ وضع التحدي الشامل مع أسئلة عشوائية
-
-================================================================================
-🎯 الاستخدام السريع:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔧 رسائل الإجابة الصحيحة؟        👉 السطر 2179
-🔧 أسئلة الإنجليزية؟            👉 السطر 2218
-🔧 نظام النقاط؟                 👉 السطر 2883
-🔧 شاشة النتائج والأزرار؟       👉 السطر 3280
-🔧 Progress bar؟               👉 السطر 2770 و 2922
-================================================================================
-*/
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AdminDashboard from './AdminDashboard.jsx';
 import {
@@ -95,7 +14,6 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
-  Check,
   Crown,
   Dna,
   FastForward,
@@ -146,7 +64,18 @@ import {
   X
 } from 'lucide-react';
 
-const questionData = {
+// استيراد البيانات والمكونات المفصولة
+import { questionData } from './data/questions.js';
+import { CH_MESSAGES, MN_MESSAGES } from './data/messages.js';
+import { handleShareChallenge } from './utils/share.js';
+import { fetchStageQuestions, fetchFullYearQuestions, fetchReviewPartQuestions } from './utils/questions.js';
+import { TactileButton, ToastNotification, triggerHaptic, SoftBackground, TooltipOverlay, EnIcon, TutorialHand } from './components/ui/common.js';
+import { StatsHUD } from './components/StatsHUD.jsx';
+import { MonsterCard } from './components/MonsterCard.jsx';
+import { LoginView } from './components/LoginView.jsx';
+import { HubScreen } from './screens/HubScreen.jsx';
+import { ChapterGameScreen } from './screens/ChapterGameScreen.jsx';
+import { MonsterGameScreen } from './screens/MonsterGameScreen.jsx';
   english: {
     ch1: {
       stages: {
@@ -193,10 +122,6 @@ const questionData = {
       },
       review_parts: {}
     }
-  }
-};
-
-
 // ═══════════════════════════════════════════════════════════════════
 // 🎮 ختمتها - Khtmtha Unified App
 // ═══════════════════════════════════════════════════════════════════
@@ -206,7 +131,6 @@ export default function App() {
   const [activeSubject, setActiveSubject] = useState('english');
   const [activeUserProfile, setActiveUserProfile] = useState(null);
   const [activeBagItem, setActiveBagItem] = useState(null);
-  const [isGuest, setIsGuest] = useState(false);
   // completedToday: { english: 0, biology: 0 } — مفصول حسب المادة
   const [completedToday, setCompletedToday] = useState(() => {
     try {
@@ -273,7 +197,7 @@ export default function App() {
   };
 
   // stars: عدد النجوم (1-3) إذا فاز، 0 إذا خسر
-  const handleGameExit = (stars = 0, goToNextChapter = false) => {
+  const handleGameExit = (stars = 0) => {
     const exitedSubject = activeSubject;
     setActiveGame(null);
     setActiveBagItem(null);
@@ -302,28 +226,21 @@ export default function App() {
         return next;
       });
     }
-    // إذا أراد الانتقال للفصل التالي
-    if (goToNextChapter && activeChapterNum < 8) {
-      setTimeout(() => {
-        const nextChapter = activeChapterNum + 1;
-        handleStartGame('chapter', activeSubject, activeUserProfile, nextChapter, 0);
-      }, 500);
-    }
   };
 
   if (activeGame === 'monster') {
     return <MonsterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} chapterNum={activeChapterNum} />;
   }
   if (activeGame === 'chapter') {
-    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} chapterNum={activeChapterNum} stageId={activeStageId} isGuest={isGuest} onStartGame={handleStartGame} />;
+    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} chapterNum={activeChapterNum} stageId={activeStageId} />;
   }
   if (activeGame === 'review_part') {
-    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} chapterNum={activeChapterNum} stageId={activeStageId} gameMode="review_part" isGuest={isGuest} onStartGame={handleStartGame} />;
+    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} chapterNum={activeChapterNum} stageId={activeStageId} gameMode="review_part" />;
   }
   if (activeGame === 'bag' && activeBagItem) {
-    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} bagItem={activeBagItem} onBagItemCompleted={handleBagItemCompleted} isGuest={isGuest} onStartGame={handleStartGame} />;
+    return <ChapterGameScreen onExit={handleGameExit} subject={activeSubject} userProfile={activeUserProfile} bagItem={activeBagItem} onBagItemCompleted={handleBagItemCompleted} />;
   }
-  return <HubScreen onStartGame={handleStartGame} onStartBagReview={handleStartBagReview} completedToday={completedToday} isGuest={isGuest} onGuestModeChange={setIsGuest} />;
+  return <HubScreen onStartGame={handleStartGame} onStartBagReview={handleStartBagReview} completedToday={completedToday} />;
 }
 
 // ╔═══════════════════════════════════════════════════════════╗
@@ -455,6 +372,8 @@ const handleShareChallenge = async (title, text) => {
 const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoogleProfileComplete }) => {
     const isGoogleFlow = !!pendingGoogleUser;
     const [step, setStep] = useState(isGoogleFlow ? 'g1' : 0);
+    const [email, setEmail] = useState('');
+    const [emailLoading, setEmailLoading] = useState(false);
     const [formData, setFormData] = useState({ name: pendingGoogleUser?.name || '', age: '', gender: '', governorate: '' });
     const [googleLoading, setGoogleLoading] = useState(false);
     const [fieldError, setFieldError] = useState('');
@@ -462,6 +381,38 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
     const governorates = ["بغداد","البصرة","نينوى","أربيل","النجف","كربلاء","كركوك","الأنبار","ديالى","ذي قار","بابل","واسط","ميسان","القادسية","المثنى","صلاح الدين","دهوك","السليمانية"];
     const ages = Array.from({length: 14}, (_, i) => 15 + i);
     const inputClass = `w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none focus:border-yellow-400 transition-all text-center shadow-sm`;
+
+    // ── التحقق من الإيميل ──
+    const handleEmailCheck = async () => {
+        setFieldError('');
+        const trimmed = email.trim().toLowerCase();
+        if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
+            setFieldError('أدخل إيميل صحيح');
+            return;
+        }
+        setEmailLoading(true);
+        try {
+            const { data: existing } = await supabase
+                .from('users')
+                .select('id, full_name, local_id')
+                .eq('email', trimmed)
+                .maybeSingle();
+            if (existing) {
+                // إيميل موجود → دخول مباشر
+                const anonId = existing.local_id || ('email_' + Date.now());
+                localStorage.setItem('anon_user_id', anonId);
+                localStorage.setItem('user_db_id', existing.id);
+                await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', existing.id).catch(() => {});
+                onLoginSuccess({ name: existing.full_name, email: trimmed, existingUser: true }, false);
+            } else {
+                // إيميل جديد → انتقل للخطوات
+                setStep(1);
+            }
+        } catch {
+            setFieldError('حدث خطأ، حاول مجدداً');
+        }
+        setEmailLoading(false);
+    };
 
     // ── Google OAuth ── يتحقق Supabase تلقائياً إذا المستخدم موجود أو جديد
     const handleGoogleSignIn = async () => {
@@ -479,6 +430,19 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
         }
     };
 
+    // ── التسجيل اليدوي (خطوات 1-3) ──
+    const handleNext = () => {
+        setFieldError('');
+        if (step === 1 && !formData.name.trim()) { setFieldError('شنو اسمك يا بطل؟'); return; }
+        if (step === 2 && (!formData.age || !formData.gender)) { setFieldError('المعلومات ناقصة!'); return; }
+        if (step === 3) {
+            if (!formData.governorate) { setFieldError('من أي محافظة؟'); return; }
+            onLoginSuccess({ name: formData.name.trim(), age: formData.age, gender: formData.gender, governorate: formData.governorate }, false);
+            return;
+        }
+        setStep(s => s + 1);
+    };
+
     // ── خطوات Google جديد ──
     const handleGoogleNext = async () => {
         setFieldError('');
@@ -486,24 +450,6 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
         if (step === 'g2' && (!formData.age || !formData.gender)) { setFieldError('المعلومات ناقصة!'); return; }
         if (step === 'g3') {
             if (!formData.governorate) { setFieldError('من أي محافظة؟'); return; }
-            
-            // ✅ فحص الأيميل المكرر
-            try {
-              const { data: existingEmail } = await supabase
-                .from('users')
-                .select('id, email')
-                .eq('email', pendingGoogleUser.email)
-                .neq('auth_id', pendingGoogleUser.id)
-                .maybeSingle();
-              
-              if (existingEmail) {
-                setFieldError('هذا الايميل مسجل بالفعل! استخدم ايميل آخر أو سجل الدخول.');
-                return;
-              }
-            } catch (e) {
-              console.error('Error checking email:', e);
-            }
-            
             try {
                 await supabase.from('users').update({
                     full_name: formData.name.trim(),
@@ -512,12 +458,7 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
                     region: formData.governorate,
                 }).eq('auth_id', pendingGoogleUser.id);
             } catch {}
-            onGoogleProfileComplete({ 
-              name: formData.name.trim(), 
-              age: parseInt(formData.age),
-              gender: formData.gender,
-              region: formData.governorate
-            });
+            onGoogleProfileComplete({ name: formData.name.trim() });
             return;
         }
         const nx = { 'g1': 'g2', 'g2': 'g3' };
@@ -525,6 +466,7 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
     };
 
     // ── شريط التقدم ──
+    // للإيميل: step = 1,2,3 | لـ Google: step = 'g1','g2','g3'
     const StepsProgressBar = ({ numericStep }) => {
         const pct = numericStep === 1 ? '0%' : numericStep === 2 ? '50%' : '100%';
         return (
@@ -545,19 +487,21 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
         );
     };
 
+    const isRegFlow = typeof step === 'number' && step > 0;
     const isGFlow = typeof step === 'string' && step.startsWith('g');
-    const numericStep = isGFlow ? ({'g1':1,'g2':2,'g3':3}[step]) : 1;
+    const numericStep = isGFlow ? ({'g1':1,'g2':2,'g3':3}[step]) : (typeof step === 'number' ? step : 1);
 
     const renderFields = (s, onNext) => (<>
-        {(s === 'g1') && (<>
+        {(s === 1 || s === 'g1') && (<>
             <h3 className={`text-xl font-black text-center mb-2 ${isDarkMode?'text-white':'text-slate-800'}`}>أهلاً! شنو اسمك؟ 👋</h3>
-            <p className="text-center text-xs text-slate-400 font-bold mb-4">سجّلت بـ Google — أكمل بياناتك مرة وحدة</p>
+            {s === 'g1' && <p className="text-center text-xs text-slate-400 font-bold mb-4">سجّلت بـ Google — أكمل بياناتك مرة وحدة</p>}
+            {s === 1 && <p className="text-center text-xs text-slate-400 font-bold mb-4">مرة وحدة بس — ما نسألك ثاني</p>}
             <input type="text" placeholder="الاسم الكامل" value={formData.name} autoFocus
                 onChange={e=>setFormData(p=>({...p,name:e.target.value}))}
                 onKeyDown={e=>e.key==='Enter'&&onNext()}
                 className={inputClass} />
         </>)}
-        {(s === 'g2') && (<>
+        {(s === 2 || s === 'g2') && (<>
             <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode?'text-white':'text-slate-800'}`}>معلوماتك الشخصية 👤</h3>
             <div className="flex gap-3">
                 <select value={formData.age} onChange={e=>setFormData(p=>({...p,age:e.target.value}))} className={`${inputClass} flex-[0.6] appearance-none cursor-pointer`}>
@@ -571,7 +515,7 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
                 </select>
             </div>
         </>)}
-        {(s === 'g3') && (<>
+        {(s === 3 || s === 'g3') && (<>
             <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode?'text-white':'text-slate-800'}`}>من أي محافظة؟ 📍</h3>
             <select value={formData.governorate} onChange={e=>setFormData(p=>({...p,governorate:e.target.value}))} className={`${inputClass} appearance-none cursor-pointer`}>
                 <option value="">اختر المحافظة</option>
@@ -622,24 +566,67 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
                                 </span>
                             </TactileButton>
 
-                            {/* ضيف */}
-                            <TactileButton onClick={() => onLoginSuccess({name:'ضيف',isGuest:true},true)}
-                                className="w-full p-4 rounded-2xl"
-                                colorClass="bg-indigo-500" borderClass="border-indigo-700">
-                                <span className="font-black text-white text-lg flex items-center justify-center gap-2">
-                                    👤 الدخول كضيف (تجربة مجانية)
+                            {/* فاصل */}
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-600"></div>
+                                <span className="text-xs text-slate-400 font-bold">أو بالإيميل</span>
+                                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-600"></div>
+                            </div>
+
+                            {/* حقل الإيميل */}
+                            <input
+                                type="email"
+                                placeholder="example@gmail.com"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleEmailCheck()}
+                                className={`${inputClass} mb-3`}
+                                dir="ltr"
+                            />
+
+                            {fieldError && <p className="text-red-500 text-xs font-bold text-center mb-2">{fieldError}</p>}
+
+                            <TactileButton onClick={handleEmailCheck} disabled={emailLoading}
+                                className="w-full p-4 rounded-2xl mb-3"
+                                colorClass="bg-yellow-400" borderClass="border-yellow-600">
+                                <span className="font-black text-yellow-900 text-lg">
+                                    {emailLoading ? '...' : 'تابع →'}
                                 </span>
                             </TactileButton>
+
+                            {/* ضيف */}
+                            <button onClick={() => onLoginSuccess({name:'ضيف',isGuest:true},true)}
+                                className={`w-full py-3 rounded-xl border-2 border-dashed font-bold text-sm transition-colors ${isDarkMode?'border-slate-600 text-slate-400 hover:bg-slate-700/50':'border-slate-300 text-slate-500 hover:bg-slate-50'}`}>
+                                الدخول كضيف (تجربة مجانية)
+                            </button>
                         </div>
 
                         {/* روابط المجتمع */}
-                        <div className="flex gap-3 mb-4 mt-5">
+                        <div className="flex gap-3 mb-4">
                             <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#229ED9]" borderClass="border-[#1A7DB0]" onClick={()=>window.open('https://t.me/khtmtha','_blank')}>
                                 <Send className="w-4 h-4 text-white -rotate-45" /><span className="font-bold text-white text-xs">مجتمع الطلاب</span>
                             </TactileButton>
                             <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#25D366]" borderClass="border-[#1da851]" onClick={()=>window.open('https://wa.me/message/AQBNBH24LYHJO1','_blank')}>
                                 <MessageCircle className="w-4 h-4 text-white" /><span className="font-bold text-white text-xs">واجهت مشكلة؟</span>
                             </TactileButton>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── خطوات التسجيل اليدوي (1-3) ── */}
+                {isRegFlow && (
+                    <div className="animate-slide-up">
+                        <StepsProgressBar numericStep={numericStep} />
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl">
+                            {renderFields(step, handleNext)}
+                            {fieldError && <p className="text-red-500 text-xs font-bold text-center mt-3">{fieldError}</p>}
+                            <div className="flex gap-3 mt-6">
+                                <button onClick={()=>{ setFieldError(''); setStep(s => s - 1); }}
+                                    className="flex-[0.3] p-4 rounded-xl font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">رجوع</button>
+                                <TactileButton onClick={handleNext} className="flex-1 p-4 rounded-xl" colorClass="bg-yellow-400" borderClass="border-yellow-600">
+                                    <span className="font-black text-yellow-900 text-lg">{step === 3 ? 'انطلق! 🚀' : 'التالي'}</span>
+                                </TactileButton>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -942,11 +929,7 @@ const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick, completedToday = 
     };
 
     // taskState يُحدد تلقائياً من عدد المراحل المكتملة اليوم
-    // completedToday قد يكون object أو رقم
-    const totalCompleted = typeof completedToday === 'object' 
-      ? ((completedToday?.english || 0) + (completedToday?.biology || 0))
-      : (completedToday || 0);
-    const taskState = totalCompleted >= 2 ? 2 : totalCompleted >= 1 ? 1 : 0;
+    const taskState = completedToday >= 2 ? 2 : completedToday >= 1 ? 1 : 0;
 
     const currentTask = [
         { color: 'bg-rose-400', border: 'border-rose-600', text: 'text-rose-900', label: 'ابدأ المهام', sub: '0/2', icon: Target, iconBg: 'bg-rose-100' },
@@ -1133,51 +1116,24 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
 };
 
 // واجهة المراحل (LevelsView)
-const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onStartGame, subject = 'english', userDbId }) => {
+const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onStartGame, subject = 'english' }) => {
      const hasDemo = chapterNum === 1;
-     const [completedStages, setCompletedStages] = useState([]);
-     const [starsMap, setStarsMap] = useState({});
-     const [loading, setLoading] = useState(false);
 
-     // قراءة المراحل المكتملة من Supabase (مصدر حقيقي للبيانات)
-     useEffect(() => {
-         const fetchStages = async () => {
-             if (isGuest || !userDbId) {
-                 setCompletedStages([]);
-                 setStarsMap({});
-                 return;
-             }
-             setLoading(true);
-             try {
-                 const { data } = await supabase
-                     .from('stage_progress')
-                     .select('stage, stars')
-                     .eq('user_id', userDbId)
-                     .eq('subject', subject)
-                     .eq('chapter', chapterNum);
-                 
-                 const stages = data?.map(d => d.stage) || [];
-                 const stars = {};
-                 data?.forEach(d => {
-                     stars[d.stage] = d.stars;
-                 });
-                 setCompletedStages(stages);
-                 setStarsMap(stars);
-                 console.log(`✅ Loaded ${stages.length} completed stages for Ch${chapterNum}`);
-             } catch (e) {
-                 console.error('Error fetching completed stages from Supabase:', e);
-                 setCompletedStages([]);
-                 setStarsMap({});
-             } finally {
-                 setLoading(false);
-             }
-         };
-         fetchStages();
-     }, [userDbId, subject, chapterNum, isGuest]);
+     // قراءة المراحل المكتملة من localStorage
+     const getCompletedStages = () => {
+         try {
+             const key = `stage_done_${subject}_ch${chapterNum}`;
+             return JSON.parse(localStorage.getItem(key) || '[]');
+         } catch { return []; }
+     };
+     const completedStages = getCompletedStages();
 
      // قراءة عدد النجوم لكل مرحلة
      const getStageStars = (stageId) => {
-         return starsMap[stageId] || 0;
+         try {
+             const key = `stage_stars_${subject}_ch${chapterNum}_s${stageId}`;
+             return parseInt(localStorage.getItem(key) || '0');
+         } catch { return 0; }
      };
 
      // عدد المراحل حسب الفصل (الفصل 1 = 28 مرحلة من Supabase)
@@ -1230,7 +1186,7 @@ const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onSt
         <div className="animate-fade-in-up pb-32">
             <div className="flex items-center gap-4 mb-8">
                 <TactileButton onClick={() => onBack('chapters')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}><ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} /></TactileButton>
-                <div><h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>الفصل {chapterNum}</h2><p className="text-sm font-bold text-slate-400">{isGuest ? 'يرجى تسجيل الدخول' : loading ? '⏳ جاري التحميل...' : 'أكمل المراحل لفتح التحدي'}</p></div>
+                <div><h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>الفصل {chapterNum}</h2><p className="text-sm font-bold text-slate-400">{isGuest ? 'يرجى تسجيل الدخول' : 'أكمل المراحل لفتح التحدي'}</p></div>
             </div>
             
             <div className="grid grid-cols-3 gap-4">
@@ -1438,99 +1394,21 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
 };
 
 // --- التطبيق الرئيسي ---
-function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday = 0, isGuest = false, onGuestModeChange = null }) {
+function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday = 0 }) {
   // wrapper يضيف userProfile تلقائياً لكل استدعاء onStartGame
   const onStartGame = (mode, subj = 'english', _unused = null, chapterNum = 0, stageId = 0) => _onStartGame(mode, subj, userProfile, chapterNum, stageId);
   const [isDarkMode, setIsDarkMode] = useState(false);
   // نقرأ حالة الدخول من localStorage حتى يبقى المستخدم مسجلاً بعد الإغلاق
-  // لكن إذا كان هناك علامة تسجيل خروج في sessionStorage، لا نستعيد الدخول
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    try {
-      // إذا المستخدم سجّل خروجاً، لا نستعيد الدخول حتى لو localStorage موجود
-      if (sessionStorage.getItem('user_logged_out') === '1') {
-        return false;
-      }
-      return localStorage.getItem('user_registered') === 'true';
-    } catch { return false; }
+    try { return localStorage.getItem('user_registered') === 'true'; } catch { return false; }
   });
+  const [isGuest, setIsGuest] = useState(false);
   const [userName, setUserName] = useState(() => {
     try { return localStorage.getItem('user_name') || ''; } catch { return ''; }
   });
   const [userProfile, setUserProfile] = useState(null);
   const [currentView, setCurrentView] = useState('home');
   const [selectedChapterForLevels, setSelectedChapterForLevels] = useState(1);
-
-  // ✅ قراءة بيانات المستخدم من Supabase عند التحميل والتحقق من اكتمال الملف
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        // إذا المستخدم سجّل خروجاً، لا نستعيد الملف الشخصي
-        if (sessionStorage.getItem('user_logged_out') === '1') {
-          console.log('⚠️ User logged out, skipping profile fetch');
-          return;
-        }
-        
-        // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الملف الشخصي
-        const loggedOut = sessionStorage.getItem('user_logged_out');
-        if (loggedOut === '1') {
-          console.log('⚠️ User logged out, skipping profile fetch');
-          setIsLoggedIn(false);
-          setUserProfile(null);
-          return;
-        }
-        
-        const userDbId = localStorage.getItem('user_db_id');
-        const anonUserId = localStorage.getItem('anon_user_id');
-        
-        // فحص نهائي قبل جلب الملف الشخصي
-        if (sessionStorage.getItem('user_logged_out') === '1') {
-          console.log('⚠️ Logout flag detected before profile fetch, aborting');
-          return;
-        }
-        
-        if (userDbId && !isGuest && isLoggedIn) {
-          const { data: profile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', userDbId)
-            .single();
-          
-          if (profile) {
-            // فحص نهائي بعد جلب الملف الشخصي
-            if (sessionStorage.getItem('user_logged_out') === '1') {
-              console.log('⚠️ Logout flag detected after profile fetch, aborting');
-              setUserProfile(null);
-              setIsLoggedIn(false);
-              return;
-            }
-            
-            setUserProfile(profile);
-            console.log('✅ User profile loaded from Supabase:', profile);
-            
-            // ✅ التحقق من اكتمال الملف الشخصي (age, gender, region)
-            const isProfileComplete = profile.age && profile.gender && profile.region;
-            
-            if (!isProfileComplete && anonUserId) {
-              // الملف غير مكتمل → اعرض نموذج الإكمال
-              const name = profile.full_name || localStorage.getItem('user_name') || 'البطل';
-              const email = profile.email || localStorage.getItem('user_email') || '';
-              setPendingGoogleUser({ id: anonUserId, email, name, dbId: userDbId });
-              setShowCompleteProfile(true);
-              console.log('⚠️ Profile incomplete, showing completion form');
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Error fetching user profile:', e);
-      }
-    };
-    // تأخير بسيط للتأكد من أن checkExistingSession يعمل أولاً
-    const timer = setTimeout(() => {
-      fetchUserProfile();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [isGuest, isLoggedIn]);
-
   const [subjectOpen, setSubjectOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState(() => {
     try {
@@ -1551,7 +1429,6 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info', icon: null });
   const [adminTapCount, setAdminTapCount] = useState(0);
   const adminTapTimer = useRef(null);
-  const processedAuthUsersRef = useRef(new Set()); // تتبع المستخدمين المعالجين لتجنب التكرار
 
   const handleAdminTap = () => {
     setAdminTapCount(prev => {
@@ -1580,7 +1457,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
 
   const handleLoginSuccess = async (data, guestMode = false) => {
       setIsLoggedIn(true);
-      if (onGuestModeChange) onGuestModeChange(guestMode);
+      setIsGuest(guestMode);
       if (!guestMode) {
           const name = data.name || data.full_name || '';
           setUserName(name);
@@ -1635,11 +1512,6 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
               localStorage.setItem('guest_session_id', guestId);
               await supabase.from('guest_sessions').insert({ guest_id: guestId });
           } catch {}
-          // 🎮 دخول الضيف مباشرة إلى مرحلة الديمو (5 أسئلة)
-          setTimeout(() => {
-              _onStartGame('chapter', 'english', null, 1, 0);
-          }, 500);
-          return;
       }
       // الشعلة تُحسب عند إكمال المهمة اليومية 2/2 (في handleGameExit) وليس عند الدخول
       // لكن نُحدث last_login في Supabase
@@ -1651,14 +1523,11 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
               }
           } catch {}
       }
+      // التيتوريال يظهر فقط للضيف
+      if (guestMode) setTimeout(() => setShowTutorial(true), 500);
   };
 
-  const handleLogout = async () => {
-      // علم أن المستخدم طلب تسجيل الخروج (حتى بعد Reload لا نستعيد الجلسة)
-      try {
-        sessionStorage.setItem('user_logged_out', '1');
-      } catch {}
-      
+  const handleLogout = () => {
       setIsLoggedIn(false);
       setIsGuest(false);
       setProfileMenuOpen(false);
@@ -1666,29 +1535,16 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
       setShowTutorial(false);
       setUserName('');
       setUserProfile(null);
-      setShowCompleteProfile(false);
-      setPendingGoogleUser(null);
       // مسح كل بيانات الدخول من localStorage حتى يُطلب الإيميل من جديد
       try {
           localStorage.removeItem('user_registered');
           localStorage.removeItem('user_name');
           localStorage.removeItem('last_login_date');
           localStorage.removeItem('anon_user_id');
-          localStorage.removeItem('user_db_id');
-          localStorage.removeItem('user_email');
-          localStorage.removeItem('user_age');
-          localStorage.removeItem('user_gender');
-          localStorage.removeItem('user_region');
           localStorage.removeItem('seen_tooltips');
-          processedAuthUsersRef.current.clear();
       } catch {}
-      // تسجيل خروج من Supabase Auth لمسح الجلسة من التخزين (يمنع استعادة الدخول بعد Reload)
-      try { 
-        await supabase.auth.signOut();
-        console.log('✅ Logged out successfully');
-      } catch (e) {
-        console.error('Error signing out:', e);
-      }
+      // تسجيل خروج من Supabase Auth إذا كانت هناك جلسة نشطة
+      try { supabase.auth.signOut(); } catch {}
   };
 
   const toggleFullscreen = () => {
@@ -1699,175 +1555,42 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
      }
   };
 
-  // ── فحص الجلسة الحالية عند تحميل الصفحة (لضمان Session ثابت بعد Refresh)
-  // يجب أن يعمل هذا قبل onAuthStateChange
-  useEffect(() => {
-    const checkExistingSession = async () => {
-      try {
-        // إذا المستخدم سجّل خروجاً، لا نستعيد الجلسة من Supabase وامسح أي جلسة متبقية
-        const loggedOut = sessionStorage.getItem('user_logged_out');
-        if (loggedOut === '1') {
-          // امسح الجلسة من Supabase أولاً
-          await supabase.auth.signOut();
-          // ثم امسح العلامة بعد التأكد من مسح الجلسة
-          sessionStorage.removeItem('user_logged_out');
-          // تأكد من مسح حالة الدخول
-          setIsLoggedIn(false);
-          setUserName('');
-          setUserProfile(null);
-          return;
-        }
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الجلسة
-        if (sessionStorage.getItem('user_logged_out') === '1') {
-          console.log('⚠️ Logout flag detected in checkExistingSession, skipping session restore');
-          return;
-        }
-        
-        if (session?.user && !processedAuthUsersRef.current.has(session.user.id)) {
-          // هناك جلسة موجودة → معالجتها
-          const user = session.user;
-          const now = new Date();
-          const { data: existing } = await supabase
-            .from('users')
-            .select('id, full_name, login_count, age, gender, region')
-            .eq('auth_id', user.id)
-            .maybeSingle();
-          
-          if (existing) {
-            const isProfileComplete = existing.age && existing.gender && existing.region;
-            processedAuthUsersRef.current.add(user.id);
-            setUserProfile(existing);
-            const name = existing.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'البطل';
-            localStorage.setItem('user_registered', 'true');
-            localStorage.setItem('user_name', name);
-            localStorage.setItem('user_email', user.email || '');
-            localStorage.setItem('user_db_id', existing.id);
-            localStorage.setItem('anon_user_id', user.id);
-            localStorage.setItem('last_login_date', now.toISOString());
-            
-            if (!isProfileComplete) {
-              setPendingGoogleUser({ id: user.id, email: user.email, name, dbId: existing.id });
-              setShowCompleteProfile(true);
-            } else {
-              setIsLoggedIn(true);
-              setUserName(name);
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Error checking existing session:', e);
-      }
-    };
-    checkExistingSession();
-  }, []);
-
   // ── مراقبة جلسة Supabase عند تحميل التطبيق
   useEffect(() => {
-    // تنظيف URL من hash/query params بعد المصادقة
-    const cleanAuthParams = () => {
-      if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
-        // بعد معالجة المصادقة، نظف URL
-        setTimeout(() => {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }, 100);
-      }
-    };
-    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // إذا المستخدم سجّل خروجاً، تجاهل أي أحداث جلسة (بما فيها TOKEN_REFRESHED)
-      const loggedOut = sessionStorage.getItem('user_logged_out');
-      if (loggedOut === '1') {
-        if (session?.user) {
-          // هناك جلسة متبقية → امسحها فوراً
-          console.log('⚠️ Session detected after logout, signing out...');
-          await supabase.auth.signOut();
-        }
-        // لا نستعيد الجلسة حتى لو كان event === 'TOKEN_REFRESHED'
-        return;
-      }
-      
-      if (event === 'SIGNED_OUT') {
-        // عند تسجيل الخروج، تأكد من مسح كل شيء
-        setIsLoggedIn(false);
-        setUserName('');
-        setUserProfile(null);
-        setShowCompleteProfile(false);
-        setPendingGoogleUser(null);
-        processedAuthUsersRef.current.clear();
-        return;
-      }
-      
       if (session?.user) {
         const user = session.user;
         // مستخدم Google جديد أو عائد
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الجلسة
-          const loggedOut = sessionStorage.getItem('user_logged_out');
-          if (loggedOut === '1') {
-            console.log('⚠️ Ignoring', event, 'after logout - signing out');
-            await supabase.auth.signOut();
-            return;
-          }
-          // تنظيف URL بعد المصادقة الناجحة
-          cleanAuthParams();
-          
-          // تجنب معالجة نفس المستخدم مرتين
-          if (processedAuthUsersRef.current.has(user.id)) {
-            return;
-          }
           try {
             const now = new Date();
-            // تحقق هل عنده ملف في قاعدة البيانات (بما في ذلك age, gender, region للتحقق من اكتمال الملف)
+            // تحقق هل عنده ملف في قاعدة البيانات
             const { data: existing } = await supabase
               .from('users')
-              .select('id, full_name, login_count, age, gender, region')
+              .select('id, full_name, login_count')
               .eq('auth_id', user.id)
               .maybeSingle();
 
             let dbId;
             if (existing) {
-              // فحص نهائي قبل استعادة الجلسة
-              if (sessionStorage.getItem('user_logged_out') === '1') {
-                console.log('⚠️ Logout flag detected during session restore, aborting');
-                await supabase.auth.signOut();
-                return;
-              }
-              
-              // مستخدم موجود — تحقق من اكتمال الملف الشخصي
-              processedAuthUsersRef.current.add(user.id); // علّم أنه تمت معالجته
-              
-              // ✅ التحقق من اكتمال الملف الشخصي
-              const isProfileComplete = existing.age && existing.gender && existing.region;
-              
+              // مستخدم موجود — تحديث آخر دخول
               await supabase.from('users').update({
                 last_login: now.toISOString(),
                 login_count: (existing.login_count || 0) + 1,
               }).eq('auth_id', user.id);
-              
               dbId = existing.id;
               setUserProfile(existing);
+              // دخول Google ناجح
               const name = existing.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'البطل';
               localStorage.setItem('user_registered', 'true');
               localStorage.setItem('user_name', name);
-              localStorage.setItem('user_email', user.email || ''); // ✅ حفظ الايميل
               localStorage.setItem('user_db_id', existing.id);
               localStorage.setItem('anon_user_id', user.id);
               localStorage.setItem('last_login_date', now.toISOString());
-              
-              // إذا الملف غير مكتمل → اعرض نموذج الإكمال
-              if (!isProfileComplete) {
-                setPendingGoogleUser({ id: user.id, email: user.email, name, dbId });
-                setShowCompleteProfile(true);
-                // لا نضع setIsLoggedIn(true) هنا حتى يكمل الملف
-              } else {
-                setIsLoggedIn(true);
-                setUserName(name);
-              }
+              setIsLoggedIn(true);
+              setUserName(name);
             } else {
               // مستخدم Google جديد — ننشئ سجل مبدئي ثم نطلب إكمال الملف الشخصي
-              processedAuthUsersRef.current.add(user.id); // علّم أنه تمت معالجته
               const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'البطل';
               const { data: newUser } = await supabase.from('users').insert({
                 auth_id: user.id,
@@ -1884,7 +1607,6 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
               localStorage.setItem('anon_user_id', user.id);
               localStorage.setItem('last_login_date', now.toISOString());
               if (dbId) localStorage.setItem('user_db_id', dbId);
-              localStorage.setItem('user_email', user.email || ''); // ✅ حفظ الايميل
               // أول دخول → اعرض نموذج إكمال الملف
               setPendingGoogleUser({ id: user.id, email: user.email, name, dbId });
               setShowCompleteProfile(true);
@@ -1985,16 +1707,8 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
             pendingGoogleUser={showCompleteProfile ? pendingGoogleUser : null}
             onGoogleProfileComplete={(profileData) => {
               const name = profileData.name;
-              const age = profileData.age || null;
-              const gender = profileData.gender || null;
-              const region = profileData.region || null;
-              
               localStorage.setItem('user_registered', 'true');
               localStorage.setItem('user_name', name);
-              if (age) localStorage.setItem('user_age', String(age));
-              if (gender) localStorage.setItem('user_gender', gender);
-              if (region) localStorage.setItem('user_region', region);
-              
               setUserName(name);
               setIsLoggedIn(true);
               setShowCompleteProfile(false);
@@ -2227,7 +1941,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
                 )}
 
                 {currentView === 'levels' && (
-                    <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} subject={subject} userDbId={localStorage.getItem('user_db_id')} />
+                    <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} subject={subject} />
                 )}
                 
                 {currentView === 'reviews' && (
@@ -2667,7 +2381,7 @@ const fetchReviewPartQuestions = async (chapterNum, partNum) => {
   } catch { return null; }
 };
 
-function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem = null, onBagItemCompleted, chapterNum = 0, stageId = 0, gameMode = 'chapter', isGuest = false, onStartGame = null }) {
+function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem = null, onBagItemCompleted, chapterNum = 0, stageId = 0, gameMode = 'chapter' }) {
   const resultStarsRef = useRef(0); // عدد النجوم (0=خسارة, 1-3=فوز) — يُمرر لـ onExit
   const [gameState, setGameState] = useState('menu');
   const [isDark, setIsDark] = useState(false);
@@ -3062,58 +2776,20 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 
   const showFeedbackModal = (correct, message, snapLives, snapQIndex, snapQTotal) => {
     setFeedback({ show: true, correct, message });
-    setTimeout(async () => {
+    setTimeout(() => {
       setFeedback({ show: false, correct: false, message: '' });
       const livesNow = snapLives ?? lives;
       const isLastQ = snapQIndex != null && snapQTotal != null && snapQIndex + 1 >= snapQTotal;
       if (livesNow <= 0 && !correct) {
         // خسارة — انتهت الأرواح
         resultStarsRef.current = 0;
-        giveXPForChapter(correctAnswers.length, snapQTotal ?? questions.length, false, chapterNum, stageId);
+        giveXPForChapter(correctAnswers.length, snapQTotal ?? questions.length, false);
         if (!bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
-        saveSessionToSupabase(correctAnswers.length, snapQTotal ?? questions.length, score, chapterNum, stageId);
+        saveSessionToSupabase(correctAnswers.length, snapQTotal ?? questions.length, score);
         setGameState('results');
       } else if (isLastQ) {
-        // آخر سؤال — فوز — حساب النجوم والانتقال للنتائج
-        // حساب عدد الإجابات الصحيحة من الجلسة الحالية
-        const totalCorrect = (snapQIndex + 1) - wrongAnswers.length; // إجمالي الأسئلة ناقص الأخطاء
-        const totalQuestions = snapQTotal ?? questions.length;
-        const pct = totalQuestions > 0 ? totalCorrect / totalQuestions : 0;
-        const stars = pct === 1 ? 3 : pct >= 0.6 ? 2 : 1;
-        // تأكد من أن progress bar يكتمل 100%
-        setProgress(100);
-        resultStarsRef.current = stars;
-        
-        // ✅ حفظ المرحلة المكتملة والنجوم في Supabase (مصدر حقيقي للبيانات)
-        const userDbId = localStorage.getItem('user_db_id');
-        if (userDbId && chapterNum > 0 && stageId > 0) {
-          try {
-            // انتظر حفظ المرحلة قبل الانتقال
-            await saveStageProgressToSupabase(userDbId, subject, chapterNum, stageId, stars);
-            console.log(`✅ Stage ${chapterNum}-${stageId} completed with ${stars} stars`);
-          } catch (e) {
-            console.error('Error saving stage progress:', e);
-          }
-        }
-        
-        // حفظ نسخة محلية كـ cache فقط
-        try {
-          if (chapterNum > 0 && stageId > 0) {
-            const doneKey = `stage_done_${subject}_ch${chapterNum}`;
-            const doneStagess = JSON.parse(localStorage.getItem(doneKey) || '[]');
-            if (!doneStagess.includes(stageId)) {
-              doneStagess.push(stageId);
-              localStorage.setItem(doneKey, JSON.stringify(doneStagess));
-            }
-            const starsKey = `stage_stars_${subject}_ch${chapterNum}_s${stageId}`;
-            localStorage.setItem(starsKey, String(stars));
-          }
-        } catch (e) { console.error('Error saving stage completion to cache:', e); }
-        
-        giveXPForChapter(totalCorrect, totalQuestions, true, chapterNum, stageId);
-        if (!bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
-        saveSessionToSupabase(totalCorrect, totalQuestions, score, chapterNum, stageId);
-        setGameState('results');
+        // آخر سؤال — فوز
+        nextQuestion(snapQIndex);
       } else {
         nextQuestion(snapQIndex);
       }
@@ -3185,171 +2861,48 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
     if (userDbId || anonId) {
       try {
         const rows = entries.map(entry => ({
-          user_id: userDbId || null,
+          user_db_id: userDbId || anonId,
           anon_user_id: anonId || null,
           subject,
           label: entry.label,
-          questions: entry.questions, // jsonb يقبل object مباشرة
+          questions: entry.questions,
           correct_replays: 0,
           next_play_at: new Date().toISOString(),
         }));
-        const { error: bagError } = await supabase.from('mistakes_bag').insert(rows).select();
-        if (bagError) {
-          console.error('mistakes_bag save error:', bagError.message, bagError.details);
-        }
-      } catch (e) {
-        console.error('Error saving bag items to Supabase:', e);
-      }
+        await supabase.from('mistakes_bag').insert(rows);
+      } catch {}
     }
   };
 
-  const giveXPForChapter = async (correct, total, won = true, chapterNum = 0, stageId = 0) => {
+  const giveXPForChapter = (correct, total, won = true) => {
     if (!won || correct === 0) return; // لا XP عند الخسارة
     const pct = total > 0 ? correct / total : 0;
     const xp = pct === 1 ? 150 : pct >= 0.6 ? 100 : 50;
+    // حفظ XP في localStorage — مفصول حسب المادة
+    const xpKey = `player_xp_${subject}`;
+    const current = parseInt(localStorage.getItem(xpKey) || '0');
+    localStorage.setItem(xpKey, String(current + xp));
+    // تحديث عداد الأسئلة الصحيحة حسب المادة
+    const qKey = `questions_answered_${subject}`;
+    const currentQ = parseInt(localStorage.getItem(qKey) || '0');
+    localStorage.setItem(qKey, String(currentQ + correct));
+    // حفظ في Supabase إذا مستخدم مسجل
     const userDbId = localStorage.getItem('user_db_id');
-    
-    // ✅ حفظ XP في Supabase (مصدر بيانات حقيقي)
     if (userDbId) {
-      try {
-        // استخدم أعمدة أساسية موجودة في معظم جدول users
-        const { data: userData, error: selectErr } = await supabase
-          .from('users')
-          .select('total_xp, total_correct_answers, total_questions_answered')
-          .eq('id', userDbId)
-          .single();
-        
-        if (selectErr) {
-          console.error('users select error:', selectErr.message, '- تأكد من RLS وسلامة جدول users');
-          return;
-        }
-        
-        const currentXp = userData?.total_xp ?? 0;
-        const currentQuestions = userData?.total_questions_answered ?? 0;
-        
-        const { error: updateErr } = await supabase
-          .from('users')
-          .update({
-            total_xp: currentXp + xp,
-            total_correct_answers: (userData?.total_correct_answers || 0) + correct,
-            total_questions_answered: currentQuestions + correct,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', userDbId);
-        
-        if (updateErr) {
-          console.error('users update error:', updateErr.message);
-          return;
-        }
-        console.log(`✅ XP Updated: +${xp} (Total: ${currentXp + xp})`);
-      } catch (e) {
-        console.error('Error updating XP in Supabase:', e);
-      }
-    }
-    
-    // حفظ نسخة محلية كـ cache فقط
-    try {
-      const xpKey = `player_xp_${subject}`;
-      const current = parseInt(localStorage.getItem(xpKey) || '0');
-      localStorage.setItem(xpKey, String(current + xp));
-      const qKey = `questions_answered_${subject}`;
-      const currentQ = parseInt(localStorage.getItem(qKey) || '0');
-      localStorage.setItem(qKey, String(currentQ + correct));
-    } catch {}
-  };
-
-  const saveStageProgressToSupabase = async (userId, subject, chapterNum, stageId, stars) => {
-    try {
-      // التحقق من وجود entry سابق للمرحلة
-      const { data: existing } = await supabase
-        .from('stage_progress')
-        .select('id, stars')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('chapter', chapterNum)
-        .eq('stage', stageId)
-        .maybeSingle();
-
-      if (existing) {
-        // تحديث: احفظ أعلى نجوم
-        if (stars > existing.stars) {
-          await supabase
-            .from('stage_progress')
-            .update({ stars, updated_at: new Date().toISOString() })
-            .eq('id', existing.id);
-        }
-      } else {
-        // إدراج: سجل جديد
-        await supabase
-          .from('stage_progress')
-          .insert({
-            user_id: userId,
-            subject,
-            chapter: chapterNum,
-            stage: stageId,
-            stars,
-            completed_at: new Date().toISOString(),
-          });
-      }
-      console.log(`✅ Stage ${chapterNum}-${stageId} saved with ${stars} stars`);
-    } catch (e) {
-      console.error('Error saving stage progress to Supabase:', e);
+      const xpField = subject === 'biology' ? 'biology_xp' : 'english_xp';
+      supabase.from('users').update({ [xpField]: current + xp }).eq('id', userDbId).catch(() => {});
     }
   };
 
-  const getCompletedStagesFromSupabase = async (userId, subject, chapterNum) => {
-    try {
-      const { data } = await supabase
-        .from('stage_progress')
-        .select('stage, stars')
-        .eq('user_id', userId)
-        .eq('subject', subject)
-        .eq('chapter', chapterNum);
-      
-      const completedStages = data?.map(d => d.stage) || [];
-      const starsMap = {};
-      data?.forEach(d => {
-        starsMap[d.stage] = d.stars;
-      });
-      return { completedStages, starsMap };
-    } catch (e) {
-      console.error('Error fetching completed stages:', e);
-      return { completedStages: [], starsMap: {} };
-    }
-  };
-
-  const saveSessionToSupabase = async (correctCount, totalCount, finalScore, chapterNum = 0, stageId = 0) => {
+  const saveSessionToSupabase = async (correctCount, totalCount, finalScore) => {
     try {
       const userDbId = localStorage.getItem('user_db_id');
       const anonId = localStorage.getItem('anon_user_id');
-      const userEmail = localStorage.getItem('user_email');
       const accuracy = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
-      
-      console.log('saveSession - userDbId:', userDbId, 'accuracy:', accuracy, 'email:', userEmail);
-      
-      // التحقق من وجود user_id في جدول users قبل الإدراج (لتجنب Foreign Key error)
-      let validUserId = null;
-      if (userDbId) {
-        const { data: userCheck } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', userDbId)
-          .maybeSingle();
-        if (userCheck) {
-          validUserId = userDbId;
-        } else {
-          console.warn('user_id not found in users table, using null');
-        }
-      }
-      
-      // ✅ حفظ جلسة العبة مع تفاصيل كاملة (بما فيها email، chapter، stage)
-      const { data: sessData, error: sessError } = await supabase.from('game_sessions').insert({
-        user_id: validUserId || null,  // null إذا لم يكن موجوداً في users
-        user_email: userEmail || null,
-        anon_user_id: anonId || null,  // قد يكون text وليس uuid حسب بنية الجدول
+      await supabase.from('game_sessions').insert({
+        user_id: userProfile?.id || null,
+        anon_user_id: userDbId || anonId || null,
         subject,
-        chapter: chapterNum > 0 ? chapterNum : null,
-        stage: stageId > 0 ? stageId : null,
         question_type: 'chapters',
         game_mode: 'chapter',
         score: finalScore,
@@ -3357,44 +2910,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         questions_correct: correctCount,
         questions_wrong: totalCount - correctCount,
         accuracy,
-        is_guest: !validUserId && !anonId,
+        is_guest: !userDbId && !userProfile?.id,
         speed_mode: speedMode,
-        created_at: new Date().toISOString(),
-      }).select();
-      
-      if (sessError) {
-        console.error('game_sessions save error:', sessError.message, sessError.details);
-        // إذا كان الخطأ بسبب Foreign Key، جرّب بدون user_id
-        if (sessError.message?.includes('foreign key')) {
-          const { error: retryError } = await supabase.from('game_sessions').insert({
-            user_id: null,  // null بدلاً من user_id غير موجود
-            user_email: userEmail || null,
-            anon_user_id: anonId || null,
-            subject,
-            chapter: chapterNum > 0 ? chapterNum : null,
-            stage: stageId > 0 ? stageId : null,
-            question_type: 'chapters',
-            game_mode: 'chapter',
-            score: finalScore,
-            questions_total: totalCount,
-            questions_correct: correctCount,
-            questions_wrong: totalCount - correctCount,
-            accuracy,
-            is_guest: true,
-            speed_mode: speedMode,
-            created_at: new Date().toISOString(),
-          });
-          if (!retryError) {
-            console.log(`✅ Session saved (without user_id): ${correctCount}/${totalCount} (${accuracy}%)`);
-            return;
-          }
-        }
-        throw sessError;
-      }
-      console.log(`✅ Session saved: ${correctCount}/${totalCount} (${accuracy}%)`);
-    } catch (e) { 
-      console.error('saveSession error:', e?.message || e); 
-    }
+      });
+    } catch (e) { console.warn('saveSession error:', e); }
   };
 
   // يُستدعى فقط للأسئلة الوسطى (نهاية اللعبة تُعالج في showFeedbackModal)
@@ -3795,27 +3314,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
                     </div>
                 )}
                 
-                {!isGuest && stageId !== 0 && (
-                  <button 
-                    onClick={() => { if (onStartGame) onStartGame('chapter', subject, userProfile, chapterNum, stageId + 1); else setGameState('menu'); }} 
-                    className="w-full py-4 rounded-xl font-black text-xl text-white bg-purple-500 shadow-lg shadow-purple-500/30 mb-3 hover:scale-105 transition-transform" 
-                    style={{ fontFamily: "'Cairo', sans-serif" }}
-                  >
-                    المرحلة التالية ⏭️
-                  </button>
-                )}
-                {chapterNum < 8 && stageId !== 0 && (
-                  <button 
-                    onClick={() => { if (onExit) onExit(resultStarsRef.current, true); else setGameState('menu'); }} 
-                    className="w-full py-4 rounded-xl font-black text-xl text-white bg-blue-500 shadow-lg shadow-blue-500/30 mb-3 hover:scale-105 transition-transform" 
-                    style={{ fontFamily: "'Cairo', sans-serif" }}
-                  >
-                    الفصل التالي 📖
-                  </button>
-                )}
-                {stageId !== 0 && (
-                  <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>إعادة المرحلة</button>
-                )}
+                <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>لعب مرة أخرى</button>
                 <button onClick={() => { if (onExit) onExit(resultStarsRef.current); else setGameState('menu'); }} className={`w-full py-4 rounded-xl font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>العودة</button>
             </div>
          </div>
@@ -5167,7 +4666,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
                     </div>
                 )}
                 
-                <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>إعادة المرحلة</button>
+                <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>لعب مرة أخرى</button>
                 <button onClick={() => { if (onExit) onExit(); else setGameState('menu'); }} className={`w-full py-4 rounded-xl font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>العودة</button>
             </div>
          </div>

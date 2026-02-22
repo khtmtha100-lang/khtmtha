@@ -147,6 +147,28 @@ export default function AdminDashboard({ onBack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // ── التحكم بالسرعة (محفوظ في localStorage)
+  const [gameSpeed, setGameSpeed] = useState(() => {
+    try { return localStorage.getItem('admin_game_speed') || 'teen'; } catch { return 'teen'; }
+  });
+  const [customSpeeds, setCustomSpeeds] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('admin_custom_speeds') || '{}');
+      return { baby: saved.baby ?? 0.25, teen: saved.teen ?? 0.45, beast: saved.beast ?? 0.75 };
+    } catch { return { baby: 0.25, teen: 0.45, beast: 0.75 }; }
+  });
+  const updateSpeed = (speed) => {
+    setGameSpeed(speed);
+    try { localStorage.setItem('admin_game_speed', speed); } catch {}
+  };
+  const updateCustomSpeed = (key, val) => {
+    const num = parseFloat(val);
+    if (isNaN(num) || num <= 0 || num > 5) return;
+    const next = { ...customSpeeds, [key]: num };
+    setCustomSpeeds(next);
+    try { localStorage.setItem('admin_custom_speeds', JSON.stringify(next)); } catch {}
+  };
+
   const CORRECT_PIN = '0773913';
   const keys = ['1','2','3','4','5','6','7','8','9','','0','del'];
 
@@ -175,15 +197,15 @@ export default function AdminDashboard({ onBack }) {
     try {
       // نستخدم analytics views الجاهزة + queries محددة
       const [
-        { data: summary },
-        { data: bySubject },
-        { data: byMode },
-        { data: allUsers },
-        { count: totalGuests },
-        { data: sessions },
-        { data: stageRows },
-        { data: wrongRows },
-        { data: dailyLogins },
+        { data: summary, error: summaryErr },
+        { data: bySubject, error: bySubjectErr },
+        { data: byMode, error: byModeErr },
+        { data: allUsers, error: usersErr },
+        { count: totalGuests, error: guestsErr },
+        { data: sessions, error: sessionsErr },
+        { data: stageRows, error: stagesErr },
+        { data: wrongRows, error: wrongErr },
+        { data: dailyLogins, error: dailyErr },
       ] = await Promise.all([
         supabase.from('analytics_summary').select('*').limit(1),
         supabase.from('analytics_by_subject').select('*'),
@@ -191,7 +213,7 @@ export default function AdminDashboard({ onBack }) {
         supabase.from('users').select('login_count, total_xp, current_streak, gender, age, region, created_at, last_login, preferred_subject, total_play_time, total_correct_answers, total_questions_answered, total_wrong_answers'),
         supabase.from('guest_sessions').select('*', { count: 'exact', head: true }),
         supabase.from('game_sessions').select('subject, question_type, game_mode, accuracy, score, questions_correct, questions_total, questions_wrong, won, duration_seconds, created_at'),
-        supabase.from('stage_progress').select('stars, stage_number'),
+        supabase.from('stage_progress').select('stars, stage').limit(10000), // إضافة limit وتجاهل الأخطاء
         supabase.from('wrong_answers_inventory').select('times_wrong'),
         supabase.from('daily_active_users').select('date, count').order('date', { ascending: true }).limit(14),
       ]);
@@ -199,7 +221,27 @@ export default function AdminDashboard({ onBack }) {
       const sum = summary?.[0] || {};
       const users = allUsers || [];
       const sess = sessions || [];
-      const stages = stageRows || [];
+      
+      // معالجة stage_progress - إذا فشل الاستعلام، جرّب استعلام أبسط
+      let stages = [];
+      if (stageRows && Array.isArray(stageRows)) {
+        stages = stageRows;
+      } else if (stagesErr) {
+        console.warn('stage_progress query error:', stagesErr.message);
+        // جرّب استعلام أبسط بدون select محدد
+        try {
+          const { data: simpleStages, error: simpleErr } = await supabase.from('stage_progress').select('*').limit(1000);
+          if (simpleErr) {
+            console.warn('Fallback stage_progress query also failed:', simpleErr.message);
+            stages = [];
+          } else {
+            stages = simpleStages || [];
+          }
+        } catch (e) {
+          console.warn('Fallback stage_progress query exception:', e);
+          stages = [];
+        }
+      }
 
       const reg = sum.total_users || users.length || 0;
       const now = new Date();
@@ -253,6 +295,17 @@ export default function AdminDashboard({ onBack }) {
         || sess.reduce((s, r) => s + (r.questions_total || 0), 0);
       const totalWrongFromInventory = (wrongRows || []).reduce((s, w) => s + (w.times_wrong || 1), 0);
 
+      // ── المهمة اليومية: كم شخص أكمل 1+ مرحلة اليوم، وكم أكمل 2+
+      const todayStr = now.toISOString().split('T')[0];
+      const todaySessions = sess.filter(s => s.created_at && s.created_at.startsWith(todayStr));
+      const userSessionsToday = {};
+      todaySessions.forEach(s => {
+        const uid = s.user_id || s.auth_id || 'unknown';
+        userSessionsToday[uid] = (userSessionsToday[uid] || 0) + 1;
+      });
+      const missionUsers1 = Object.values(userSessionsToday).filter(c => c >= 1).length;
+      const missionUsers2 = Object.values(userSessionsToday).filter(c => c >= 2).length;
+
       // ── النجوم
       const stars1 = stages.filter(r => r.stars === 1).length;
       const stars2 = stages.filter(r => r.stars === 2).length;
@@ -302,6 +355,7 @@ export default function AdminDashboard({ onBack }) {
         reg, totalGuests: totalGuests || 0, activeUsers7d,
         avgLogins, avgXp, avgStreak, avgPlayTime, avgAge, avgDailyReturn,
         totalPlayTimeSess,
+        missionUsers1, missionUsers2,
         topRegion: sum.top_region || topRegions[0]?.label || '—',
 
         totalSessions: sess.length,
@@ -463,6 +517,62 @@ export default function AdminDashboard({ onBack }) {
                 sub="سنة" />
               <StatCard label="متوسط الـ XP" value={stats.avgXp} color="text-indigo-400" icon="⚡"
                 sub="لكل مستخدم" />
+            </div>
+
+            {/* ── المهمة اليومية ── */}
+            <div className="bg-slate-800/80 border border-emerald-500/30 rounded-2xl p-4">
+              <p className="text-emerald-400 text-xs font-black mb-3">🎯 المهمة اليومية — اليوم</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-emerald-900/30 rounded-xl p-3 text-center">
+                  <div className="text-2xl font-black text-emerald-400">{stats.missionUsers1}</div>
+                  <div className="text-slate-400 text-[10px] mt-1">أكملوا مرحلة واحدة ✅</div>
+                </div>
+                <div className="bg-yellow-900/30 rounded-xl p-3 text-center">
+                  <div className="text-2xl font-black text-yellow-400">{stats.missionUsers2}</div>
+                  <div className="text-slate-400 text-[10px] mt-1">أكملوا مرحلتين 🏆</div>
+                </div>
+              </div>
+              <p className="text-slate-500 text-[10px] mt-2 text-center">يُحسب من جلسات اللعب اليوم</p>
+            </div>
+
+            {/* ── التحكم بسرعة السؤال النازل ── */}
+            <div className="bg-slate-800/80 border border-yellow-500/30 rounded-2xl p-4">
+              <p className="text-yellow-400 text-xs font-black mb-1">⚡ سرعة السؤال النازل</p>
+              <p className="text-slate-500 text-[10px] mb-3">اضغط الوضع لتفعيله، وغيّر الرقم لضبط السرعة (0.1 = بطيء جداً، 2 = سريع جداً)</p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {[
+                  { key: 'baby', label: '🐣', name: 'رضيع', desc: 'بطيء' },
+                  { key: 'teen', label: '⚡', name: 'متوسط', desc: 'افتراضي' },
+                  { key: 'beast', label: '💀', name: 'وحش', desc: 'سريع' },
+                ].map(s => (
+                  <div key={s.key} className={`p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
+                    gameSpeed === s.key
+                      ? 'bg-yellow-400 border-yellow-300'
+                      : 'bg-slate-700 border-slate-600 hover:border-yellow-500/50'
+                  }`} onClick={() => updateSpeed(s.key)}>
+                    <div className="text-xl mb-0.5">{s.label}</div>
+                    <div className={`text-[11px] font-black mb-1 ${gameSpeed === s.key ? 'text-slate-800' : 'text-slate-300'}`}>{s.name}</div>
+                    <input
+                      type="number"
+                      min="0.1" max="5" step="0.05"
+                      value={customSpeeds[s.key]}
+                      onClick={e => e.stopPropagation()}
+                      onChange={e => updateCustomSpeed(s.key, e.target.value)}
+                      className={`w-full text-center text-sm font-mono font-black rounded-lg p-1 border outline-none transition-all ${
+                        gameSpeed === s.key
+                          ? 'bg-yellow-300 border-yellow-500 text-slate-900'
+                          : 'bg-slate-800 border-slate-600 text-yellow-400'
+                      }`}
+                    />
+                    <div className={`text-[9px] mt-1 ${gameSpeed === s.key ? 'text-slate-700' : 'text-slate-500'}`}>{s.desc}</div>
+                  </div>
+                ))}
+              </div>
+              {gameSpeed && (
+                <div className="text-center text-[10px] text-green-400 font-bold">
+                  ✓ الوضع الحالي: {gameSpeed === 'baby' ? `🐣 رضيع ×${customSpeeds.baby}` : gameSpeed === 'teen' ? `⚡ متوسط ×${customSpeeds.teen}` : `💀 وحش ×${customSpeeds.beast}`} — محفوظ
+                </div>
+              )}
             </div>
 
             {/* النجوم */}

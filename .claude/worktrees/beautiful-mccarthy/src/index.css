@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add this to fix the Arabic layout */
+body {
+  margin: 0;
+  direction: rtl; /* This app is in Arabic, so RTL is better */
+  font-family: 'Cairo', sans-serif;
+}

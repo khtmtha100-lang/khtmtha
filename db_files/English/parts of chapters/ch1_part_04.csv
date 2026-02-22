@@ -1,0 +1,83 @@
+﻿chapterno,stageno,blockno,questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,repeatcount,isgolden,repeatcount_ministerial,explanation
+1,4,1,ch1-p04-054,Get them tested once a year. (Use an imperative to give advice).,Use an imperative to give advice,You should look after your eyes.,Look after your eyes,Please look after your eyes.,Don't forget to look after your eyes.,Look after your eyes,1,True,3,"✅ Imperative = أمر مباشر
+📌 الشكل: ابدأ بالفعل مباشرة بدون subject
+❌ لا تكتب You should أو Please
+🔑 الجواب: Look after your eyes"
+1,4,2,ch1-p04-058,"He (have) his hair cut at the hairdresser's ,but now his wife (cut) it for him. (use the correct form of [use to[ and the present or past simple)",Correct the verb,was haveing,"He used to have his hair cut at the hairdresser's ,but now his wife cuts it for him",would have,didn't use to have,"He used to have his hair cut at the hairdresser's ,but now his wife cuts it for him",1,True,4,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: He used to have his hair cut at the hairdresser's ,but now his wife cuts it for him"
+1,4,3,ch1-p04-063,Girls (not go) to school (Use: use to),Use: use to,Girls didn't use to go to school every day.,Girls didn't use to go to schools,Girls didn't use to go to school,had school,Girls didn't use to go to school,1,False,1,"✅ الجواب الصحيح: Girls didn't use to go to school
+📌 راجع قاعدة Use: use to في الكتاب المدرسي"
+1,4,4,ch1-p04-064,"I (like) travelling, but I don't like it any more. (Use: used to)",Use: used to,was likeing,would like,didn't use to like,"I used to like travelling, but I don't like it anymore","I used to like travelling, but I don't like it anymore",1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: I used to like travelling, but I don't like it anymore"
+1,4,5,ch1-p04-065,How /you have/ fun? (used to),used to,How did you use to have fun? every day.,How did you use to have fun?s,How did you use to have fun?,had fun?,How did you use to have fun?,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: How did you use to have fun?"
+1,4,6,ch1-p04-066,(girls / go to school) ? . (Question with used to),Correct the verb,Did girls use to go to school? every day.,Did girls use to go to school?s,had school?,Did girls use to go to school?,Did girls use to go to school?,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Did girls use to go to school?"
+1,4,7,ch1-p04-069,"She (not / talk ) so much, but now she never stops talking. (Use the correct form of: used to)",Use the correct form of: used to,"used to she talk so much, but now she never stops talking","doesn't use to she talk so much, but now she never stops talking","wouldn't she talk so much, but now she never stops talking","She didn't use to talk so much, but now she never stops talking","She didn't use to talk so much, but now she never stops talking",1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: She didn't use to talk so much, but now she never stops talking"
+1,4,8,ch1-p04-070,(You / go ) to work by car? (Use: used to),Use: used to,Did you use to go to work by car?,Did you use to go to work by car? every day.,Did you use to go to work by car?s,had car?,Did you use to go to work by car?,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Did you use to go to work by car?"
+1,4,9,ch1-p04-071,"There (be) a house here, but they knocked it down two years ago. (Use the correct from of used to)",Use the correct from of used to,was being,"There used to be a house here, but they knocked it down two years ago",would be,didn't use to be,"There used to be a house here, but they knocked it down two years ago",1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: There used to be a house here, but they knocked it down two years ago"
+1,4,10,ch1-p04-072,"We …………… (not walk) around talking on these silly mobile things like you people today. (Use the correct form of 't used to"" )","Use the correct form of 't used to""",used to we walk around talking on these silly mobile things like you people today,We didn't use to walk around talking on these silly mobile things like you people today,doesn't use to we walk around talking on these silly mobile things like you people today,wouldn't we walk around talking on these silly mobile things like you people today,We didn't use to walk around talking on these silly mobile things like you people today,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: We didn't use to walk around talking on these silly mobile things like you people today"
+1,4,11,ch1-p04-073,"Salwa (eat) meat, but now she (be) a vegetarian. (Used to)",Used to,"Salwa used to eat meat, but now she is a vegetarian",was eating,would eat,didn't use to eat,"Salwa used to eat meat, but now she is a vegetarian",1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Salwa used to eat meat, but now she is a vegetarian"
+1,4,12,ch1-p04-074,"He (have) his hair cut at the hairdresser's ,but now his wife cuts it for him. (Use the correct form of 't used to"" )","Use the correct form of 't used to""",was haveing,would have,He used to have his hair cut at the hairdresser's but now his wife cuts it for him,didn't use to have,He used to have his hair cut at the hairdresser's but now his wife cuts it for him,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: He used to have his hair cut at the hairdresser's but now his wife cuts it for him"
+1,4,13,ch1-p04-075,"Films (be) black and white, but now they are usually in colour.(Use the correct form of ""used to 't)","Use the correct form of ""used to 't","Films used to be black and white, but now they are usually in colour",was being,would be,didn't use to be,"Films used to be black and white, but now they are usually in colour",1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Films used to be black and white, but now they are usually in colour"
+1,4,14,ch1-p04-076,"I ( drink ) coffee every morning, but now I drink tea. (Use the correct form of 8’ used to t’)",Use the correct form of 8’ used to t’,was drinking,I used to drink coffee every morning but now I drink tea,would drink,didn't use to drink,I used to drink coffee every morning but now I drink tea,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: I used to drink coffee every morning but now I drink tea "
+1,4,15,ch1-p04-077,"I ( have ) long hair, but now I have short hair. (Use the correct form of used to 'l)",Use the correct form of used to 'l,was haveing,used to have,would have,didn't use to have,used to have,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: used to have"
+1,4,16,ch1-p04-078,"He (not like ) Chinese food, but now he loves it. (Use the correct form of' used to"")","Use the correct form of' used to""",didn't use to like,used to like,doesn't use to like,wouldn't like,didn't use to like,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: didn't use to like"
+1,4,17,ch1-p04-079,"She ( smoke ), but she ( give ) up a few years ago. (Use the correct form of ""used to "" and present or past simple)",Correct the verb,She used to smoke,was smokeing,would smoke,didn't use to smoke,She used to smoke,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: She used to smoke"
+1,4,18,ch1-p04-080,(Films/funny/used to be) . (Use: as....as to make a comparison),Use: as....as to make a comparison,Films are not as funny as they used to be,was being,would be,didn't use to be,Films are not as funny as they used to be,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Films are not as funny as they used to be"
+1,4,19,ch1-p04-081,(education/good).compare today with 50 years.,Correct the verb,was being,Education is better now than it used to be,would be,didn't use to be,Education is better now than it used to be,1,False,1,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: Education is better now than it used to be"
+1,4,20,ch1-p04-067,"I used to have a bicycle, but someone (steal) it last month.",Correct the verb,"I used to have a bicycle, but someone stole it last month",was haveing,would have,didn't use to have,"I used to have a bicycle, but someone stole it last month",1,True,3,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: I used to have a bicycle, but someone stole it last month "
+1,4,21,ch1-p04-068,"There (be) a house here, but they ( knock ) it down two years ago. (Use the correct form of ""used to"" and present or past simple)",Correct the verb,"There used to be a house here, but they knocked it down two years ago",was being,would be,didn't use to be,"There used to be a house here, but they knocked it down two years ago",1,True,3,"✅ used to + فعل = عادة ماضية انتهت
+📌 مثال: I used to play football = كنت ألعب كرة (لكن الآن لا)
+❌ النفي: didn't use to | السؤال: Did...use to?
+🔑 الجواب: There used to be a house here, but they knocked it down two years ago"

@@ -1,0 +1,70 @@
+﻿chapterno,stageno,blockno,questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,repeatcount,isgolden,repeatcount_ministerial,explanation
+1,1,1,ch1-p01-002,A thief took our clothes as we were (swim). (Correct),Correct,swam,A thief took our clothes as we were swimming,swims,is swimming,A thief took our clothes as we were swimming,1,True,3,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: A thief took our clothes as we were swimming"
+1,1,2,ch1-p01-007,She (tell) us to be quiet as we (make) too much noise. (Put one verb in the past simple and one in the past contin(,Correct the verb,told,tells,She told us to be quite as we were making too much noise,is telling,She told us to be quite as we were making too much noise,1,True,3,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: She told us to be quite as we were making too much noise"
+1,1,3,ch1-p01-001,Khalid (play) football when he broke his ankle. (Correct),Correct,played,was playing,plays,is playing,was playing,1,False,2,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: was playing"
+1,1,4,ch1-p01-003,She told us to be quiet as we ................ (make) too much noise. (Correct the form of the verb),Correct the form of the verb,made,were making,makes,is making,were making,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: were making"
+1,1,5,ch1-p01-004,(clean) my room and I (find) E30 under my bed. (Put one verb in the past continuous and one in the past simple),Correct the verb,cleaned,cleans,I was cleaning my room and I found E30 under my bed,is cleaning,I was cleaning my room and I found E30 under my bed,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: I was cleaning my room and I found E30 under my bed"
+1,1,6,ch1-p01-005,I (sit) in the park when someone kicked a ball at me.,Correct the verb,sat,sits,is sitting,was sitting,was sitting,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: was sitting"
+1,1,7,ch1-p01-006,My cousin hid my purse under the stair while I ............. (not / look)[Put the verb in the correct,Correct the verb,was looking,didn't look,isn't looking,wasn't looking,wasn't looking,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: wasn't looking"
+1,1,8,ch1-p01-008,We were speeding when we (see)the police car. (correct),correct,sees,is seeing,saw,was seeing,saw,1,False,1,"✅ Past Simple = فعل انتهى في الماضي
+📌 مع when = الحدث القاطع يكون Past Simple
+🔑 الجواب: saw"
+1,1,9,ch1-p01-009,"While my baggage (go) through the X-ray machine, I walked through the metal detector. (correct)",correct,went,was going,goes,is going,was going,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: was going"
+1,1,10,ch1-p01-010,They …………. in the desert when they …………. a large snake . (camp / see),Correct the verb,camped,were camping,camps,is camping,were camping,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: were camping"
+1,1,11,ch1-p01-011,"Luckily, Sharifa didn't drive very fast. The child ran into the road. (Join use: whe",Correct the verb,"Luckily, Sharifa wasn't driving very fast when the child ran into the road every day.","Luckily, Sharifa wasn't driving very fast when the child ran into the roads",had road,"Luckily, Sharifa wasn't driving very fast when the child ran into the road","Luckily, Sharifa wasn't driving very fast when the child ran into the road",1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: Luckily, Sharifa wasn't driving very fast when the child ran into the road"
+1,1,12,ch1-p01-012,"As he was running, he……………….(fall) down. (Put the verb in the correct form)",Put the verb in the correct form,fell,falls,is falling,was falling,fell,1,False,2,"✅ Past Simple = فعل انتهى في الماضي
+📌 مع when = الحدث القاطع يكون Past Simple
+🔑 الجواب: fell"
+1,1,13,ch1-p01-013,My sister (hide) my purse under the bed while I (not look) . (Correct),Correct,hid,hides,is hiding,was hiding,hid,1,False,1,"✅ Past Simple = فعل انتهى في الماضي
+📌 مع when = الحدث القاطع يكون Past Simple
+🔑 الجواب: hid"
+1,1,14,ch1-p01-014,"While Salam was driving too fast, a boy (run) on the road. (Correct the verb)",Correct the verb,ran,runs,is running,was running,ran,1,False,1,"✅ Past Simple = فعل انتهى في الماضي
+📌 مع when = الحدث القاطع يكون Past Simple
+🔑 الجواب: ran"
+1,1,15,ch1-p01-015,He twisted his ankle while he ( Play ) football.,Correct the verb,played,was playing,plays,is playing,was playing,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: was playing"
+1,1,16,ch1-p01-016,My phone rang while we (watch) the movie . (Correct the verb),Correct the verb,watched,were watching,watches,is watching,were watching,1,False,1,"✅ Past Continuous مع while/as/when
+📌 الحدث المستمر: was/were + فعل+ing
+📌 الحدث القاطع: Past Simple
+🔑 الجواب: were watching"
+1,1,17,ch1-p01-017,"As she was doing the washing up, she (drop) on . (Correct)",Correct,drops,is dropping,was dropping,dropped,dropped,1,False,1,"✅ الجواب الصحيح: dropped
+📌 راجع قاعدة Correct في الكتاب المدرسي"
+1,1,18,ch1-p01-018,He (fall) over as he (come) down the stairs. (Put the verbs in brackets in the correct form),Correct the verb,dropped,drops,is dropping,was dropping,dropped,1,False,1,"✅ الجواب الصحيح: dropped
+📌 راجع قاعدة Correct the verb في الكتاب المدرسي"
+1,1,19,ch1-p01-022,"While Ali was having a shower, somebody (knock) at the Front door. (Correct the form of the verb)",Correct the form of the verb,knocks,is knocking,was knocking,knocked,knocked,1,True,3,"✅ الجواب الصحيح: knocked
+📌 راجع قاعدة Correct the form of the verb في الكتاب المدرسي"
+1,1,20,ch1-p01-024,I was eating breakfast and a bird (fly) into the kitchen. (Correct the form of the verb),Correct the form of the verb,flies,is flying,was flying,flew,flew,1,True,3,"✅ Past Simple = فعل انتهى في الماضي
+📌 مع when = الحدث القاطع يكون Past Simple
+🔑 الجواب: flew"
