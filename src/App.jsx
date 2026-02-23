@@ -1204,8 +1204,13 @@ const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onSt
      const isLevelUnlocked = (stageId) => {
          if (isGuest) return false;
          if (hasDemo) {
-             // الفصل الأول: الديمو مفتوح، وبعد إكماله تنفتح المراحل بالتسلسل
-             return completedStages.includes(0) && (stageId === 1 || completedStages.includes(stageId - 1));
+          // الفصل الأول:
+          // - الديمو (0) مفتوح دائماً
+          // - المرحلة 1 مفتوحة دائماً بعد تسجيل الدخول
+          // - المراحل التالية تُفتح بالتسلسل اعتماداً على Supabase
+          if (stageId === 0) return true;
+          if (stageId === 1) return true;
+          return completedStages.includes(stageId - 1);
          }
          // الفصول 2-8: المرحلة 1 دائماً مفتوحة، والباقي بالتسلسل
          if (stageId === 1) return true;
