@@ -1993,11 +1993,12 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
 
       <SoftBackground isDarkMode={isDarkMode} />
 
-      {!isLoggedIn || showCompleteProfile ? (
+      {(!isLoggedIn || showCompleteProfile || pendingGoogleUser) ? (
           <LoginView
             isDarkMode={isDarkMode}
             onLoginSuccess={handleLoginSuccess}
-            pendingGoogleUser={showCompleteProfile ? pendingGoogleUser : null}
+            // عند وجود pendingGoogleUser نمرّره دائماً حتى لو صار there is any timing issue
+            pendingGoogleUser={pendingGoogleUser}
             onGoogleProfileComplete={(profileData) => {
               const name = profileData.name;
               const age = profileData.age || null;
