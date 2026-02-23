@@ -1594,6 +1594,8 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
   };
 
   const handleLoginSuccess = async (data, guestMode = false) => {
+      // دخول ناجح → امسح علامة تسجيل الخروج حتى لا تمنع استعادة الجلسة
+      try { sessionStorage.removeItem('user_logged_out'); } catch {}
       setIsLoggedIn(true);
       if (onGuestModeChange) onGuestModeChange(guestMode);
       if (!guestMode) {
@@ -1818,13 +1820,8 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
         const user = session.user;
         // مستخدم Google جديد أو عائد
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الجلسة
-          const loggedOut = sessionStorage.getItem('user_logged_out');
-          if (loggedOut === '1') {
-            console.log('⚠️ Ignoring', event, 'after logout - signing out');
-            await supabase.auth.signOut();
-            return;
-          }
+          // دخول جديد/تحديث توكن ناجح → امسح علامة تسجيل الخروج
+          try { sessionStorage.removeItem('user_logged_out'); } catch {}
           // تنظيف URL بعد المصادقة الناجحة
           cleanAuthParams();
           
