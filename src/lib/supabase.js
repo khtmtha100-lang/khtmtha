@@ -9,10 +9,13 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // تسجيل الدخول بجوجل
 export const signInWithGoogle = async () => {
+  // استخدام URL الحالي الفعلي (يعمل في localhost و Vercel)
+  // يمكن استخدام متغير بيئة VITE_SITE_URL للإنتاج، أو URL الحالي
+  const redirectUrl = import.meta.env.VITE_SITE_URL || (window.location.origin + window.location.pathname);
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: redirectUrl,
     },
   });
   if (error) throw error;

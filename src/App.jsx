@@ -468,9 +468,12 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
         setGoogleLoading(true);
         setFieldError('');
         try {
+            // استخدام URL الحالي الفعلي (يعمل في localhost و Vercel)
+            // يمكن استخدام متغير بيئة VITE_SITE_URL للإنتاج، أو URL الحالي
+            const redirectUrl = import.meta.env.VITE_SITE_URL || (window.location.origin + window.location.pathname);
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin },
+                options: { redirectTo: redirectUrl },
             });
             if (error) throw error;
         } catch {
