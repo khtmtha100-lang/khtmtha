@@ -1793,15 +1793,14 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
     };
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // إذا المستخدم سجّل خروجاً، تجاهل أي أحداث جلسة (بما فيها TOKEN_REFRESHED)
+      // إذا المستخدم سجّل خروجاً، تجاهل أي أحداث جلسة قديمة
+      // لكن اسمح بحدث SIGNED_IN كجلسة جديدة تمهيداً لدخول جديد
       const loggedOut = sessionStorage.getItem('user_logged_out');
-      if (loggedOut === '1') {
+      if (loggedOut === '1' && event !== 'SIGNED_IN') {
         if (session?.user) {
-          // هناك جلسة متبقية → امسحها فوراً
           console.log('⚠️ Session detected after logout, signing out...');
           await supabase.auth.signOut();
         }
-        // لا نستعيد الجلسة حتى لو كان event === 'TOKEN_REFRESHED'
         return;
       }
       
