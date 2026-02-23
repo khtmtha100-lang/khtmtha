@@ -551,6 +551,18 @@ const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoo
     const isGFlow = typeof step === 'string' && step.startsWith('g');
     const numericStep = isGFlow ? ({'g1':1,'g2':2,'g3':3}[step]) : 1;
 
+    // إذا رجعنا من Google وبعدها تم ضبط pendingGoogleUser من الأعلى،
+    // نتأكد أننا نحول مباشرة إلى خطوة g1 لأول مرة
+    useEffect(() => {
+        if (pendingGoogleUser && !isGFlow) {
+            setStep('g1');
+            setFormData(prev => ({
+                ...prev,
+                name: pendingGoogleUser.name || prev.name || ''
+            }));
+        }
+    }, [pendingGoogleUser, isGFlow]);
+
     const renderFields = (s, onNext) => (<>
         {(s === 'g1') && (<>
             <h3 className={`text-xl font-black text-center mb-2 ${isDarkMode?'text-white':'text-slate-800'}`}>أهلاً! شنو اسمك؟ 👋</h3>
