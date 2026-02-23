@@ -1663,7 +1663,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
       } catch {}
       
       setIsLoggedIn(false);
-      setIsGuest(false);
+      if (onGuestModeChange) onGuestModeChange(false);
       setProfileMenuOpen(false);
       setCurrentView('home');
       setShowTutorial(false);
