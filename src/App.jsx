@@ -86,6 +86,7 @@ import {
   signInWithGoogle, signOut, getSession,
   getUserProfile,
 } from './lib/supabase.js';
+import { EnIcon, TutorialHand, TooltipOverlay, SoftBackground, TactileButton, ToastNotification } from './components/ui/common.jsx';
 import { 
   ArrowLeft,
   Baby,
@@ -145,6 +146,40 @@ import {
   VolumeX,
   X
 } from 'lucide-react';
+import LevelsView from './screens/LevelsView.jsx';
+import ResultScreen from './screens/ResultScreen.jsx';
+import { CH_MESSAGES } from './constants/chapterMessages.js';
+import { getCHQuestions } from './data/chapterQuestions.js';
+import { loadAllStageProgress } from './services/progressService.js';
+
+// ── Answer correctness helpers ─────────────────────────────────────
+const normalizeAnswerText = (s) =>
+  (s ?? '')
+    .toString()
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+
+// Supabase `correctanswer` may be either:
+// - a/b/c/d letter, or
+// - the full correct option text
+const resolveCorrectAnswerText = (q) => {
+  const aRaw = (q?.a ?? '').toString().trim();
+  const options = Array.isArray(q?.options) ? q.options : [];
+
+  const letters = ['a', 'b', 'c', 'd'];
+  const idx = letters.indexOf(aRaw.toLowerCase());
+  if (idx !== -1) return (options[idx] ?? '').toString();
+
+  const normA = normalizeAnswerText(aRaw);
+  const matched = options.find(opt => normalizeAnswerText(opt) === normA);
+  if (matched != null) return matched.toString();
+
+  return aRaw;
+};
+
+// إجمالي المراحل لكل فصل (حسب تقسيمك الحالي في Supabase/الواجهة)
+const getTotalStagesForChapter = (chapterNum) => (chapterNum === 1 ? 30 : 12); // الفصل1: ديمو(0) + 29 مرحلة
 
 const questionData = {
   english: {
@@ -331,107 +366,7 @@ export default function App() {
 // ╚═══════════════════════════════════════════════════════════╝
 
 // --- 1. المكونات المساعدة والتعريفات ---
-
-const EnIcon = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M3 7v10h5" /><path d="M3 12h4" /><path d="M3 7h5" />
-    <path d="M14 17v-10l7 10v-10" />
-  </svg>
-);
-
-// مكون اليد الموجهة (من الجانب)
-const TutorialHand = ({ text = "اضغط هنا" }) => (
-  <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center animate-bounce">
-    <div className="bg-yellow-400 text-yellow-900 text-sm font-black px-4 py-2 rounded-2xl shadow-lg border-2 border-yellow-200 whitespace-nowrap">
-      {text}
-    </div>
-    {/* سهم يشير للأسفل */}
-    <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-yellow-400 mt-0.5" />
-  </div>
-);
-
-// فقاعة الشرح (Tooltip Overlay)
-const TooltipOverlay = ({ title, text, onClose, targetRef }) => {
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-[2px] animate-fade-in" onClick={onClose}>
-            <div 
-                className="bg-white dark:bg-[#2A2640] p-6 rounded-[2rem] max-w-sm w-full shadow-2xl border-4 border-yellow-400 relative animate-pop-in"
-                onClick={(e) => e.stopPropagation()} // Prevent closing if clicking inside
-            >
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center border-4 border-white dark:border-[#2A2640]">
-                    <Info className="w-7 h-7 text-yellow-900" />
-                </div>
-                <div className="mt-4 text-center">
-                    <h3 className="text-xl font-black mb-2 text-slate-800 dark:text-white">{title}</h3>
-                    <p className="text-slate-600 dark:text-slate-300 font-bold text-sm leading-relaxed mb-6">
-                        {text}
-                    </p>
-                    <button 
-                        onClick={onClose}
-                        className="bg-yellow-400 text-yellow-900 px-8 py-3 rounded-xl font-black shadow-lg hover:scale-105 transition-transform w-full"
-                    >
-                        فهمت عليك! 👍
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const SoftBackground = ({ isDarkMode }) => (
-  <div className={`fixed inset-0 -z-10 transition-colors duration-500 ${isDarkMode ? 'bg-[#1E1B2E]' : 'bg-[#FFFBF5]'}`}>
-    <div className={`absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[60px] opacity-15 mix-blend-multiply animate-float-slow ${isDarkMode ? 'bg-purple-900' : 'bg-[#FFE4E6]'}`} />
-    <div className={`absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full blur-[60px] opacity-15 mix-blend-multiply animate-float-delayed ${isDarkMode ? 'bg-indigo-900' : 'bg-[#E0F2FE]'}`} />
-    <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-  </div>
-);
-
-const TactileButton = ({ children, onClick, className, colorClass, borderClass, shadowColor = "", isDarkMode, disabled, activeScale = true, type = "button", style, id }) => {
-  return (
-    <button 
-      id={id}
-      type={type}
-      disabled={disabled}
-      onClick={(e) => { triggerHaptic(); if(onClick) onClick(e); }}
-      style={style}
-      className={`
-        relative group transition-all duration-150 ease-out
-        border-2 border-b-[6px] 
-        ${activeScale ? 'active:border-b-2 active:translate-y-[4px] active:scale-[0.98]' : ''}
-        rounded-[20px] flex items-center justify-center
-        ${disabled ? 'opacity-80' : ''}
-        ${className}
-        ${colorClass}
-        ${borderClass}
-        ${shadowColor}
-        shadow-sm
-      `}
-    >
-      {children}
-    </button>
-  );
-};
-
-const ToastNotification = ({ message, icon: Icon, isVisible, type = 'info' }) => {
-  return (
-    <div 
-      className={`fixed top-24 left-1/2 transform -translate-x-1/2 z-[150] transition-all duration-500 cubic-bezier(0.68, -0.55, 0.27, 1.55) w-[90%] max-w-sm
-      ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0 pointer-events-none'}
-      `}
-    >
-      <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl border-b-4 backdrop-blur-md justify-center text-center relative overflow-hidden
-        ${type === 'fire' ? 'bg-orange-500 border-orange-700 text-white' : 
-          type === 'love' ? 'bg-rose-500 border-rose-700 text-white' :
-          type === 'info' ? 'bg-blue-600 border-blue-800 text-white' : 
-          'bg-slate-800 border-slate-950 text-white'}
-      `}>
-        <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10"></div>
-        {Icon && <Icon className={`w-6 h-6 shrink-0 ${type === 'love' ? 'animate-pulse' : 'animate-bounce'}`} />}
-        <span className="font-bold text-sm leading-snug">{message}</span>
-      </div>
-    </div>
-  );
-};
+// (تم نقل UI helpers إلى `src/components/ui/common.jsx`)
 
 const handleShareChallenge = async (title, text) => {
     const shareData = {
@@ -1054,7 +989,7 @@ const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick, completedToday = 
 // واجهة الفصول (ChaptersView)
 const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin, userProfile, subject = 'english' }) => {
     const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
-    const STAGES_PER_CHAPTER = 12; // 12 مرحلة لكل فصل
+    const STAGES_PER_CHAPTER = 12; // للفصول 2-8
 
     const handleChapterClick = (num) => {
         if (isGuest && num > 1) {
@@ -1064,14 +999,36 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
         }
     };
 
-    // حساب نسبة إكمال فصل معين من localStorage
+    // حساب نسبة إكمال فصل معين (Supabase أولاً، ثم cache localStorage)
+    const [supabaseDoneMap, setSupabaseDoneMap] = useState({}); // { [chapterNum]: Set(stages) }
+    useEffect(() => {
+        const userDbId = (() => { try { return localStorage.getItem('user_db_id'); } catch { return null; } })();
+        if (isGuest || !userDbId) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                const rows = await loadAllStageProgress({ userDbId, subject });
+                if (cancelled) return;
+                const map = {};
+                rows.forEach(r => {
+                    const ch = Number(r.chapter);
+                    const st = Number(r.stage);
+                    if (!map[ch]) map[ch] = new Set();
+                    map[ch].add(st);
+                });
+                setSupabaseDoneMap(map);
+            } catch {}
+        })();
+        return () => { cancelled = true; };
+    }, [isGuest, subject]);
+
     const getChapterProgress = (num) => {
-        try {
-            const done = JSON.parse(localStorage.getItem(`stage_done_${subject}_ch${num}`) || '[]');
-            // الفصل 1 فيه ديمو (0) + 12 مرحلة = 13 إجمالاً
-            const total = num === 1 ? STAGES_PER_CHAPTER + 1 : STAGES_PER_CHAPTER;
-            return Math.min(100, Math.round((done.length / total) * 100));
-        } catch { return 0; }
+        const total = getTotalStagesForChapter(num);
+        const supaSet = supabaseDoneMap[num];
+        if (supaSet && total > 0) {
+            return Math.min(100, Math.round((supaSet.size / total) * 100));
+        }
+        return 0;
     };
 
     const getProgressColor = (p) => {
@@ -1147,159 +1104,7 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
     );
 };
 
-// واجهة المراحل (LevelsView)
-const LevelsView = ({ isDarkMode, chapterNum, onBack, isGuest, onShowLogin, onStartGame, subject = 'english', userDbId }) => {
-     const hasDemo = chapterNum === 1;
-     const [completedStages, setCompletedStages] = useState([]);
-     const [starsMap, setStarsMap] = useState({});
-     const [loading, setLoading] = useState(false);
-
-     // قراءة المراحل المكتملة من Supabase (مصدر حقيقي للبيانات)
-     useEffect(() => {
-         const fetchStages = async () => {
-             if (isGuest || !userDbId) {
-                 setCompletedStages([]);
-                 setStarsMap({});
-                 return;
-             }
-             setLoading(true);
-             try {
-                 const { data } = await supabase
-                     .from('stage_progress')
-                     .select('stage, stars')
-                     .eq('user_id', userDbId)
-                     .eq('subject', subject)
-                     .eq('chapter', chapterNum);
-                 
-                 const stages = data?.map(d => d.stage) || [];
-                 const stars = {};
-                 data?.forEach(d => {
-                     stars[d.stage] = d.stars;
-                 });
-                 setCompletedStages(stages);
-                 setStarsMap(stars);
-                 console.log(`✅ Loaded ${stages.length} completed stages for Ch${chapterNum}`);
-             } catch (e) {
-                 console.error('Error fetching completed stages from Supabase:', e);
-                 setCompletedStages([]);
-                 setStarsMap({});
-             } finally {
-                 setLoading(false);
-             }
-         };
-         fetchStages();
-     }, [userDbId, subject, chapterNum, isGuest]);
-
-     // قراءة عدد النجوم لكل مرحلة
-     const getStageStars = (stageId) => {
-         return starsMap[stageId] || 0;
-     };
-
-     // عدد المراحل حسب الفصل (الفصل 1 = 28 مرحلة من Supabase)
-     const STAGES_COUNT = chapterNum === 1 ? 29 : 12;
-
-     // منطق الفتح:
-     // الفصل 1: ديمو فقط مفتوح — بعد إكمال الديمو تنفتح المراحل بالتدريج
-     // الفصل 2-8: مرحلة 1 مفتوحة دائماً — المرحلة N تُفتح بعد إكمال N-1
-     const isLevelUnlocked = (stageId) => {
-         if (isGuest) return false;
-         if (hasDemo) {
-          // الفصل الأول:
-          // - الديمو (0) مفتوح دائماً
-          // - المرحلة 1 مفتوحة دائماً بعد تسجيل الدخول
-          // - المراحل التالية تُفتح بالتسلسل اعتماداً على Supabase
-          if (stageId === 0) return true;
-          if (stageId === 1) return true;
-          return completedStages.includes(stageId - 1);
-         }
-         // الفصول 2-8: المرحلة 1 دائماً مفتوحة، والباقي بالتسلسل
-         if (stageId === 1) return true;
-         return completedStages.includes(stageId - 1);
-     };
-
-     let levelsList = Array.from({ length: STAGES_COUNT }, (_, i) => {
-         const id = i + 1;
-         return {
-             id,
-             locked: !isLevelUnlocked(id),
-             stars: getStageStars(id),
-         };
-     });
-
-     if (hasDemo) {
-         levelsList = [
-             { id: 0, isDemo: true, locked: isGuest, stars: getStageStars(0) },
-             ...levelsList
-         ];
-     }
-
-     const handleLevelClick = (level) => {
-         if (level.locked) {
-             onShowLogin();
-             return;
-         }
-         // حفظ آخر مكان وصل إليه اللاعب
-         try {
-             localStorage.setItem(`last_chapter_${subject}`, String(chapterNum));
-             localStorage.setItem(`last_stage_${subject}`, String(level.id));
-         } catch {}
-         onStartGame('chapter', subject, null, chapterNum, level.id);
-     };
-
-    return (
-        <div className="animate-fade-in-up pb-32">
-            <div className="flex items-center gap-4 mb-8">
-                <TactileButton onClick={() => onBack('chapters')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}><ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} /></TactileButton>
-                <div><h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>الفصل {chapterNum}</h2><p className="text-sm font-bold text-slate-400">{isGuest ? 'يرجى تسجيل الدخول' : loading ? '⏳ جاري التحميل...' : 'أكمل المراحل لفتح التحدي'}</p></div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-                {levelsList.map((level) => (
-                    <div key={level.id} className="flex flex-col items-center gap-2">
-                        <TactileButton 
-                            onClick={() => handleLevelClick(level)}
-                            className={`w-full aspect-[4/5] rounded-[24px] flex flex-col items-center justify-center gap-1 relative overflow-hidden group transition-transform active:scale-95 
-                                ${level.locked 
-                                    ? 'opacity-80 grayscale' 
-                                    : level.isDemo 
-                                        ? 'shadow-lg shadow-purple-500/20' // Special shadow for demo
-                                        : 'shadow-lg shadow-indigo-500/20'}
-                            `}
-                            colorClass={
-                                level.locked 
-                                    ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-200') 
-                                    : level.isDemo
-                                        ? (isDarkMode ? 'bg-purple-600' : 'bg-[#8B5CF6]') // Purple for Demo
-                                        : (isDarkMode ? 'bg-indigo-600' : 'bg-[#8B5CF6]')
-                            }
-                            borderClass={
-                                level.locked 
-                                    ? (isDarkMode ? 'border-slate-800' : 'border-slate-300') 
-                                    : level.isDemo
-                                        ? (isDarkMode ? 'border-purple-800' : 'border-[#7C3AED]')
-                                        : (isDarkMode ? 'border-indigo-800' : 'border-[#7C3AED]')
-                            }
-                        >
-                            {level.isDemo ? (
-                                <>
-                                    <span className="text-4xl font-black text-white drop-shadow-md">0</span>
-                                    <span className="text-[10px] font-bold text-purple-100 bg-black/20 px-2 py-0.5 rounded-full mt-1">ديمو</span>
-                                </>
-                            ) : (
-                                <span className={`text-6xl font-black drop-shadow-md ${level.locked ? 'text-slate-400' : 'text-white'}`}>{level.id}</span>
-                            )}
-                            
-                            {level.locked ? <Lock className="w-8 h-8 text-slate-400 mt-2" /> : (
-                                !level.isDemo && <div className="flex gap-1 mt-2">{[1, 2, 3].map(s => <Star key={s} className={`w-5 h-5 drop-shadow-sm ${s <= level.stars ? 'text-yellow-300 fill-yellow-300' : 'text-white/30'}`} />)}</div>
-                            )}
-                            {level.isDemo && <div className="flex gap-1 mt-2"><Gamepad2 className="w-5 h-5 text-white opacity-80" /></div>}
-                        </TactileButton>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
+// LevelsView تم نقله إلى `src/screens/LevelsView.jsx`
 
 // واجهة المراجعات
 const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick, onStartGame, subject = 'english', userProfile }) => {
@@ -1560,6 +1365,69 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
     return { name: 'English', icon: EnIcon };
   });
   const subject = selectedSubject.name === 'الأحياء' ? 'biology' : 'english';
+
+  // ── Journey progress (تابع رحلتك) — من Supabase فقط لكل حساب ─────
+  const [journeyPct, setJourneyPct] = useState(0);
+  const [resumeChapter, setResumeChapter] = useState(null);
+  const [resumeStage, setResumeStage] = useState(null);
+
+  useEffect(() => {
+    if (isGuest || !isLoggedIn) {
+      setJourneyPct(0);
+      setResumeChapter(null);
+      setResumeStage(null);
+      return;
+    }
+
+    // نستخدم auth uid (anon_user_id) كمفتاح user_id في stage_progress
+    let authUserId = null;
+    try {
+      authUserId = localStorage.getItem('anon_user_id');
+    } catch {
+      authUserId = null;
+    }
+    if (!authUserId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // 1️⃣ من Supabase فقط
+        const rows = await loadAllStageProgress({ userDbId: authUserId, subject });
+        if (cancelled) return;
+        const supaSet = new Set(rows.map(r => `${Number(r.chapter)}:${Number(r.stage)}`));
+
+        // حساب آخر مرحلة مكتملة (للـ resume)
+        if (rows && rows.length > 0) {
+          // sort by chapter ثم stage
+          const sorted = [...rows].sort((a, b) => {
+            if (a.chapter === b.chapter) return a.stage - b.stage;
+            return a.chapter - b.chapter;
+          });
+          const last = sorted[sorted.length - 1];
+          setResumeChapter(last.chapter);
+          setResumeStage(last.stage);
+        } else {
+          setResumeChapter(null);
+          setResumeStage(null);
+        }
+
+        let totalStages = 0;
+        for (let ch = 1; ch <= 8; ch++) {
+          totalStages += getTotalStagesForChapter(ch);
+        }
+        const completedCount = supaSet.size;
+        const pct = totalStages > 0 ? Math.min(100, Math.round((completedCount / totalStages) * 100)) : 0;
+        setJourneyPct(pct);
+      } catch {
+        // لو Supabase فيه مشكلة نخليها 0% فقط
+        setJourneyPct(0);
+        setResumeChapter(null);
+        setResumeStage(null);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [isGuest, isLoggedIn, subject]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [monsterSheetOpen, setMonsterSheetOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -2106,70 +1974,51 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
                             {showTutorial && isGuest && (
                                 <TutorialHand text="جرب مجاناً — اضغط هنا! 🎮" />
                             )}
-                            {(() => {
-                                // حساب النسبة المئوية الحقيقية من المراحل المكتملة
-                                const TOTAL_STAGES = 28 + 7 * 12 + 1; // الفصل1=28 + فصول2-8×12 + 1 ديمو = 113
-                                let completedCount = 0;
-                                for (let ch = 1; ch <= 8; ch++) {
-                                    try {
-                                        const done = JSON.parse(localStorage.getItem(`stage_done_${subject}_ch${ch}`) || '[]');
-                                        completedCount += done.length;
-                                    } catch {}
-                                }
-                                const progressPct = Math.min(100, Math.round((completedCount / TOTAL_STAGES) * 100));
-
-                                // آخر مكان وصله اللاعب
-                                const lastChapter = parseInt(localStorage.getItem(`last_chapter_${subject}`) || '0');
-
-                                return (
-                                    <TactileButton
-                                        onClick={() => {
-                                            setShowTutorial(false);
-                                            if (isGuest) {
-                                                // الضيف: الديمو مباشرة
-                                                onStartGame('chapter', subject, null, 1, 0);
+                            {(() => (
+                                <TactileButton
+                                    onClick={() => {
+                                        setShowTutorial(false);
+                                        if (isGuest) {
+                                            onStartGame('chapter', subject, null, 1, 0);
+                                        } else {
+                                            if (resumeChapter != null && resumeStage != null) {
+                                                onStartGame('chapter', subject, null, resumeChapter, resumeStage);
                                             } else {
-                                                const lastCh = parseInt(localStorage.getItem(`last_chapter_${subject}`) || '0');
-                                                const lastSt = parseInt(localStorage.getItem(`last_stage_${subject}`) || '0');
-                                                if (lastCh > 0) {
-                                                    // فتح المرحلة الأخيرة مباشرة
-                                                    onStartGame('chapter', subject, null, lastCh, lastSt);
-                                                } else {
-                                                    // أول مرة: الديمو
-                                                    onStartGame('chapter', subject, null, 1, 0);
-                                                }
+                                                onStartGame('chapter', subject, null, 1, 0);
                                             }
-                                        }}
-                                        className={`w-full mb-6 p-6 rounded-[32px] group border-2 relative overflow-hidden
-                                            ${showTutorial && isGuest ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}
-                                        `}
-                                        colorClass="bg-gradient-to-br from-indigo-500 to-blue-600"
-                                        borderClass="border-indigo-700"
-                                    >
-                                        <div className="w-full flex items-center justify-between z-20 relative">
-                                            <div className="flex flex-col items-start gap-1">
-                                                <span className="text-2xl font-black text-white drop-shadow-md">{isGuest ? 'جرب التحدي مجاناً 🎮' : 'تابع رحلتك 🚀'}</span>
-                                                <span className="text-sm font-bold text-indigo-100 opacity-90">
-                                                    {isGuest ? 'العب أول مرحلة واكتشف مستواك!' : (lastChapter > 0 ? `الفصل ${lastChapter}` : 'ابدأ رحلتك الآن!')}
-                                                </span>
+                                        }
+                                    }}
+                                    className={`w-full mb-6 p-6 rounded-[32px] group border-2 relative overflow-hidden
+                                        ${showTutorial && isGuest ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}
+                                    `}
+                                    colorClass="bg-gradient-to-br from-indigo-500 to-blue-600"
+                                    borderClass="border-indigo-700"
+                                >
+                                    <div className="w-full flex items-center justify-between z-20 relative">
+                                        <div className="flex flex-col items-start gap-1">
+                                            <span className="text-2xl font-black text-white drop-shadow-md">{isGuest ? 'جرب التحدي مجاناً 🎮' : 'تابع رحلتك 🚀'}</span>
+                                            <span className="text-sm font-bold text-indigo-100 opacity-90">
+                                                {isGuest
+                                                  ? 'العب أول مرحلة واكتشف مستواك!'
+                                                  : (resumeChapter != null ? `الفصل ${resumeChapter}` : 'ابدأ رحلتك الآن!')}
+                                            </span>
+                                        </div>
+                                        {isGuest ? (
+                                            <div className="flex flex-col items-center leading-tight">
+                                                <span className="text-3xl font-black text-white drop-shadow-lg">5</span>
+                                                <span className="text-[10px] font-bold text-yellow-300 text-center leading-tight">أسئلة<br/>سريعة</span>
                                             </div>
-                                            {isGuest ? (
-                                                <div className="flex flex-col items-center leading-tight">
-                                                    <span className="text-3xl font-black text-white drop-shadow-lg">5</span>
-                                                    <span className="text-[10px] font-bold text-yellow-300 text-center leading-tight">أسئلة<br/>سريعة</span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-5xl font-black text-white drop-shadow-lg tracking-tighter" style={{ textShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
-                                                    {progressPct}<span className="text-2xl">%</span>
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="absolute bottom-0 left-0 right-0 h-3 bg-black/20">
-                                            <div className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.9)]" style={{ width: isGuest ? '0%' : `${progressPct}%` }}></div>
-                                        </div>
-                                    </TactileButton>
-                                );
-                            })()}
+                                        ) : (
+                                            <span className="text-5xl font-black text-white drop-shadow-lg tracking-tighter" style={{ textShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                                                {journeyPct}<span className="text-2xl">%</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 h-3 bg-black/20">
+                                        <div className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.9)]" style={{ width: isGuest ? '0%' : `${journeyPct}%` }}></div>
+                                    </div>
+                                </TactileButton>
+                            ))()}
                             
                         </div>
 
@@ -2486,134 +2335,8 @@ const ChapterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
 // =================================================================
 // 📝 منطقة تعديل النصوص والرسائل
 // =================================================================
-const CH_MESSAGES = {
-  // التشجيع (عام)
-  correct: [
-    "👏 إمتاز! استمر هيج",
-    "🌟 وحش ابو جاسم",
-    "⚡ انت شكاكي",
-    "🌟 جينات اينشتاين عندك؟",
-    "رح تشكهم بالوزاري",
-    "🔥 بطل",
-    "💯 ممتاز!",
-    "👏 ممتاز! استمر هيج!",
-    "💪 ما تتوقف!",
-    "🔥 عفية عليك!",
-    "🚀 إشكلك مخلص المنهج قبل الأستاذ!",
-    "🔥 الله يزوجك 4"
-  ],
-  // الذم (عام)
-  wrong: [
-    "🙄 السؤال يگلك: أرجوك بعد لا تجاوبني!",
-    "⚡ بهاي السرعة جاوبت... شكلك مستغني عن الدرجة!",
-    "💔 راح تبقى الإجابة بذاكرتك كصدمة عاطفية!",
-    "🤦‍♂️ لو تخلي إيدك على عينك جان جاوبت صح",
-    "😭 من جاوبت، الجملة جانت تبجي وتصيح: مو هيج الحل",
-    "😅 همزين مو بالوزاري!",
-    "🤣 بعدك بالسادس لو حوّلوك ابتدائي؟",
-    "😳 جاوبت من جيبك؟ لأن الكتاب مابي هيج شي",
-    "😬 آخ... طارت الدرجة!"
-  ],
-  // رسائل خاصة لآخر 3 أسئلة
-  finalCountdown: {
-    3: "يلا يا وحش 💪 باقيلك 3 بس!",
-    2: "ركز أبو جاسم 😎 بعد سؤالين وتخلص!",
-    1: "هاي الأخيرة 🔥 لا تضيّعها!"
-  },
-  streak: ["🔥🔥 ON FIRE!", "⚡ UNSTOPPABLE!", "💪 GODLIKE!", "🌟 LEGEND!"]
-};
-
-// Sample Questions with Explanation
-// أسئلة الفصول - إنجليزي (3 ذهبية، 2 عادية)
-const CH_QUESTIONS_EN = [
-  {
-    id: 1,
-    q: "She ______ glasses before she had surgery.",
-    options: ["wear", "used to wear", "wears", "wearing"],
-    a: "used to wear",
-    explanation: "نستخدم 'used to' للتعبير عن عادة في الماضي لم تعد موجودة.",
-    golden: false
-  },
-  {
-    id: 2,
-    q: "How ______ water does a camel store in its hump?",
-    options: ["many", "much", "more", "few"],
-    a: "much",
-    explanation: "كلمة 'water' غير معدودة (uncountable)، فنستخدم 'much' وليس 'many'.",
-    golden: false
-  },
-  {
-    id: 3,
-    q: "If I ______ you, I would study harder for the exam.",
-    options: ["am", "was", "were", "be"],
-    a: "were",
-    explanation: "في الجملة الشرطية النوع الثاني للنصيحة نستخدم 'If I were you'.",
-    golden: true
-  },
-  {
-    id: 4,
-    q: "The story was ______ written by a famous author.",
-    options: ["beautiful", "beautifully", "beauty", "beautify"],
-    a: "beautifully",
-    explanation: "نحتاج ظرفاً (Adverb) لوصف الفعل 'written'، لذا نختار 'beautifully'.",
-    golden: true
-  },
-  {
-    id: 5,
-    q: "By the time she arrived, he ______ the report.",
-    options: ["finish", "finished", "had finished", "was finishing"],
-    a: "had finished",
-    explanation: "نستخدم Past Perfect (had + V3) للحدث الذي اكتمل قبل حدث آخر في الماضي.",
-    golden: true
-  },
-];
-
-// أسئلة الفصول - أحياء (3 ذهبية، 2 عادية)
-const CH_QUESTIONS_BIO = [
-  {
-    id: 1,
-    q: "ما العضية المسؤولة عن إنتاج الطاقة (ATP) في الخلية؟",
-    options: ["النواة", "الميتوكوندريا", "جهاز گولجي", "الريبوسومات"],
-    a: "الميتوكوندريا",
-    explanation: "الميتوكوندريا هي 'مصنع الطاقة' في الخلية، تُنتج ATP عبر التنفس الخلوي.",
-    golden: false
-  },
-  {
-    id: 2,
-    q: "ما العملية التي تصنع فيها النباتات غذاءها باستخدام ضوء الشمس؟",
-    options: ["التنفس", "التركيب الضوئي", "الهضم", "النتح"],
-    a: "التركيب الضوئي",
-    explanation: "التركيب الضوئي (Photosynthesis) يحوّل ثاني أكسيد الكربون والماء والضوء إلى غلوكوز وأكسجين.",
-    golden: false
-  },
-  {
-    id: 3,
-    q: "DNA اختصار لـ ______.",
-    options: ["Deoxyribose Nucleic Acid", "Deoxyribonucleic Acid", "Di-nitrogen Amino Acid", "Dynamic Nucleic Atom"],
-    a: "Deoxyribonucleic Acid",
-    explanation: "DNA اختصار لـ Deoxyribonucleic Acid وهي المادة الوراثية في خلايا الكائنات الحية.",
-    golden: true
-  },
-  {
-    id: 4,
-    q: "كم عدد كروموسومات الإنسان الطبيعية في الخلية الجسدية؟",
-    options: ["23", "46", "48", "44"],
-    a: "46",
-    explanation: "تحتوي الخلية الجسدية الإنسانية على 46 كروموسوماً (23 زوجاً) في الحالة الثنائية.",
-    golden: true
-  },
-  {
-    id: 5,
-    q: "أي من التالي هو مثال على الانتقاء الطبيعي؟",
-    options: ["تهجين نباتين", "نمو الكائنات المتكيفة وتكاثرها أكثر", "استنساخ حيوان", "التلقيح الصناعي"],
-    a: "نمو الكائنات المتكيفة وتكاثرها أكثر",
-    explanation: "الانتقاء الطبيعي: الكائنات ذات الصفات الملائمة للبيئة تتكاثر أكثر وتنقل صفاتها للأجيال.",
-    golden: true
-  },
-];
-
-// اختيار أسئلة الفصول بحسب المادة (من Supabase للانكليزي، محلي للاحياء)
-const getCHQuestions = (subject) => subject === 'biology' ? CH_QUESTIONS_BIO : CH_QUESTIONS_EN;
+// تم نقل `CH_MESSAGES` إلى `src/constants/chapterMessages.js`
+// وتم نقل بيانات الأسئلة + `getCHQuestions` إلى `src/data/chapterQuestions.js`
 
 // جلب أسئلة مرحلة معينة من Supabase
 // stageId=0 = الديمو (أول 5 أسئلة من stageno=1)
@@ -2864,10 +2587,16 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       console.error('startGame: no questions found');
       return;
     }
-    const preparedQuestions = sourceQuestions.map(q => ({
-      ...q,
-      options: [...(q.options || [])].sort(() => Math.random() - 0.5)
-    }));
+    const preparedQuestions = sourceQuestions.map(q => {
+      const originalOptions = [...(q.options || [])];
+      // IMPORTANT: resolve correct answer BEFORE shuffling options
+      const correctText = resolveCorrectAnswerText({ ...q, options: originalOptions });
+      return {
+        ...q,
+        a: correctText,
+        options: [...originalOptions].sort(() => Math.random() - 0.5),
+      };
+    });
 
     setQuestions(preparedQuestions);
     setCurrentQ(preparedQuestions[0]);
@@ -2955,7 +2684,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
     
     initAudio(); 
     
-    const isCorrect = answer === currentQ.a;
+    const isCorrect = normalizeAnswerText(answer) === normalizeAnswerText(currentQ.a);
     const btnEl = optionRefs.current[btnIndex];
     const btnRect = btnEl?.getBoundingClientRect();
     const qRect = questionRef.current?.getBoundingClientRect();
@@ -3103,7 +2832,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         
         // ✅ حفظ المرحلة المكتملة والنجوم في Supabase (مصدر حقيقي للبيانات)
         const userDbId = localStorage.getItem('user_db_id');
-        if (userDbId && chapterNum > 0 && stageId > 0) {
+        if (userDbId && chapterNum > 0 && stageId >= 0) {
           try {
             // انتظر حفظ المرحلة قبل الانتقال
             await saveStageProgressToSupabase(userDbId, subject, chapterNum, stageId, stars);
@@ -3112,20 +2841,6 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
             console.error('Error saving stage progress:', e);
           }
         }
-        
-        // حفظ نسخة محلية كـ cache فقط
-        try {
-          if (chapterNum > 0 && stageId > 0) {
-            const doneKey = `stage_done_${subject}_ch${chapterNum}`;
-            const doneStagess = JSON.parse(localStorage.getItem(doneKey) || '[]');
-            if (!doneStagess.includes(stageId)) {
-              doneStagess.push(stageId);
-              localStorage.setItem(doneKey, JSON.stringify(doneStagess));
-            }
-            const starsKey = `stage_stars_${subject}_ch${chapterNum}_s${stageId}`;
-            localStorage.setItem(starsKey, String(stars));
-          }
-        } catch (e) { console.error('Error saving stage completion to cache:', e); }
         
         giveXPForChapter(totalCorrect, totalQuestions, true, chapterNum, stageId);
         if (!bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
@@ -3277,40 +2992,82 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 
   const saveStageProgressToSupabase = async (userId, subject, chapterNum, stageId, stars) => {
     try {
-      // التحقق من وجود entry سابق للمرحلة
-      const { data: existing } = await supabase
+      // نستخدم user_id من جدول auth.users (الـ auth_id) حتى يطابق الـ FK
+      // نخزّنه مسبقاً في localStorage كـ anon_user_id عند تسجيل الدخول بـ Google
+      let authUserId = null;
+      try {
+        authUserId = localStorage.getItem('anon_user_id');
+      } catch {
+        authUserId = null;
+      }
+
+      // إذا ما عندناش auth user (ضيف أو مستخدم محلي فقط) نتوقف هنا
+      if (!authUserId) {
+        console.warn('⚠️ No auth user id found for stage_progress; skipping Supabase write.');
+        return;
+      }
+
+      // 1️⃣ حاول تجيب سجل موجود لنفس المرحلة
+      const { data: existing, error: existingErr } = await supabase
         .from('stage_progress')
         .select('id, stars')
-        .eq('user_id', userId)
+        .eq('user_id', authUserId)
         .eq('subject', subject)
         .eq('chapter', chapterNum)
         .eq('stage', stageId)
         .maybeSingle();
 
-      if (existing) {
-        // تحديث: احفظ أعلى نجوم
-        if (stars > existing.stars) {
-          await supabase
-            .from('stage_progress')
-            .update({ stars, updated_at: new Date().toISOString() })
-            .eq('id', existing.id);
-        }
-      } else {
-        // إدراج: سجل جديد
-        await supabase
-          .from('stage_progress')
-          .insert({
-            user_id: userId,
-            subject,
-            chapter: chapterNum,
-            stage: stageId,
-            stars,
-            completed_at: new Date().toISOString(),
-          });
+      if (existingErr) {
+        console.error('❌ stage_progress select failed:', existingErr.message, existingErr.details);
+        return;
       }
-      console.log(`✅ Stage ${chapterNum}-${stageId} saved with ${stars} stars`);
+
+      if (existing?.id) {
+        // 2️⃣ تحديث النجوم: نحافظ على الأعلى فقط
+        const bestStars = Math.max(existing.stars || 0, stars);
+        const { error: updErr } = await supabase
+          .from('stage_progress')
+          .update({ stars: bestStars })
+          .eq('id', existing.id);
+
+        if (updErr) {
+          console.error('❌ stage_progress update failed:', updErr.message, updErr.details);
+          return;
+        }
+
+        console.log(`✅ Stage ${chapterNum}-${stageId} updated in Supabase => ${bestStars} stars`);
+        return;
+      }
+
+      // 3️⃣ إدراج سجل جديد مع ملء كل الأعمدة غير القابلة للإفراغ في الجدول الحالي
+      const nowIso = new Date().toISOString();
+      const { error: insErr } = await supabase
+        .from('stage_progress')
+        .insert({
+          user_id: authUserId,
+          subject,
+          // الأعمدة القديمة والجديدة في جدولك (لضمان عدم وجود NULL)
+          chapter_number: chapterNum,
+          stage_number: stageId,
+          chapter: chapterNum,
+          stage: stageId,
+          stars,
+          // أعمدة إضافية حسب بنية جدولك الحالية
+          score: 0,
+          completed: true,
+          attempts: 1,
+          created_at: nowIso,
+          updated_at: nowIso,
+        });
+
+      if (insErr) {
+        console.error('❌ stage_progress insert failed:', insErr.message, insErr.details);
+        return;
+      }
+
+      console.log(`✅ Stage ${chapterNum}-${stageId} inserted in Supabase => ${stars} stars`);
     } catch (e) {
-      console.error('Error saving stage progress to Supabase:', e);
+      console.error('Error saving stage progress to Supabase (unexpected):', e);
     }
   };
 
@@ -3769,74 +3526,23 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       />
 
       {/* ============ RESULTS SCREEN ============ */}
-      {gameState === 'results' && (
-         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-popIn">
-            <div className={`w-full max-w-sm p-6 rounded-[2rem] shadow-2xl border-2 ${card}`}>
-                <div className="text-center mb-6">
-                    <span className="text-6xl block mb-2">{score > 50 ? '👑' : '😎'}</span>
-                    <h2 className={`text-3xl font-black ${text}`} style={{ fontFamily: "'Cairo', sans-serif" }}>النتيجة النهائية</h2>
-                </div>
-                
-                {/* Total Score */}
-                <div className="bg-slate-200 p-6 rounded-2xl mb-6 text-center shadow-inner">
-                    <span className="text-sm text-slate-500 font-bold uppercase tracking-widest">Total Score</span>
-                    <div className="text-6xl font-black text-slate-800 mt-2">{score}</div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="bg-green-100 p-3 rounded-xl text-center border-2 border-green-200">
-                        <span className="block text-xs font-bold text-green-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات صحيحة</span>
-                        <span className="text-3xl font-black text-green-600">{correctAnswers.length}</span>
-                    </div>
-                    <div className="bg-red-100 p-3 rounded-xl text-center border-2 border-red-200">
-                        <span className="block text-xs font-bold text-red-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات خاطئة</span>
-                        <span className="text-3xl font-black text-red-600">{wrongAnswers.length}</span>
-                    </div>
-                </div>
-
-                {/* Error Review with Explanation */}
-                {wrongAnswers.length > 0 && (
-                    <div className="mb-4 max-h-40 overflow-y-auto bg-white rounded-xl p-3 border border-slate-200">
-                        <h3 className="font-bold text-red-500 mb-2 text-base text-right font-black" style={{ fontFamily: "'Cairo', sans-serif" }}>الأخطاء ({wrongAnswers.length})</h3>
-                        {wrongAnswers.map((item, i) => (
-                            <div key={i} className="text-right text-sm border-b border-slate-100 last:border-0 py-3">
-                                <p className="font-black mb-1 text-slate-800 text-base">{item.question.q}</p>
-                                <div className="flex justify-end gap-2 mb-1">
-                                    <span className="text-green-600 font-black text-sm bg-green-100 px-2 py-0.5 rounded">{item.question.a} ✓</span>
-                                    <span className="text-red-500 font-bold line-through opacity-70">{item.userAnswer || 'وقت'}</span>
-                                </div>
-                                <p className="text-slate-600 italic bg-slate-50 p-2 rounded font-bold text-xs" style={{ fontFamily: "'Cairo', sans-serif" }}>💡 {item.question.explanation || 'لا يوجد شرح متاح.'}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                
-                {!isGuest && stageId !== 0 && (
-                  <button 
-                    onClick={() => { if (onStartGame) onStartGame('chapter', subject, userProfile, chapterNum, stageId + 1); else setGameState('menu'); }} 
-                    className="w-full py-4 rounded-xl font-black text-xl text-white bg-purple-500 shadow-lg shadow-purple-500/30 mb-3 hover:scale-105 transition-transform" 
-                    style={{ fontFamily: "'Cairo', sans-serif" }}
-                  >
-                    المرحلة التالية ⏭️
-                  </button>
-                )}
-                {chapterNum < 8 && stageId !== 0 && (
-                  <button 
-                    onClick={() => { if (onExit) onExit(resultStarsRef.current, true); else setGameState('menu'); }} 
-                    className="w-full py-4 rounded-xl font-black text-xl text-white bg-blue-500 shadow-lg shadow-blue-500/30 mb-3 hover:scale-105 transition-transform" 
-                    style={{ fontFamily: "'Cairo', sans-serif" }}
-                  >
-                    الفصل التالي 📖
-                  </button>
-                )}
-                {stageId !== 0 && (
-                  <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>إعادة المرحلة</button>
-                )}
-                <button onClick={() => { if (onExit) onExit(resultStarsRef.current); else setGameState('menu'); }} className={`w-full py-4 rounded-xl font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>العودة</button>
-            </div>
-         </div>
-      )}
+      <ResultScreen
+        open={gameState === 'results'}
+        isDark={isDark}
+        score={score}
+        correctAnswers={correctAnswers}
+        wrongAnswers={wrongAnswers}
+        isGuest={isGuest}
+        stageId={stageId}
+        chapterNum={chapterNum}
+        onNextStage={() => {
+          if (onStartGame) onStartGame('chapter', subject, userProfile, chapterNum, stageId + 1);
+          setGameState('menu');
+        }}
+        onNextChapter={() => { if (onExit) onExit(resultStarsRef.current, true); else setGameState('menu'); }}
+        onRetryStage={startGame}
+        onBack={() => { if (onExit) onExit(resultStarsRef.current); else setGameState('menu'); }}
+      />
 
       {/* ============ FEEDBACK OVERLAY ============ */}
       {feedback.show && (
@@ -4424,10 +4130,16 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       rawQuestions = getMNQuestions(subject);
     }
 
-    const preparedQuestions = rawQuestions.map(q => ({
-      ...q,
-      options: [...q.options].sort(() => Math.random() - 0.5)
-    }));
+    const preparedQuestions = rawQuestions.map(q => {
+      const originalOptions = [...(q.options || [])];
+      // IMPORTANT: resolve correct answer BEFORE shuffling options
+      const correctText = resolveCorrectAnswerText({ ...q, options: originalOptions });
+      return {
+        ...q,
+        a: correctText,
+        options: [...originalOptions].sort(() => Math.random() - 0.5),
+      };
+    });
 
     setQuestions(preparedQuestions);
     setCurrentQ(preparedQuestions[0]);
@@ -4510,7 +4222,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
 
     initAudio();
 
-    const isCorrect = answer === currentQ.a;
+    const isCorrect = normalizeAnswerText(answer) === normalizeAnswerText(currentQ.a);
     const btnEl = optionRefs.current[btnIndex];
     const btnRect = btnEl?.getBoundingClientRect();
     const qRect = questionRef.current?.getBoundingClientRect();
