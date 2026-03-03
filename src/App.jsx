@@ -87,6 +87,9 @@ import {
   getUserProfile,
 } from './lib/supabase.js';
 import { EnIcon, TutorialHand, TooltipOverlay, SoftBackground, TactileButton, ToastNotification } from './components/ui/common.jsx';
+
+// Feature flag: keep error-bag logic present but disabled
+const ERROR_BAG_ENABLED = false;
 import { 
   ArrowLeft,
   Baby,
@@ -257,8 +260,6 @@ export default function App() {
 
   const [activeChapterNum, setActiveChapterNum] = useState(0);
   const [activeStageId, setActiveStageId] = useState(0);
-
-  const ERROR_BAG_ENABLED = false;
 
   const handleStartGame = (mode, subject = 'english', userProfile = null, chapterNum = 0, stageId = 0) => {
     setActiveSubject(subject);
