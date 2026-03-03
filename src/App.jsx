@@ -2392,7 +2392,7 @@ const fetchStageQuestions = async (chapterNum, stageId, subject = 'english') => 
 // جلب أسئلة تحدي السنة كاملة من Supabase
 const fetchFullYearQuestions = async (chapterNum, subject = 'english') => {
   try {
-    const tableName = subject === 'biology' ? 'biology_fullyear_stages' : 'english_fullyear_stages';
+    const tableName = subject === 'biology' ? 'biology_review_all' : 'english_review_all';
     const { data, error } = await supabase
       .from(tableName)
       .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
@@ -2599,13 +2599,13 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
     let sourceQuestions;
     if (bagItem) {
       sourceQuestions = bagItem.questions;
-    } else if (gameMode === 'review_part' && subject === 'english' && chapterNum > 0) {
+    } else if (gameMode === 'review_part' && chapterNum > 0) {
       // جزء مراجعة — stageId = رقم الجزء (1-4)
-      const fetched = await fetchReviewPartQuestions(chapterNum, stageId);
+      const fetched = await fetchReviewPartQuestions(chapterNum, stageId, subject);
       sourceQuestions = fetched && fetched.length > 0 ? fetched : getCHQuestions(subject);
-    } else if (subject === 'english' && chapterNum > 0 && stageId >= 0) {
-      // جلب من Supabase للمراحل الانجليزية (0 = الديمو، 1-29 = المراحل)
-      const fetched = await fetchStageQuestions(chapterNum, stageId);
+    } else if (chapterNum > 0 && stageId >= 0) {
+      // جلب من Supabase للمراحل (0 = الديمو، 1-29 = المراحل)
+      const fetched = await fetchStageQuestions(chapterNum, stageId, subject);
       sourceQuestions = fetched && fetched.length > 0 ? fetched : getCHQuestions(subject);
     } else {
       sourceQuestions = getCHQuestions(subject);
@@ -4146,8 +4146,8 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
 
     // إذا في chapterNum → جلب أسئلة السنة الكاملة من Supabase
     let rawQuestions = null;
-    if (chapterNum > 0 && subject === 'english') {
-      rawQuestions = await fetchFullYearQuestions(chapterNum);
+    if (chapterNum > 0) {
+      rawQuestions = await fetchFullYearQuestions(chapterNum, subject);
     }
     if (!rawQuestions) {
       rawQuestions = getMNQuestions(subject);
