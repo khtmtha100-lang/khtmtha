@@ -182,7 +182,8 @@ const resolveCorrectAnswerText = (q) => {
 };
 
 // إجمالي المراحل لكل فصل (حسب تقسيمك الحالي في Supabase/الواجهة)
-const getTotalStagesForChapter = (chapterNum) => (chapterNum === 1 ? 30 : 12); // الفصل1: ديمو(0) + 29 مرحلة
+const getSubjectChapterCount = (subject) => (subject === 'biology' ? 5 : 8);
+const getTotalStagesForChapter = (chapterNum) => (chapterNum === 1 ? 30 : 12);
 
 const questionData = {
   english: {
@@ -778,7 +779,7 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
           </div>
         )}
         <div className="grid grid-cols-4 gap-3 mb-8">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
+          {Array.from({ length: getSubjectChapterCount(subject) }, (_, i) => i + 1).map((num) => {
             const isChapterLocked = false;
             const score = isChapterLocked ? 0 : (chapterScores[num] || 0);
             const hasScore = score > 0;
@@ -1080,7 +1081,7 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
       </div>
 
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
+        {Array.from({ length: getSubjectChapterCount(subject) }, (_, i) => i + 1).map((num) => {
           // تم فتح جميع الفصول كما طلب المستخدم
           const isLocked = false;
           const progress = isLocked ? 0 : getChapterProgress(num);
@@ -1197,8 +1198,8 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
         </div>
       ) : (
         <div className="space-y-4">
-          {/* الفصول 1-8 — تم فتحها مع عرض الأجزاء بالتسلسل */}
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((chapterNum) => {
+          {/* الفصول المتاحة للمادة المختارة — تم فتحها مع عرض الأجزاء بالتسلسل */}
+          {Array.from({ length: getSubjectChapterCount(subject) }, (_, i) => i + 1).map((chapterNum) => {
             const parts = buildChapterParts(chapterNum);
             const completions = getChapterCompletions(chapterNum);
             const allDone = parts.every(p => p.done);
