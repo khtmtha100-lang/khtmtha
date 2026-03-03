@@ -258,6 +258,8 @@ export default function App() {
   const [activeChapterNum, setActiveChapterNum] = useState(0);
   const [activeStageId, setActiveStageId] = useState(0);
 
+  const ERROR_BAG_ENABLED = false;
+
   const handleStartGame = (mode, subject = 'english', userProfile = null, chapterNum = 0, stageId = 0) => {
     setActiveSubject(subject);
     setActiveUserProfile(userProfile);
@@ -270,6 +272,7 @@ export default function App() {
   };
 
   const handleStartBagReview = (bagItem) => {
+    if (!ERROR_BAG_ENABLED) return;
     setActiveBagItem(bagItem);
     // استخدام مادة الحقيبة إذا متوفرة
     if (bagItem?.subject) setActiveSubject(bagItem.subject);
@@ -277,6 +280,7 @@ export default function App() {
   };
 
   const handleBagItemCompleted = async (bagItemId) => {
+    if (!ERROR_BAG_ENABLED) return;
     try {
       const bag = JSON.parse(localStorage.getItem('mistakes_bag') || '[]');
       const item = bag.find(b => b.id === bagItemId);
@@ -843,11 +847,13 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
 const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick, completedToday = 0, onStartBagReview, subject = 'english' }) => {
     const [mistakesOpen, setMistakesOpen] = useState(false);
     const [bagItems, setBagItems] = useState(() => {
+        if (!ERROR_BAG_ENABLED) return [];
         try { return JSON.parse(localStorage.getItem('mistakes_bag') || '[]'); } catch { return []; }
     });
 
     // تحديث الحقيبة عند الفتح — أولاً من localStorage ثم Supabase (للمزامنة)
     const openBag = async () => {
+        if (!ERROR_BAG_ENABLED) return;
         try { setBagItems(JSON.parse(localStorage.getItem('mistakes_bag') || '[]')); } catch {}
         setMistakesOpen(true);
 
@@ -2816,7 +2822,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         // خسارة — انتهت الأرواح
         resultStarsRef.current = 0;
         giveXPForChapter(correctAnswers.length, snapQTotal ?? questions.length, false, chapterNum, stageId);
-        if (!bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
+        if (ERROR_BAG_ENABLED && !bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
         saveSessionToSupabase(correctAnswers.length, snapQTotal ?? questions.length, score, chapterNum, stageId);
         setGameState('results');
       } else if (isLastQ) {
@@ -2843,7 +2849,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         }
         
         giveXPForChapter(totalCorrect, totalQuestions, true, chapterNum, stageId);
-        if (!bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
+        if (ERROR_BAG_ENABLED && !bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
         saveSessionToSupabase(totalCorrect, totalQuestions, score, chapterNum, stageId);
         setGameState('results');
       } else {
@@ -2888,6 +2894,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   };
 
   const saveWrongAnswersToBag = async (wrongArr, allQs) => {
+    if (!ERROR_BAG_ENABLED) return;
     if (!wrongArr || wrongArr.length === 0) return;
     const now = Date.now();
     const entries = buildBagEntries(wrongArr, allQs);
@@ -4422,6 +4429,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   };
 
   const saveMonsterWrongAnswersToBag = async (wrongArr) => {
+    if (!ERROR_BAG_ENABLED) return;
     if (!wrongArr || wrongArr.length === 0) return;
     const now = Date.now();
     const entries = buildMonsterBagEntries(wrongArr);
@@ -4468,7 +4476,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       setFeedback({ show: false, correct: false, message: '' });
       if (lives <= 1 && !correct) {
         // لا XP من لعبة الوحش — الـ XP فقط من مراحل الفصول والمراجعات
-        saveMonsterWrongAnswersToBag(wrongAnswers); // حفظ الأخطاء في الحقيبة
+        if (ERROR_BAG_ENABLED) saveMonsterWrongAnswersToBag(wrongAnswers); // حفظ الأخطاء في الحقيبة
         saveMonsterSessionToSupabase(correctAnswers.length, correctAnswers.length + wrongAnswers.length, score);
         setGameState('results');
       } else {
