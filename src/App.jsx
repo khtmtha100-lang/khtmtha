@@ -90,7 +90,7 @@ import { EnIcon, TutorialHand, TooltipOverlay, SoftBackground, TactileButton, To
 
 // Feature flag: keep error-bag logic present but disabled
 const ERROR_BAG_ENABLED = false;
-import { 
+import {
   ArrowLeft,
   Baby,
   Briefcase,
@@ -189,30 +189,30 @@ const questionData = {
     ch1: {
       stages: {
         s0: [{
-          id: 1, 
-          q: "I ______ to the store yesterday.", 
-          options: ["go", "went", "gone", "going"], 
-          a: "went", 
+          id: 1,
+          q: "I ______ to the store yesterday.",
+          options: ["go", "went", "gone", "going"],
+          a: "went",
           explanation: "نستخدم الماضي البسيط (went) لأن الجملة تحتوي على 'yesterday'.",
-          golden: false 
+          golden: false
         }],
         s1: [{
-          id: 2, 
-          q: "She ______ glasses before.", 
-          options: ["wear", "used to wear", "wears", "wearing"], 
-          a: "used to wear", 
+          id: 2,
+          q: "She ______ glasses before.",
+          options: ["wear", "used to wear", "wears", "wearing"],
+          a: "used to wear",
           explanation: "نستخدم 'used to' للتعبير عن عادة في الماضي لم تعد موجودة.",
-          golden: true 
+          golden: true
         }],
       },
       review_parts: {
         p1: [{
-          id: 1, 
-          q: "Review: She ______ glasses before.", 
-          options: ["wear", "used to wear", "wears", "wearing"], 
-          a: "used to wear", 
+          id: 1,
+          q: "Review: She ______ glasses before.",
+          options: ["wear", "used to wear", "wears", "wearing"],
+          a: "used to wear",
           explanation: "نستخدم 'used to' للتعبير عن عادة في الماضي لم تعد موجودة.",
-          golden: true 
+          golden: true
         }]
       }
     }
@@ -221,12 +221,12 @@ const questionData = {
     ch1: {
       stages: {
         s0: [{
-          id: 1, 
-          q: "Biology Demo Question?", 
-          options: ["A", "B", "C", "D"], 
-          a: "A", 
+          id: 1,
+          q: "Biology Demo Question?",
+          options: ["A", "B", "C", "D"],
+          a: "A",
           explanation: "...",
-          golden: false 
+          golden: false
         }]
       },
       review_parts: {}
@@ -269,7 +269,7 @@ export default function App() {
     setActiveStageId(stageId);
     setActiveGame(mode);
     // تتبع Google Analytics
-    try { if (window.gtag) window.gtag('event', 'start_game', { game_mode: mode, subject, chapter: chapterNum, stage: stageId }); } catch {}
+    try { if (window.gtag) window.gtag('event', 'start_game', { game_mode: mode, subject, chapter: chapterNum, stage: stageId }); } catch { }
   };
 
   const handleStartBagReview = (bagItem) => {
@@ -308,8 +308,8 @@ export default function App() {
             updated_at: new Date().toISOString(),
           }).eq('id', bagItemId);
         }
-      } catch {}
-    } catch {}
+      } catch { }
+    } catch { }
   };
 
   // stars: عدد النجوم (1-3) إذا فاز، 0 إذا خسر
@@ -318,13 +318,13 @@ export default function App() {
     setActiveGame(null);
     setActiveBagItem(null);
     // تتبع Google Analytics
-    try { if (window.gtag) window.gtag('event', 'game_complete', { subject: exitedSubject, stars, game_mode: activeGame }); } catch {}
+    try { if (window.gtag) window.gtag('event', 'game_complete', { subject: exitedSubject, stars, game_mode: activeGame }); } catch { }
     // المهمة اليومية تزداد فقط عند الفوز بنجمة واحدة على الأقل
     if (stars >= 1) {
       setCompletedToday(prev => {
         const next = { ...prev, [exitedSubject]: (prev[exitedSubject] || 0) + 1 };
         const today = new Date().toISOString().split('T')[0];
-        try { localStorage.setItem('daily_mission', JSON.stringify({ date: today, ...next })); } catch {}
+        try { localStorage.setItem('daily_mission', JSON.stringify({ date: today, ...next })); } catch { }
         // عند إكمال 2 مهام يومية → يُحسب يوم للشعلة
         const totalToday = (next.english || 0) + (next.biology || 0);
         if (totalToday >= 2) {
@@ -337,7 +337,7 @@ export default function App() {
               localStorage.setItem('player_streak', String(newStreak));
               localStorage.setItem('last_streak_date', today);
             }
-          } catch {}
+          } catch { }
         }
         return next;
       });
@@ -374,16 +374,16 @@ export default function App() {
 // (تم نقل UI helpers إلى `src/components/ui/common.jsx`)
 
 const handleShareChallenge = async (title, text) => {
-    const shareData = {
-        title: title,
-        text: text,
-        url: "https://hero-student-game.app",
-    };
-    if (navigator.share) {
-        try { await navigator.share(shareData); } catch (err) { console.log('Error sharing:', err); }
-    } else {
-        alert("تم نسخ رابط التحدي! 🚀");
-    }
+  const shareData = {
+    title: title,
+    text: text,
+    url: "https://hero-student-game.app",
+  };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch (err) { console.log('Error sharing:', err); }
+  } else {
+    alert("تم نسخ رابط التحدي! 🚀");
+  }
 };
 
 // --- 2. المكونات الرئيسية ---
@@ -393,235 +393,235 @@ const handleShareChallenge = async (title, text) => {
 // step 1,2,3  = تسجيل جديد (اسم، شخصي، محافظة)
 // step 'g1,g2,g3' = إكمال ملف Google جديد
 const LoginView = ({ isDarkMode, onLoginSuccess, pendingGoogleUser = null, onGoogleProfileComplete }) => {
-    const isGoogleFlow = !!pendingGoogleUser;
-    const [step, setStep] = useState(isGoogleFlow ? 'g1' : 0);
-    const [formData, setFormData] = useState({ name: pendingGoogleUser?.name || '', age: '', gender: '', governorate: '' });
-    const [googleLoading, setGoogleLoading] = useState(false);
-    const [fieldError, setFieldError] = useState('');
+  const isGoogleFlow = !!pendingGoogleUser;
+  const [step, setStep] = useState(isGoogleFlow ? 'g1' : 0);
+  const [formData, setFormData] = useState({ name: pendingGoogleUser?.name || '', age: '', gender: '', governorate: '' });
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [fieldError, setFieldError] = useState('');
 
-    const governorates = ["بغداد","البصرة","نينوى","أربيل","النجف","كربلاء","كركوك","الأنبار","ديالى","ذي قار","بابل","واسط","ميسان","القادسية","المثنى","صلاح الدين","دهوك","السليمانية"];
-    const ages = Array.from({length: 14}, (_, i) => 15 + i);
-    const inputClass = `w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none focus:border-yellow-400 transition-all text-center shadow-sm`;
+  const governorates = ["بغداد", "البصرة", "نينوى", "أربيل", "النجف", "كربلاء", "كركوك", "الأنبار", "ديالى", "ذي قار", "بابل", "واسط", "ميسان", "القادسية", "المثنى", "صلاح الدين", "دهوك", "السليمانية"];
+  const ages = Array.from({ length: 14 }, (_, i) => 15 + i);
+  const inputClass = `w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none focus:border-yellow-400 transition-all text-center shadow-sm`;
 
-    // ── Google OAuth ── يتحقق Supabase تلقائياً إذا المستخدم موجود أو جديد
-    const handleGoogleSignIn = async () => {
-        setGoogleLoading(true);
-        setFieldError('');
-        try {
-            // استخدام URL الحالي الفعلي (يعمل في localhost و Vercel)
-            // يمكن استخدام متغير بيئة VITE_SITE_URL للإنتاج، أو URL الحالي
-            const redirectUrl = import.meta.env.VITE_SITE_URL || (window.location.origin + window.location.pathname);
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: redirectUrl },
-            });
-            if (error) throw error;
-        } catch {
-            setFieldError('فشل تسجيل الدخول بـ Google. حاول مجدداً.');
-            setGoogleLoading(false);
+  // ── Google OAuth ── يتحقق Supabase تلقائياً إذا المستخدم موجود أو جديد
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setFieldError('');
+    try {
+      // استخدام URL الحالي الفعلي (يعمل في localhost و Vercel)
+      // يمكن استخدام متغير بيئة VITE_SITE_URL للإنتاج، أو URL الحالي
+      const redirectUrl = import.meta.env.VITE_SITE_URL || (window.location.origin + window.location.pathname);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: redirectUrl },
+      });
+      if (error) throw error;
+    } catch {
+      setFieldError('فشل تسجيل الدخول بـ Google. حاول مجدداً.');
+      setGoogleLoading(false);
+    }
+  };
+
+  // ── خطوات Google جديد ──
+  const handleGoogleNext = async () => {
+    setFieldError('');
+    if (step === 'g1' && !formData.name.trim()) { setFieldError('شنو اسمك يا بطل؟'); return; }
+    if (step === 'g2' && (!formData.age || !formData.gender)) { setFieldError('المعلومات ناقصة!'); return; }
+    if (step === 'g3') {
+      if (!formData.governorate) { setFieldError('من أي محافظة؟'); return; }
+
+      // ✅ فحص الأيميل المكرر
+      try {
+        const { data: existingEmail } = await supabase
+          .from('users')
+          .select('id, email')
+          .eq('email', pendingGoogleUser.email)
+          .neq('auth_id', pendingGoogleUser.id)
+          .maybeSingle();
+
+        if (existingEmail) {
+          setFieldError('هذا الايميل مسجل بالفعل! استخدم ايميل آخر أو سجل الدخول.');
+          return;
         }
-    };
+      } catch (e) {
+        console.error('Error checking email:', e);
+      }
 
-    // ── خطوات Google جديد ──
-    const handleGoogleNext = async () => {
-        setFieldError('');
-        if (step === 'g1' && !formData.name.trim()) { setFieldError('شنو اسمك يا بطل؟'); return; }
-        if (step === 'g2' && (!formData.age || !formData.gender)) { setFieldError('المعلومات ناقصة!'); return; }
-        if (step === 'g3') {
-            if (!formData.governorate) { setFieldError('من أي محافظة؟'); return; }
-            
-            // ✅ فحص الأيميل المكرر
-            try {
-              const { data: existingEmail } = await supabase
-                .from('users')
-                .select('id, email')
-                .eq('email', pendingGoogleUser.email)
-                .neq('auth_id', pendingGoogleUser.id)
-                .maybeSingle();
-              
-              if (existingEmail) {
-                setFieldError('هذا الايميل مسجل بالفعل! استخدم ايميل آخر أو سجل الدخول.');
-                return;
-              }
-            } catch (e) {
-              console.error('Error checking email:', e);
-            }
-            
-            try {
-                await supabase.from('users').update({
-                    full_name: formData.name.trim(),
-                    age: parseInt(formData.age),
-                    gender: formData.gender,
-                    region: formData.governorate,
-                }).eq('auth_id', pendingGoogleUser.id);
-            } catch {}
-            onGoogleProfileComplete({ 
-              name: formData.name.trim(), 
-              age: parseInt(formData.age),
-              gender: formData.gender,
-              region: formData.governorate
-            });
-            return;
-        }
-        const nx = { 'g1': 'g2', 'g2': 'g3' };
-        setStep(nx[step]);
-    };
+      try {
+        await supabase.from('users').update({
+          full_name: formData.name.trim(),
+          age: parseInt(formData.age),
+          gender: formData.gender,
+          region: formData.governorate,
+        }).eq('auth_id', pendingGoogleUser.id);
+      } catch { }
+      onGoogleProfileComplete({
+        name: formData.name.trim(),
+        age: parseInt(formData.age),
+        gender: formData.gender,
+        region: formData.governorate
+      });
+      return;
+    }
+    const nx = { 'g1': 'g2', 'g2': 'g3' };
+    setStep(nx[step]);
+  };
 
-    // ── شريط التقدم ──
-    const StepsProgressBar = ({ numericStep }) => {
-        const pct = numericStep === 1 ? '0%' : numericStep === 2 ? '50%' : '100%';
-        return (
-            <div className="flex items-center justify-between mb-8 px-4 w-full relative">
-                {[1, 2, 3].map((s) => (
-                    <div key={s} className="flex flex-col items-center relative z-10">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-4 transition-all duration-500 ${numericStep >= s ? 'bg-yellow-400 border-yellow-200 text-yellow-900 scale-110 shadow-lg' : 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400'}`}>
-                            {numericStep > s ? <Check className="w-5 h-5" /> : s}
-                        </div>
-                        <span className={`text-[10px] font-bold mt-2 ${numericStep >= s ? 'text-yellow-600' : 'text-slate-400'}`}>
-                            {s === 1 ? 'الاسم' : s === 2 ? 'شخصي' : 'المكان'}
-                        </span>
-                    </div>
-                ))}
-                <div className="absolute top-5 left-8 right-8 h-1 bg-slate-200 dark:bg-slate-800 -z-0"></div>
-                <div className="absolute top-5 left-8 h-1 bg-yellow-400 transition-all duration-500 ease-out -z-0" style={{ width: pct }}></div>
-            </div>
-        );
-    };
-
-    const isGFlow = typeof step === 'string' && step.startsWith('g');
-    const numericStep = isGFlow ? ({'g1':1,'g2':2,'g3':3}[step]) : 1;
-
-    // إذا رجعنا من Google وبعدها تم ضبط pendingGoogleUser من الأعلى،
-    // نتأكد أننا نحول مباشرة إلى خطوة g1 لأول مرة
-    useEffect(() => {
-        if (pendingGoogleUser && !isGFlow) {
-            setStep('g1');
-            setFormData(prev => ({
-                ...prev,
-                name: pendingGoogleUser.name || prev.name || ''
-            }));
-        }
-    }, [pendingGoogleUser, isGFlow]);
-
-    const renderFields = (s, onNext) => (<>
-        {(s === 'g1') && (<>
-            <h3 className={`text-xl font-black text-center mb-2 ${isDarkMode?'text-white':'text-slate-800'}`}>أهلاً! شنو اسمك؟ 👋</h3>
-            <p className="text-center text-xs text-slate-400 font-bold mb-4">سجّلت بـ Google — أكمل بياناتك مرة وحدة</p>
-            <input type="text" placeholder="الاسم الكامل" value={formData.name} autoFocus
-                onChange={e=>setFormData(p=>({...p,name:e.target.value}))}
-                onKeyDown={e=>e.key==='Enter'&&onNext()}
-                className={inputClass} />
-        </>)}
-        {(s === 'g2') && (<>
-            <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode?'text-white':'text-slate-800'}`}>معلوماتك الشخصية 👤</h3>
-            <div className="flex gap-3">
-                <select value={formData.age} onChange={e=>setFormData(p=>({...p,age:e.target.value}))} className={`${inputClass} flex-[0.6] appearance-none cursor-pointer`}>
-                    <option value="">العمر</option>
-                    {ages.map(a=><option key={a} value={a}>{a}</option>)}
-                </select>
-                <select value={formData.gender} onChange={e=>setFormData(p=>({...p,gender:e.target.value}))} className={`${inputClass} flex-1 appearance-none cursor-pointer`}>
-                    <option value="">الجنس</option>
-                    <option value="male">ذكر 🙋‍♂️</option>
-                    <option value="female">أنثى 🙋‍♀️</option>
-                </select>
-            </div>
-        </>)}
-        {(s === 'g3') && (<>
-            <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode?'text-white':'text-slate-800'}`}>من أي محافظة؟ 📍</h3>
-            <select value={formData.governorate} onChange={e=>setFormData(p=>({...p,governorate:e.target.value}))} className={`${inputClass} appearance-none cursor-pointer`}>
-                <option value="">اختر المحافظة</option>
-                {governorates.map(g=><option key={g} value={g}>{g}</option>)}
-            </select>
-        </>)}
-    </>);
-
+  // ── شريط التقدم ──
+  const StepsProgressBar = ({ numericStep }) => {
+    const pct = numericStep === 1 ? '0%' : numericStep === 2 ? '50%' : '100%';
     return (
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center px-5 py-10 w-full animate-fade-in-up" dir="rtl" style={{paddingTop:'max(2.5rem,env(safe-area-inset-top,2.5rem))',paddingBottom:'max(2.5rem,env(safe-area-inset-bottom,2.5rem))'}}>
-
-            {/* الشعار */}
-            <div className={`text-center mb-8 relative z-10 transition-all duration-500 ${step !== 0 ? 'scale-75 mb-2' : ''}`}>
-                <div className="w-24 h-24 mx-auto bg-yellow-400 rounded-[2rem] rotate-[-3deg] flex items-center justify-center shadow-xl border-b-8 border-yellow-600 mb-4 relative group hover:rotate-0 transition-transform duration-300">
-                    <CheckCircle2 className="w-12 h-12 text-white drop-shadow-md" strokeWidth={3} />
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center border-4 border-yellow-200 animate-bounce">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    </div>
-                </div>
-                <h1 className={`text-4xl md:text-5xl font-black tracking-tighter mb-1 ${isDarkMode?'text-white':'text-slate-800'}`}>ختمتها<span className="text-yellow-500">.</span></h1>
-                <p className={`text-xs font-bold opacity-60 ${isDarkMode?'text-slate-300':'text-slate-600'}`}>الطريق الأمتع للـ 100</p>
+      <div className="flex items-center justify-between mb-8 px-4 w-full relative">
+        {[1, 2, 3].map((s) => (
+          <div key={s} className="flex flex-col items-center relative z-10">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-4 transition-all duration-500 ${numericStep >= s ? 'bg-yellow-400 border-yellow-200 text-yellow-900 scale-110 shadow-lg' : 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400'}`}>
+              {numericStep > s ? <Check className="w-5 h-5" /> : s}
             </div>
-
-            <div className="w-full max-w-sm relative z-20">
-
-                {/* ── شاشة البداية ── */}
-                {step === 0 && (
-                    <div className="animate-fade-in-up">
-                        <div className={`p-6 rounded-[32px] border-2 shadow-2xl backdrop-blur-lg mb-5 ${isDarkMode?'bg-slate-800/80 border-slate-700':'bg-white/90 border-white'}`}>
-
-                            {/* Google */}
-                            <TactileButton onClick={handleGoogleSignIn} disabled={googleLoading}
-                                className="w-full p-4 rounded-2xl flex items-center justify-center gap-3 mb-3"
-                                colorClass="bg-white" borderClass="border-slate-200">
-                                <div className="w-6 h-6 shrink-0 flex items-center justify-center">
-                                    {googleLoading
-                                        ? <span className="animate-spin w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full inline-block"></span>
-                                        : <svg viewBox="0 0 24 24" className="w-6 h-6">
-                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                                        </svg>
-                                    }
-                                </div>
-                                <span className="font-bold text-base text-slate-700">
-                                    {googleLoading ? 'جاري الدخول...' : 'دخول سريع عبر Google'}
-                                </span>
-                            </TactileButton>
-
-                            {/* ضيف */}
-                            <TactileButton onClick={() => onLoginSuccess({name:'ضيف',isGuest:true},true)}
-                                className="w-full p-4 rounded-2xl"
-                                colorClass="bg-indigo-500" borderClass="border-indigo-700">
-                                <span className="font-black text-white text-lg flex items-center justify-center gap-2">
-                                    👤 الدخول كضيف (تجربة مجانية)
-                                </span>
-                            </TactileButton>
-                        </div>
-
-                        {/* روابط المجتمع */}
-                        <div className="flex gap-3 mb-4 mt-5">
-                            <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#229ED9]" borderClass="border-[#1A7DB0]" onClick={()=>window.open('https://t.me/khtmtha','_blank')}>
-                                <Send className="w-4 h-4 text-white -rotate-45" /><span className="font-bold text-white text-xs">مجتمع الطلاب</span>
-                            </TactileButton>
-                            <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#25D366]" borderClass="border-[#1da851]" onClick={()=>window.open('https://wa.me/message/AQBNBH24LYHJO1','_blank')}>
-                                <MessageCircle className="w-4 h-4 text-white" /><span className="font-bold text-white text-xs">واجهت مشكلة؟</span>
-                            </TactileButton>
-                        </div>
-                    </div>
-                )}
-
-                {/* ── خطوات Google جديد (g1-g3) ── */}
-                {isGFlow && (
-                    <div className="animate-slide-up">
-                        <StepsProgressBar numericStep={numericStep} />
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl">
-                            {renderFields(step, handleGoogleNext)}
-                            {fieldError && <p className="text-red-500 text-xs font-bold text-center mt-3">{fieldError}</p>}
-                            <div className="flex gap-3 mt-6">
-                                {step !== 'g1' && (
-                                    <button onClick={()=>{ setFieldError(''); setStep(step==='g3'?'g2':'g1'); }}
-                                        className="flex-[0.3] p-4 rounded-xl font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">رجوع</button>
-                                )}
-                                <TactileButton onClick={handleGoogleNext} className="flex-1 p-4 rounded-xl" colorClass="bg-yellow-400" borderClass="border-yellow-600">
-                                    <span className="font-black text-yellow-900 text-lg">{step === 'g3' ? 'انطلق! 🚀' : 'التالي'}</span>
-                                </TactileButton>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-            </div>
-        </div>
+            <span className={`text-[10px] font-bold mt-2 ${numericStep >= s ? 'text-yellow-600' : 'text-slate-400'}`}>
+              {s === 1 ? 'الاسم' : s === 2 ? 'شخصي' : 'المكان'}
+            </span>
+          </div>
+        ))}
+        <div className="absolute top-5 left-8 right-8 h-1 bg-slate-200 dark:bg-slate-800 -z-0"></div>
+        <div className="absolute top-5 left-8 h-1 bg-yellow-400 transition-all duration-500 ease-out -z-0" style={{ width: pct }}></div>
+      </div>
     );
+  };
+
+  const isGFlow = typeof step === 'string' && step.startsWith('g');
+  const numericStep = isGFlow ? ({ 'g1': 1, 'g2': 2, 'g3': 3 }[step]) : 1;
+
+  // إذا رجعنا من Google وبعدها تم ضبط pendingGoogleUser من الأعلى،
+  // نتأكد أننا نحول مباشرة إلى خطوة g1 لأول مرة
+  useEffect(() => {
+    if (pendingGoogleUser && !isGFlow) {
+      setStep('g1');
+      setFormData(prev => ({
+        ...prev,
+        name: pendingGoogleUser.name || prev.name || ''
+      }));
+    }
+  }, [pendingGoogleUser, isGFlow]);
+
+  const renderFields = (s, onNext) => (<>
+    {(s === 'g1') && (<>
+      <h3 className={`text-xl font-black text-center mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>أهلاً! شنو اسمك؟ 👋</h3>
+      <p className="text-center text-xs text-slate-400 font-bold mb-4">سجّلت بـ Google — أكمل بياناتك مرة وحدة</p>
+      <input type="text" placeholder="الاسم الكامل" value={formData.name} autoFocus
+        onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+        onKeyDown={e => e.key === 'Enter' && onNext()}
+        className={inputClass} />
+    </>)}
+    {(s === 'g2') && (<>
+      <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>معلوماتك الشخصية 👤</h3>
+      <div className="flex gap-3">
+        <select value={formData.age} onChange={e => setFormData(p => ({ ...p, age: e.target.value }))} className={`${inputClass} flex-[0.6] appearance-none cursor-pointer`}>
+          <option value="">العمر</option>
+          {ages.map(a => <option key={a} value={a}>{a}</option>)}
+        </select>
+        <select value={formData.gender} onChange={e => setFormData(p => ({ ...p, gender: e.target.value }))} className={`${inputClass} flex-1 appearance-none cursor-pointer`}>
+          <option value="">الجنس</option>
+          <option value="male">ذكر 🙋‍♂️</option>
+          <option value="female">أنثى 🙋‍♀️</option>
+        </select>
+      </div>
+    </>)}
+    {(s === 'g3') && (<>
+      <h3 className={`text-xl font-black text-center mb-6 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>من أي محافظة؟ 📍</h3>
+      <select value={formData.governorate} onChange={e => setFormData(p => ({ ...p, governorate: e.target.value }))} className={`${inputClass} appearance-none cursor-pointer`}>
+        <option value="">اختر المحافظة</option>
+        {governorates.map(g => <option key={g} value={g}>{g}</option>)}
+      </select>
+    </>)}
+  </>);
+
+  return (
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center px-5 py-10 w-full animate-fade-in-up" dir="rtl" style={{ paddingTop: 'max(2.5rem,env(safe-area-inset-top,2.5rem))', paddingBottom: 'max(2.5rem,env(safe-area-inset-bottom,2.5rem))' }}>
+
+      {/* الشعار */}
+      <div className={`text-center mb-8 relative z-10 transition-all duration-500 ${step !== 0 ? 'scale-75 mb-2' : ''}`}>
+        <div className="w-24 h-24 mx-auto bg-yellow-400 rounded-[2rem] rotate-[-3deg] flex items-center justify-center shadow-xl border-b-8 border-yellow-600 mb-4 relative group hover:rotate-0 transition-transform duration-300">
+          <CheckCircle2 className="w-12 h-12 text-white drop-shadow-md" strokeWidth={3} />
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center border-4 border-yellow-200 animate-bounce">
+            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+          </div>
+        </div>
+        <h1 className={`text-4xl md:text-5xl font-black tracking-tighter mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>ختمتها<span className="text-yellow-500">.</span></h1>
+        <p className={`text-xs font-bold opacity-60 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>الطريق الأمتع للـ 100</p>
+      </div>
+
+      <div className="w-full max-w-sm relative z-20">
+
+        {/* ── شاشة البداية ── */}
+        {step === 0 && (
+          <div className="animate-fade-in-up">
+            <div className={`p-6 rounded-[32px] border-2 shadow-2xl backdrop-blur-lg mb-5 ${isDarkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white/90 border-white'}`}>
+
+              {/* Google */}
+              <TactileButton onClick={handleGoogleSignIn} disabled={googleLoading}
+                className="w-full p-4 rounded-2xl flex items-center justify-center gap-3 mb-3"
+                colorClass="bg-white" borderClass="border-slate-200">
+                <div className="w-6 h-6 shrink-0 flex items-center justify-center">
+                  {googleLoading
+                    ? <span className="animate-spin w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full inline-block"></span>
+                    : <svg viewBox="0 0 24 24" className="w-6 h-6">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                  }
+                </div>
+                <span className="font-bold text-base text-slate-700">
+                  {googleLoading ? 'جاري الدخول...' : 'دخول سريع عبر Google'}
+                </span>
+              </TactileButton>
+
+              {/* ضيف */}
+              <TactileButton onClick={() => onLoginSuccess({ name: 'ضيف', isGuest: true }, true)}
+                className="w-full p-4 rounded-2xl"
+                colorClass="bg-indigo-500" borderClass="border-indigo-700">
+                <span className="font-black text-white text-lg flex items-center justify-center gap-2">
+                  👤 الدخول كضيف (تجربة مجانية)
+                </span>
+              </TactileButton>
+            </div>
+
+            {/* روابط المجتمع */}
+            <div className="flex gap-3 mb-4 mt-5">
+              <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#229ED9]" borderClass="border-[#1A7DB0]" onClick={() => window.open('https://t.me/khtmtha', '_blank')}>
+                <Send className="w-4 h-4 text-white -rotate-45" /><span className="font-bold text-white text-xs">مجتمع الطلاب</span>
+              </TactileButton>
+              <TactileButton className="flex-1 p-3 rounded-2xl gap-2" colorClass="bg-[#25D366]" borderClass="border-[#1da851]" onClick={() => window.open('https://wa.me/message/AQBNBH24LYHJO1', '_blank')}>
+                <MessageCircle className="w-4 h-4 text-white" /><span className="font-bold text-white text-xs">واجهت مشكلة؟</span>
+              </TactileButton>
+            </div>
+          </div>
+        )}
+
+        {/* ── خطوات Google جديد (g1-g3) ── */}
+        {isGFlow && (
+          <div className="animate-slide-up">
+            <StepsProgressBar numericStep={numericStep} />
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl">
+              {renderFields(step, handleGoogleNext)}
+              {fieldError && <p className="text-red-500 text-xs font-bold text-center mt-3">{fieldError}</p>}
+              <div className="flex gap-3 mt-6">
+                {step !== 'g1' && (
+                  <button onClick={() => { setFieldError(''); setStep(step === 'g3' ? 'g2' : 'g1'); }}
+                    className="flex-[0.3] p-4 rounded-xl font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">رجوع</button>
+                )}
+                <TactileButton onClick={handleGoogleNext} className="flex-1 p-4 rounded-xl" colorClass="bg-yellow-400" borderClass="border-yellow-600">
+                  <span className="font-black text-yellow-900 text-lg">{step === 'g3' ? 'انطلق! 🚀' : 'التالي'}</span>
+                </TactileButton>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
 };
 
 // --- كبسولة الإحصائيات ---
@@ -642,43 +642,43 @@ const StatsHUD = ({ isDarkMode, compact = false, onFlameClick, onQuestionsClick,
   if (compact) {
     return (
       <div className={`w-full mb-6 p-3 px-5 rounded-2xl border-2 flex items-center justify-between shadow-sm animate-fade-in-up ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
-         <div onClick={onFlameClick} className="flex items-center gap-3 cursor-pointer active:scale-90 transition-transform">
-           <div className="relative">
-             <Flame className={`w-6 h-6 ${isGuest ? 'text-slate-400' : hasFireStreak ? 'text-red-500 fill-red-500' : 'text-orange-500 fill-orange-500 animate-pulse'}`} />
-             {hasFireStreak && <span className="absolute -top-1 -right-1 text-[8px]">🔥</span>}
-           </div>
-           <span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayDays}</span>
-         </div>
-         <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
-         <div onClick={onQuestionsClick} className="flex items-center gap-3 cursor-pointer active:scale-90 transition-transform"><Target className={`w-6 h-6 ${isGuest ? 'text-slate-400' : 'text-blue-400'}`} /><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayQuestions}</span></div>
-         <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
-         <div className="flex items-center gap-3"><Star className={`w-6 h-6 ${isGuest ? 'text-slate-400' : 'text-yellow-400 fill-yellow-400'}`} /><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayXP}</span></div>
+        <div onClick={onFlameClick} className="flex items-center gap-3 cursor-pointer active:scale-90 transition-transform">
+          <div className="relative">
+            <Flame className={`w-6 h-6 ${isGuest ? 'text-slate-400' : hasFireStreak ? 'text-red-500 fill-red-500' : 'text-orange-500 fill-orange-500 animate-pulse'}`} />
+            {hasFireStreak && <span className="absolute -top-1 -right-1 text-[8px]">🔥</span>}
+          </div>
+          <span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayDays}</span>
+        </div>
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+        <div onClick={onQuestionsClick} className="flex items-center gap-3 cursor-pointer active:scale-90 transition-transform"><Target className={`w-6 h-6 ${isGuest ? 'text-slate-400' : 'text-blue-400'}`} /><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayQuestions}</span></div>
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+        <div className="flex items-center gap-3"><Star className={`w-6 h-6 ${isGuest ? 'text-slate-400' : 'text-yellow-400 fill-yellow-400'}`} /><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayXP}</span></div>
       </div>
     );
   }
 
   return (
     <div className={`w-full max-w-lg mx-auto mb-6 p-3 rounded-2xl border-2 border-b-4 flex items-center justify-between relative overflow-hidden transition-all duration-300 ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0] shadow-sm'}`}>
-       <div onClick={(e) => { e.stopPropagation(); onFlameClick(); }} className="flex-1 flex flex-col items-center justify-center relative group cursor-pointer active:scale-95 transition-transform">
-          <div className="flex items-center gap-1 mb-0.5">
-            <div className={`p-1.5 rounded-lg relative ${isGuest ? 'bg-slate-100 dark:bg-slate-700' : hasFireStreak ? 'bg-red-100' : 'bg-orange-100'}`}>
-              <Flame className={`w-4 h-4 ${isGuest ? 'text-slate-400' : hasFireStreak ? 'text-red-500 fill-red-500' : 'text-orange-500 fill-orange-500 animate-pulse'}`} />
-              {hasFireStreak && <span className="absolute -top-1 -right-1 text-[7px]">🔥</span>}
-            </div>
-            <span className={`text-xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayDays}</span>
+      <div onClick={(e) => { e.stopPropagation(); onFlameClick(); }} className="flex-1 flex flex-col items-center justify-center relative group cursor-pointer active:scale-95 transition-transform">
+        <div className="flex items-center gap-1 mb-0.5">
+          <div className={`p-1.5 rounded-lg relative ${isGuest ? 'bg-slate-100 dark:bg-slate-700' : hasFireStreak ? 'bg-red-100' : 'bg-orange-100'}`}>
+            <Flame className={`w-4 h-4 ${isGuest ? 'text-slate-400' : hasFireStreak ? 'text-red-500 fill-red-500' : 'text-orange-500 fill-orange-500 animate-pulse'}`} />
+            {hasFireStreak && <span className="absolute -top-1 -right-1 text-[7px]">🔥</span>}
           </div>
-          <span className={`text-[10px] font-bold uppercase tracking-wider ${hasFireStreak ? 'text-red-400' : 'text-slate-400'}`}>{hasFireStreak ? '🔥 متوهج!' : 'أيام'}</span>
-       </div>
-       <div className="w-0.5 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-full"></div>
-       <div onClick={(e) => { e.stopPropagation(); onQuestionsClick(); }} className="flex-[1.5] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform">
-          <div className="flex items-baseline gap-1 mb-0.5"><span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayQuestions}</span><span className="text-xs font-bold text-slate-400">/10k</span><Target className={`w-3.5 h-3.5 ml-1 ${isGuest ? 'text-slate-400' : 'text-blue-400'}`} /></div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">سؤال</span>
-       </div>
-       <div className="w-0.5 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-full"></div>
-       <div className="flex-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform">
-          <div className="flex items-center gap-1 mb-0.5"><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayXP}</span><Star className={`w-4 h-4 ${isGuest ? 'text-slate-400' : 'text-yellow-400 fill-yellow-400'}`} /></div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">XP</span>
-       </div>
+          <span className={`text-xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayDays}</span>
+        </div>
+        <span className={`text-[10px] font-bold uppercase tracking-wider ${hasFireStreak ? 'text-red-400' : 'text-slate-400'}`}>{hasFireStreak ? '🔥 متوهج!' : 'أيام'}</span>
+      </div>
+      <div className="w-0.5 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-full"></div>
+      <div onClick={(e) => { e.stopPropagation(); onQuestionsClick(); }} className="flex-[1.5] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform">
+        <div className="flex items-baseline gap-1 mb-0.5"><span className={`text-2xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayQuestions}</span><span className="text-xs font-bold text-slate-400">/10k</span><Target className={`w-3.5 h-3.5 ml-1 ${isGuest ? 'text-slate-400' : 'text-blue-400'}`} /></div>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">سؤال</span>
+      </div>
+      <div className="w-0.5 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-full"></div>
+      <div className="flex-1 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform">
+        <div className="flex items-center gap-1 mb-0.5"><span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{displayXP}</span><Star className={`w-4 h-4 ${isGuest ? 'text-slate-400' : 'text-yellow-400 fill-yellow-400'}`} /></div>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">XP</span>
+      </div>
     </div>
   );
 };
@@ -695,578 +695,613 @@ const MonsterCard = ({ isDarkMode, onClick, isGuest, subject = 'english' }) => {
     return max;
   })();
   return (
-  <TactileButton 
-    onClick={onClick}
-    disabled={false} 
-    className={`w-full mb-6 overflow-hidden p-0 group ${isGuest ? 'opacity-80 grayscale-[0.8]' : ''}`}
-    colorClass={isDarkMode ? 'bg-[#7C3AED]' : 'bg-[#8B5CF6]'} 
-    borderClass={isDarkMode ? 'border-[#5B21B6]' : 'border-[#7C3AED]'} 
-    shadowColor={isGuest ? '' : "shadow-purple-200 dark:shadow-none"}
-  >
-    <div className="absolute inset-0 bg-white/5"></div> 
-    {!isGuest && <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>}
-    
-    <div className="relative z-10 w-full p-6 flex items-center justify-between">
-       <div className="flex flex-col items-start text-right w-full">
+    <TactileButton
+      onClick={onClick}
+      disabled={false}
+      className={`w-full mb-6 overflow-hidden p-0 group ${isGuest ? 'opacity-80 grayscale-[0.8]' : ''}`}
+      colorClass={isDarkMode ? 'bg-[#7C3AED]' : 'bg-[#8B5CF6]'}
+      borderClass={isDarkMode ? 'border-[#5B21B6]' : 'border-[#7C3AED]'}
+      shadowColor={isGuest ? '' : "shadow-purple-200 dark:shadow-none"}
+    >
+      <div className="absolute inset-0 bg-white/5"></div>
+      {!isGuest && <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>}
+
+      <div className="relative z-10 w-full p-6 flex items-center justify-between">
+        <div className="flex flex-col items-start text-right w-full">
           <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-xl border border-white/20 mb-2 shadow-sm">
-             <Swords className="w-3.5 h-3.5 text-white" />
-             <span className="text-[10px] font-black text-white tracking-wide">ENDLESS</span>
+            <Swords className="w-3.5 h-3.5 text-white" />
+            <span className="text-[10px] font-black text-white tracking-wide">ENDLESS</span>
           </div>
           <h2 className="text-3xl font-black text-white drop-shadow-sm mb-1">تحدي الوحش</h2>
           <p className="text-purple-100 text-xs font-bold mb-4 opacity-90">{isGuest ? 'سجل لفتح التحدي' : 'اكسر حاجز الملل!'}</p>
           <div className="flex items-center gap-2 bg-black/20 p-2 rounded-2xl border border-white/10 mb-2 w-fit">
-             <div className="flex flex-col items-start px-1">
-                <span className="text-[9px] text-purple-100 font-bold uppercase opacity-80">أعلى سكور</span>
-                <span className="text-xl font-black text-white font-mono leading-none">{globalMaxScore > 999 ? (globalMaxScore / 1000).toFixed(1) + 'k' : globalMaxScore}</span>
-             </div>
-             <div className="w-px h-8 bg-white/20 mx-2"></div>
-             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform ${isGuest ? 'bg-slate-400 text-slate-200' : 'bg-white text-purple-600 group-hover:scale-110'}`}>
-                {isGuest ? <Lock className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-             </div>
+            <div className="flex flex-col items-start px-1">
+              <span className="text-[9px] text-purple-100 font-bold uppercase opacity-80">أعلى سكور</span>
+              <span className="text-xl font-black text-white font-mono leading-none">{globalMaxScore > 999 ? (globalMaxScore / 1000).toFixed(1) + 'k' : globalMaxScore}</span>
+            </div>
+            <div className="w-px h-8 bg-white/20 mx-2"></div>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform ${isGuest ? 'bg-slate-400 text-slate-200' : 'bg-white text-purple-600 group-hover:scale-110'}`}>
+              {isGuest ? <Lock className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+            </div>
           </div>
-       </div>
-       <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 transform group-hover:rotate-12 transition-transform duration-500">
+        </div>
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 transform group-hover:rotate-12 transition-transform duration-500">
           <Swords className="w-32 h-32 text-white" />
-       </div>
-       {isGuest && <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>}
-    </div>
-  </TactileButton>
+        </div>
+        {isGuest && <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>}
+      </div>
+    </TactileButton>
   );
 };
 
 // --- واجهة ساحة المعركة (BattleArenaModal) ---
 const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onStartGame, subject = 'english', onShowToast }) => {
-    const [showVsTutorial, setShowVsTutorial] = useState(() => {
-        try { return !JSON.parse(localStorage.getItem('seen_tooltips') || '{}').vs_tutorial; } catch { return true; }
-    });
-    const dismissVsTutorial = () => {
-        setShowVsTutorial(false);
-        try {
-            const seen = JSON.parse(localStorage.getItem('seen_tooltips') || '{}');
-            seen.vs_tutorial = true;
-            localStorage.setItem('seen_tooltips', JSON.stringify(seen));
-        } catch {}
-    };
-    const [selectedChapter, setSelectedChapter] = useState(null);
-    const bgCard = isDarkMode ? 'bg-[#1E293B]' : 'bg-white';
-    const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
-    const textSecondary = isDarkMode ? 'text-slate-400' : 'text-slate-500';
-    const accentColor = 'text-[#F59E0B]'; 
-    const primaryColor = 'bg-[#3B82F6]'; 
-    const onShare = (chapterName, score) => {
-        const text = `🎮 تحدي الأبطال!\n\nالمحارب (${playerName}) حقق ${score} XP في ${chapterName}..\nويتحداك تكسر هذا الرقم! 💪🔥`;
-        handleShareChallenge('تحدي ختمتها!', text);
-    };
+  const [showVsTutorial, setShowVsTutorial] = useState(() => {
+    try { return !JSON.parse(localStorage.getItem('seen_tooltips') || '{}').vs_tutorial; } catch { return true; }
+  });
+  const dismissVsTutorial = () => {
+    setShowVsTutorial(false);
+    try {
+      const seen = JSON.parse(localStorage.getItem('seen_tooltips') || '{}');
+      seen.vs_tutorial = true;
+      localStorage.setItem('seen_tooltips', JSON.stringify(seen));
+    } catch { }
+  };
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const bgCard = isDarkMode ? 'bg-[#1E293B]' : 'bg-white';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
+  const textSecondary = isDarkMode ? 'text-slate-400' : 'text-slate-500';
+  const accentColor = 'text-[#F59E0B]';
+  const primaryColor = 'bg-[#3B82F6]';
+  const onShare = (chapterName, score) => {
+    const text = `🎮 تحدي الأبطال!\n\nالمحارب (${playerName}) حقق ${score} XP في ${chapterName}..\nويتحداك تكسر هذا الرقم! 💪🔥`;
+    handleShareChallenge('تحدي ختمتها!', text);
+  };
 
-    return (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 font-['Cairo'] backdrop-blur-sm transition-colors duration-500 ${isDarkMode ? 'bg-slate-900/80' : 'bg-slate-200/50'}`}>
-            <div className={`relative w-full max-w-sm md:max-w-md p-6 pb-8 rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-300 animate-pop-in ${bgCard} ${isDarkMode ? 'shadow-black/50 border border-slate-700' : 'shadow-xl border border-slate-100'}`}>
-                <div className={`w-8 h-1 rounded-full mx-auto mb-6 opacity-20 ${isDarkMode ? 'bg-white' : 'bg-slate-900'}`}></div>
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex flex-col">
-                        <h3 className={`text-3xl font-black ${textPrimary} tracking-tight leading-none flex items-center gap-2`}><GraduationCap className={`w-8 h-8 ${accentColor}`} /> ساحة التحدي</h3>
-                        <div className="flex items-center gap-1.5 mt-1"><span className={`text-xs font-bold ${textSecondary}`}>اختر التحدي الدراسي</span><Flame className="w-3 h-3 text-orange-500 fill-orange-500 animate-pulse" /></div>
-                    </div>
-                    <button onClick={onClose} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200'}`}><X className={`w-5 h-5 ${textPrimary}`} /></button>
+  return (
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 font-['Cairo'] backdrop-blur-sm transition-colors duration-500 ${isDarkMode ? 'bg-slate-900/80' : 'bg-slate-200/50'}`}>
+      <div className={`relative w-full max-w-sm md:max-w-md p-6 pb-8 rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-300 animate-pop-in ${bgCard} ${isDarkMode ? 'shadow-black/50 border border-slate-700' : 'shadow-xl border border-slate-100'}`}>
+        <div className={`w-8 h-1 rounded-full mx-auto mb-6 opacity-20 ${isDarkMode ? 'bg-white' : 'bg-slate-900'}`}></div>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col">
+            <h3 className={`text-3xl font-black ${textPrimary} tracking-tight leading-none flex items-center gap-2`}><GraduationCap className={`w-8 h-8 ${accentColor}`} /> ساحة التحدي</h3>
+            <div className="flex items-center gap-1.5 mt-1"><span className={`text-xs font-bold ${textSecondary}`}>اختر التحدي الدراسي</span><Flame className="w-3 h-3 text-orange-500 fill-orange-500 animate-pulse" /></div>
+          </div>
+          <button onClick={onClose} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200'}`}><X className={`w-5 h-5 ${textPrimary}`} /></button>
+        </div>
+        {/* إشعار "تحدى صديقك" — يظهر فوق الـ grid مرة واحدة فقط */}
+        {showVsTutorial && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-2xl bg-yellow-400/20 border border-yellow-400/40 animate-fade-in">
+            <span className="text-lg">🔥</span>
+            <p className="text-yellow-700 dark:text-yellow-300 font-black text-sm flex-1">تحدى صديقك! اضغط VS بجانب أي فصل أنهيته</p>
+            <button onClick={dismissVsTutorial} className="text-yellow-600 hover:text-yellow-800 transition-colors"><X className="w-4 h-4" /></button>
+          </div>
+        )}
+        <div className="grid grid-cols-4 gap-3 mb-8">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
+            const isChapterLocked = false;
+            const score = isChapterLocked ? 0 : (chapterScores[num] || 0);
+            const hasScore = score > 0;
+            const isSelected = selectedChapter === num;
+
+            if (isChapterLocked) {
+              return (
+                <div key={num} className="relative group h-28">
+                  <div
+                    onClick={() => onShowToast?.('🔒 الفصل قريباً!')}
+                    className={`w-full h-full flex flex-col items-center justify-center !rounded-[20px] cursor-pointer opacity-40 select-none ${isDarkMode ? 'bg-[#334155]' : 'bg-slate-100'}`}
+                  >
+                    <span className={`text-[10px] font-bold mb-0.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>الفصل</span>
+                    <span className={`text-3xl font-black leading-none mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`}>{num}</span>
+                    <Lock className="w-4 h-4 text-slate-400 mt-1" />
+                  </div>
                 </div>
-                {/* إشعار "تحدى صديقك" — يظهر فوق الـ grid مرة واحدة فقط */}
-                {showVsTutorial && (
-                    <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-2xl bg-yellow-400/20 border border-yellow-400/40 animate-fade-in">
-                        <span className="text-lg">🔥</span>
-                        <p className="text-yellow-700 dark:text-yellow-300 font-black text-sm flex-1">تحدى صديقك! اضغط VS بجانب أي فصل أنهيته</p>
-                        <button onClick={dismissVsTutorial} className="text-yellow-600 hover:text-yellow-800 transition-colors"><X className="w-4 h-4" /></button>
+              );
+            }
+
+            return (
+              <div key={num} className="relative group h-28">
+                <TactileButton onClick={() => { setSelectedChapter(num); onStartGame('monster', subject, null, num); }} className={`w-full h-full flex-col !gap-0 !rounded-[20px] border-none transition-all ${isSelected ? `${primaryColor} text-white shadow-lg shadow-blue-500/30 translate-y-[-4px]` : (isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200')}`}>
+                  <div className="flex-1 flex flex-col items-center justify-center w-full">
+                    <span className={`text-[10px] font-bold mb-0.5 opacity-80`}>الفصل</span>
+                    <span className={`text-3xl font-black leading-none mb-1`}>{num}</span>
+                    <div className="mt-2 h-5 flex items-center justify-center">
+                      {hasScore ? (
+                        <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                          <Star className={`w-2.5 h-2.5 ${isSelected ? 'text-yellow-300 fill-current' : 'text-yellow-500 fill-current'}`} />
+                          <span className={`text-[9px] font-black ${isSelected ? 'text-white' : (isDarkMode ? 'text-slate-300' : 'text-slate-600')}`}>{score > 999 ? (score / 1000).toFixed(1) + 'k' : score}</span>
+                        </div>
+                      ) : (
+                        <span className={`text-[9px] font-bold opacity-40 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ابدأ</span>
+                      )}
                     </div>
-                )}
-                <div className="grid grid-cols-4 gap-3 mb-8">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
-                        const isChapterLocked = num > 1;
-                        const score = isChapterLocked ? 0 : (chapterScores[num] || 0);
-                        const hasScore = score > 0;
-                        const isSelected = selectedChapter === num;
-
-                        if (isChapterLocked) {
-                            return (
-                                <div key={num} className="relative group h-28">
-                                    <div
-                                        onClick={() => onShowToast?.('🔒 الفصل قريباً!')}
-                                        className={`w-full h-full flex flex-col items-center justify-center !rounded-[20px] cursor-pointer opacity-40 select-none ${isDarkMode ? 'bg-[#334155]' : 'bg-slate-100'}`}
-                                    >
-                                        <span className={`text-[10px] font-bold mb-0.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>الفصل</span>
-                                        <span className={`text-3xl font-black leading-none mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`}>{num}</span>
-                                        <Lock className="w-4 h-4 text-slate-400 mt-1" />
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <div key={num} className="relative group h-28">
-                                <TactileButton onClick={() => { setSelectedChapter(num); onStartGame('monster', subject, null, num); }} className={`w-full h-full flex-col !gap-0 !rounded-[20px] border-none transition-all ${isSelected ? `${primaryColor} text-white shadow-lg shadow-blue-500/30 translate-y-[-4px]` : (isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200')}`}>
-                                    <div className="flex-1 flex flex-col items-center justify-center w-full">
-                                        <span className={`text-[10px] font-bold mb-0.5 opacity-80`}>الفصل</span>
-                                        <span className={`text-3xl font-black leading-none mb-1`}>{num}</span>
-                                        <div className="mt-2 h-5 flex items-center justify-center">
-                                            {hasScore ? (
-                                                <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
-                                                    <Star className={`w-2.5 h-2.5 ${isSelected ? 'text-yellow-300 fill-current' : 'text-yellow-500 fill-current'}`} />
-                                                    <span className={`text-[9px] font-black ${isSelected ? 'text-white' : (isDarkMode ? 'text-slate-300' : 'text-slate-600')}`}>{score > 999 ? (score/1000).toFixed(1) + 'k' : score}</span>
-                                                </div>
-                                            ) : (
-                                                <span className={`text-[9px] font-bold opacity-40 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>ابدأ</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </TactileButton>
-                                {hasScore && (
-                                    <div className="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 z-30">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                dismissVsTutorial();
-                                                onShare(`الفصل ${num}`, score);
-                                            }}
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform border-[3px]
+                  </div>
+                </TactileButton>
+                {hasScore && (
+                  <div className="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 z-30">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dismissVsTutorial();
+                        onShare(`الفصل ${num}`, score);
+                      }}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform border-[3px]
                                                 ${isDarkMode ? 'border-[#1E293B] bg-white text-slate-900' : 'border-white bg-slate-900 text-white'}
                                             `}
-                                        >
-                                            <span className="text-[9px] font-black italic">VS</span>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-                <div className="relative w-full mt-2"><TactileButton className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none opacity-50 ${isDarkMode ? 'bg-slate-600' : 'bg-slate-400'}`} onClick={() => onShowToast?.('🔒 التحدي الشامل قريباً!')}><div className="w-full p-5 flex items-center justify-between z-10 relative"><div className="flex items-center gap-4"><div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center"><Lock className="w-7 h-7 text-white" /></div><div className="text-right"><div className="flex items-center gap-2 mb-1"><span className="text-xl font-black text-white">التحدي الشامل</span></div><div className="flex items-center gap-1.5 text-white/90"><span className="text-xs font-bold text-white/70">قريباً</span></div></div></div><div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white"><Lock className="w-5 h-5" /></div></div></TactileButton></div>
-            </div>
+                    >
+                      <span className="text-[9px] font-black italic">VS</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-    );
+        <div className="relative w-full mt-2">
+          <TactileButton
+            className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none ${isDarkMode ? 'bg-indigo-600' : 'bg-indigo-500'}`}
+            onClick={() => onStartGame('monster', subject, null, 0)}
+          >
+            <div className="w-full p-5 flex items-center justify-between z-10 relative">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                  <Swords className="w-7 h-7 text-white" />
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl font-black text-white">التحدي الشامل</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-white/90">
+                    <span className="text-xs font-bold text-white/70">كل المنهج</span>
+                  </div>
+                </div>
+              </div>
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white">
+                <Play className="w-5 h-5 fill-current" />
+              </div>
+            </div>
+          </TactileButton>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 
 // القائمة السفلية (BottomDock)
 const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick, completedToday = 0, onStartBagReview, subject = 'english' }) => {
-    const [mistakesOpen, setMistakesOpen] = useState(false);
-    const [bagItems, setBagItems] = useState(() => {
-        if (!ERROR_BAG_ENABLED) return [];
-        try { return JSON.parse(localStorage.getItem('mistakes_bag') || '[]'); } catch { return []; }
-    });
+  const [mistakesOpen, setMistakesOpen] = useState(false);
+  const [bagItems, setBagItems] = useState(() => {
+    if (!ERROR_BAG_ENABLED) return [];
+    try { return JSON.parse(localStorage.getItem('mistakes_bag') || '[]'); } catch { return []; }
+  });
 
-    // تحديث الحقيبة عند الفتح — أولاً من localStorage ثم Supabase (للمزامنة)
-    const openBag = async () => {
-        if (!ERROR_BAG_ENABLED) return;
-        try { setBagItems(JSON.parse(localStorage.getItem('mistakes_bag') || '[]')); } catch {}
-        setMistakesOpen(true);
+  // تحديث الحقيبة عند الفتح — أولاً من localStorage ثم Supabase (للمزامنة)
+  const openBag = async () => {
+    if (!ERROR_BAG_ENABLED) return;
+    try { setBagItems(JSON.parse(localStorage.getItem('mistakes_bag') || '[]')); } catch { }
+    setMistakesOpen(true);
 
-        const userDbId = localStorage.getItem('user_db_id');
-        if (userDbId) {
-            try {
-                const { data } = await supabase
-                    .from('mistakes_bag')
-                    .select('*')
-                    .eq('user_db_id', userDbId)
-                    .lt('correct_replays', 4)
-                    .order('added_at');
-                if (data && data.length > 0) {
-                    const synced = data.map(r => ({
-                        id: r.id,
-                        type: 'questions',
-                        label: r.label || '',
-                        subject: r.subject,
-                        questions: r.questions || [],
-                        correctReplays: r.correct_replays || 0,
-                        addedAt: new Date(r.added_at).getTime(),
-                        nextPlayAt: new Date(r.next_play_at).getTime(),
-                    }));
-                    setBagItems(synced);
-                    localStorage.setItem('mistakes_bag', JSON.stringify(synced));
-                }
-            } catch {}
+    const userDbId = localStorage.getItem('user_db_id');
+    if (userDbId) {
+      try {
+        const { data } = await supabase
+          .from('mistakes_bag')
+          .select('*')
+          .eq('user_db_id', userDbId)
+          .lt('correct_replays', 4)
+          .order('added_at');
+        if (data && data.length > 0) {
+          const synced = data.map(r => ({
+            id: r.id,
+            type: 'questions',
+            label: r.label || '',
+            subject: r.subject,
+            questions: r.questions || [],
+            correctReplays: r.correct_replays || 0,
+            addedAt: new Date(r.added_at).getTime(),
+            nextPlayAt: new Date(r.next_play_at).getTime(),
+          }));
+          setBagItems(synced);
+          localStorage.setItem('mistakes_bag', JSON.stringify(synced));
         }
-    };
+      } catch { }
+    }
+  };
 
-    const now = Date.now();
-    // فلترة: تُخفى العناصر التي وصلت 4 مرات صحيحة وتُصفّى حسب المادة الحالية
-    const activeBag = bagItems.filter(item => (item.correctReplays || 0) < 4 && (!item.subject || item.subject === subject));
-    const bagCount = activeBag.length;
+  const now = Date.now();
+  // فلترة: تُخفى العناصر التي وصلت 4 مرات صحيحة وتُصفّى حسب المادة الحالية
+  const activeBag = bagItems.filter(item => (item.correctReplays || 0) < 4 && (!item.subject || item.subject === subject));
+  const bagCount = activeBag.length;
 
-    const formatCountdown = (nextPlayAt) => {
-        const diff = nextPlayAt - now;
-        if (diff <= 0) return null;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        return h > 0 ? `${h}س ${m}د` : `${m} دقيقة`;
-    };
+  const formatCountdown = (nextPlayAt) => {
+    const diff = nextPlayAt - now;
+    if (diff <= 0) return null;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return h > 0 ? `${h}س ${m}د` : `${m} دقيقة`;
+  };
 
-    // taskState يُحدد تلقائياً من عدد المراحل المكتملة اليوم
-    // completedToday قد يكون object أو رقم
-    const totalCompleted = typeof completedToday === 'object' 
-      ? ((completedToday?.english || 0) + (completedToday?.biology || 0))
-      : (completedToday || 0);
-    const taskState = totalCompleted >= 2 ? 2 : totalCompleted >= 1 ? 1 : 0;
+  // taskState يُحدد تلقائياً من عدد المراحل المكتملة اليوم
+  // completedToday قد يكون object أو رقم
+  const totalCompleted = typeof completedToday === 'object'
+    ? ((completedToday?.english || 0) + (completedToday?.biology || 0))
+    : (completedToday || 0);
+  const taskState = totalCompleted >= 2 ? 2 : totalCompleted >= 1 ? 1 : 0;
 
-    const currentTask = [
-        { color: 'bg-rose-400', border: 'border-rose-600', text: 'text-rose-900', label: 'ابدأ المهام', sub: '0/2', icon: Target, iconBg: 'bg-rose-100' },
-        { color: 'bg-yellow-400', border: 'border-yellow-600', text: 'text-yellow-900', label: 'جاري العمل', sub: '1/2', icon: Play, iconBg: 'bg-yellow-100' },
-        { color: 'bg-emerald-400', border: 'border-emerald-600', text: 'text-emerald-900', label: 'أحسنت!', sub: '2/2', icon: CheckCircle2, iconBg: 'bg-emerald-100' }
-    ][taskState];
+  const currentTask = [
+    { color: 'bg-rose-400', border: 'border-rose-600', text: 'text-rose-900', label: 'ابدأ المهام', sub: '0/2', icon: Target, iconBg: 'bg-rose-100' },
+    { color: 'bg-yellow-400', border: 'border-yellow-600', text: 'text-yellow-900', label: 'جاري العمل', sub: '1/2', icon: Play, iconBg: 'bg-yellow-100' },
+    { color: 'bg-emerald-400', border: 'border-emerald-600', text: 'text-emerald-900', label: 'أحسنت!', sub: '2/2', icon: CheckCircle2, iconBg: 'bg-emerald-100' }
+  ][taskState];
 
-    return (
-        <div className="fixed bottom-6 left-0 right-0 z-50 px-6 pointer-events-none">
-            <div className="max-w-lg mx-auto flex items-end justify-between pointer-events-auto">
-                <div className="relative">
-                    {mistakesOpen && (
-                        <div className={`absolute bottom-full left-0 mb-3 w-64 p-4 rounded-3xl border-2 border-b-4 shadow-xl animate-fade-in origin-bottom-left ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
-                            <div className="flex justify-between items-center mb-3">
-                                <h3 className={`font-black text-sm ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>حقيبة الأخطاء 🎒</h3>
-                                <button onClick={() => setMistakesOpen(false)}><X className="w-4 h-4 text-slate-400" /></button>
-                            </div>
-                            {activeBag.length === 0 ? (
-                                <p className="text-xs text-slate-500 text-center py-3">الحقيبة فارغة! ما عندك أخطاء 🎉</p>
-                            ) : (
-                                <div className="space-y-2 max-h-56 overflow-y-auto">
-                                    {activeBag.map(item => {
-                                        const countdown = formatCountdown(item.nextPlayAt);
-                                        const canPlay = !countdown;
-                                        return (
-                                            <div key={item.id} className={`rounded-xl p-3 border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${item.type === 'stage' ? 'bg-purple-100 text-purple-700' : 'bg-red-100 text-red-700'}`}>
-                                                        {item.type === 'stage' ? '📚 مرحلة كاملة' : '❓ أسئلة خاطئة'}
-                                                    </span>
-                                                    <span className="text-[9px] text-slate-400">{item.correctReplays}/4 ✓</span>
-                                                </div>
-                                                <p className={`text-xs font-bold mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>{item.label}</p>
-                                                {canPlay ? (
-                                                    <button
-                                                        onClick={() => {
-                                                            setMistakesOpen(false);
-                                                            if (onStartBagReview) onStartBagReview(item);
-                                                        }}
-                                                        className="w-full py-1.5 bg-amber-400 border-b-2 border-amber-600 rounded-lg text-xs font-black text-amber-900 active:translate-y-0.5 transition-all"
-                                                    >
-                                                        العب الآن ▶
-                                                    </button>
-                                                ) : (
-                                                    <div className="w-full py-1.5 bg-slate-200 rounded-lg text-xs font-bold text-slate-500 text-center">
-                                                        ⏳ {countdown}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+  return (
+    <div className="fixed bottom-6 left-0 right-0 z-50 px-6 pointer-events-none">
+      <div className="max-w-lg mx-auto flex items-end justify-between pointer-events-auto">
+        <div className="relative">
+          {mistakesOpen && (
+            <div className={`absolute bottom-full left-0 mb-3 w-64 p-4 rounded-3xl border-2 border-b-4 shadow-xl animate-fade-in origin-bottom-left ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className={`font-black text-sm ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>حقيبة الأخطاء 🎒</h3>
+                <button onClick={() => setMistakesOpen(false)}><X className="w-4 h-4 text-slate-400" /></button>
+              </div>
+              {activeBag.length === 0 ? (
+                <p className="text-xs text-slate-500 text-center py-3">الحقيبة فارغة! ما عندك أخطاء 🎉</p>
+              ) : (
+                <div className="space-y-2 max-h-56 overflow-y-auto">
+                  {activeBag.map(item => {
+                    const countdown = formatCountdown(item.nextPlayAt);
+                    const canPlay = !countdown;
+                    return (
+                      <div key={item.id} className={`rounded-xl p-3 border ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${item.type === 'stage' ? 'bg-purple-100 text-purple-700' : 'bg-red-100 text-red-700'}`}>
+                            {item.type === 'stage' ? '📚 مرحلة كاملة' : '❓ أسئلة خاطئة'}
+                          </span>
+                          <span className="text-[9px] text-slate-400">{item.correctReplays}/4 ✓</span>
                         </div>
-                    )}
-                    <TactileButton
-                        onClick={(e) => {
-                            if (onMistakeClick && onMistakeClick(e) === false) return;
-                            if (mistakesOpen) setMistakesOpen(false); else openBag();
-                        }}
-                        className="w-16 h-16 rounded-[20px] flex flex-col gap-1"
-                        colorClass={isDarkMode ? 'bg-yellow-500' : 'bg-[#FCD34D]'}
-                        borderClass={isDarkMode ? 'border-yellow-700' : 'border-yellow-700'}
-                    >
-                         <Briefcase className="w-6 h-6 text-amber-800" />
-                         {bagCount > 0 && (
-                             <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 border-2 border-white dark:border-slate-800 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm animate-bounce">{bagCount}</span>
-                         )}
-                    </TactileButton>
+                        <p className={`text-xs font-bold mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>{item.label}</p>
+                        {canPlay ? (
+                          <button
+                            onClick={() => {
+                              setMistakesOpen(false);
+                              if (onStartBagReview) onStartBagReview(item);
+                            }}
+                            className="w-full py-1.5 bg-amber-400 border-b-2 border-amber-600 rounded-lg text-xs font-black text-amber-900 active:translate-y-0.5 transition-all"
+                          >
+                            العب الآن ▶
+                          </button>
+                        ) : (
+                          <div className="w-full py-1.5 bg-slate-200 rounded-lg text-xs font-bold text-slate-500 text-center">
+                            ⏳ {countdown}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <TactileButton
-                    onClick={(e) => { onTaskClick(e); }}
-                    className="h-16 px-6 rounded-[20px] flex items-center justify-between gap-6 min-w-[190px]"
-                    colorClass={currentTask.color}
-                    borderClass={currentTask.border}
-                >
-                    <div className={`flex flex-col items-start ${currentTask.text}`}>
-                        <span className="text-[10px] opacity-80 font-bold">المهمة اليومية</span>
-                        <span className="text-sm font-black tracking-wide">{currentTask.label}</span>
-                    </div>
-                    <div className={`w-10 h-10 rounded-full ${currentTask.iconBg} flex items-center justify-center border-2 border-white/40 shadow-sm`}>
-                        {taskState === 2 ? <CheckCircle2 className="w-5 h-5 text-teal-600" /> : <span className={`font-black text-sm ${currentTask.text}`}>{currentTask.sub}</span>}
-                    </div>
-                </TactileButton>
+              )}
             </div>
+          )}
+          <TactileButton
+            onClick={(e) => {
+              if (onMistakeClick && onMistakeClick(e) === false) return;
+              if (mistakesOpen) setMistakesOpen(false); else openBag();
+            }}
+            className="w-16 h-16 rounded-[20px] flex flex-col gap-1"
+            colorClass={isDarkMode ? 'bg-yellow-500' : 'bg-[#FCD34D]'}
+            borderClass={isDarkMode ? 'border-yellow-700' : 'border-yellow-700'}
+          >
+            <Briefcase className="w-6 h-6 text-amber-800" />
+            {bagCount > 0 && (
+              <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 border-2 border-white dark:border-slate-800 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm animate-bounce">{bagCount}</span>
+            )}
+          </TactileButton>
         </div>
-    );
+        <TactileButton
+          onClick={(e) => { onTaskClick(e); }}
+          className="h-16 px-6 rounded-[20px] flex items-center justify-between gap-6 min-w-[190px]"
+          colorClass={currentTask.color}
+          borderClass={currentTask.border}
+        >
+          <div className={`flex flex-col items-start ${currentTask.text}`}>
+            <span className="text-[10px] opacity-80 font-bold">المهمة اليومية</span>
+            <span className="text-sm font-black tracking-wide">{currentTask.label}</span>
+          </div>
+          <div className={`w-10 h-10 rounded-full ${currentTask.iconBg} flex items-center justify-center border-2 border-white/40 shadow-sm`}>
+            {taskState === 2 ? <CheckCircle2 className="w-5 h-5 text-teal-600" /> : <span className={`font-black text-sm ${currentTask.text}`}>{currentTask.sub}</span>}
+          </div>
+        </TactileButton>
+      </div>
+    </div>
+  );
 };
 
 // واجهة الفصول (ChaptersView)
 const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin, userProfile, subject = 'english' }) => {
-    const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
-    const STAGES_PER_CHAPTER = 12; // للفصول 2-8
+  const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
+  const STAGES_PER_CHAPTER = 12; // للفصول 2-8
 
-    const handleChapterClick = (num) => {
-        if (isGuest && num > 1) {
-            onShowLogin();
-        } else {
-            onChapterClick(num);
-        }
-    };
+  const handleChapterClick = (num) => {
+    if (isGuest && num > 1) {
+      onShowLogin();
+    } else {
+      onChapterClick(num);
+    }
+  };
 
-    // حساب نسبة إكمال فصل معين (Supabase أولاً، ثم cache localStorage)
-    const [supabaseDoneMap, setSupabaseDoneMap] = useState({}); // { [chapterNum]: Set(stages) }
-    useEffect(() => {
-        const userDbId = (() => { try { return localStorage.getItem('user_db_id'); } catch { return null; } })();
-        if (isGuest || !userDbId) return;
-        let cancelled = false;
-        (async () => {
-            try {
-                const rows = await loadAllStageProgress({ userDbId, subject });
-                if (cancelled) return;
-                const map = {};
-                rows.forEach(r => {
-                    const ch = Number(r.chapter);
-                    const st = Number(r.stage);
-                    if (!map[ch]) map[ch] = new Set();
-                    map[ch].add(st);
-                });
-                setSupabaseDoneMap(map);
-            } catch {}
-        })();
-        return () => { cancelled = true; };
-    }, [isGuest, subject]);
+  // حساب نسبة إكمال فصل معين (Supabase أولاً، ثم cache localStorage)
+  const [supabaseDoneMap, setSupabaseDoneMap] = useState({}); // { [chapterNum]: Set(stages) }
+  useEffect(() => {
+    const userDbId = (() => { try { return localStorage.getItem('user_db_id'); } catch { return null; } })();
+    if (isGuest || !userDbId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await loadAllStageProgress({ userDbId, subject });
+        if (cancelled) return;
+        const map = {};
+        rows.forEach(r => {
+          const ch = Number(r.chapter);
+          const st = Number(r.stage);
+          if (!map[ch]) map[ch] = new Set();
+          map[ch].add(st);
+        });
+        setSupabaseDoneMap(map);
+      } catch { }
+    })();
+    return () => { cancelled = true; };
+  }, [isGuest, subject]);
 
-    const getChapterProgress = (num) => {
-        const total = getTotalStagesForChapter(num);
-        const supaSet = supabaseDoneMap[num];
-        if (supaSet && total > 0) {
-            return Math.min(100, Math.round((supaSet.size / total) * 100));
-        }
-        return 0;
-    };
+  const getChapterProgress = (num) => {
+    const total = getTotalStagesForChapter(num);
+    const supaSet = supabaseDoneMap[num];
+    if (supaSet && total > 0) {
+      return Math.min(100, Math.round((supaSet.size / total) * 100));
+    }
+    return 0;
+  };
 
-    const getProgressColor = (p) => {
-        if (p === 100) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
-        if (p >= 90) return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse';
-        if (p >= 50) return 'bg-orange-500';
-        return 'bg-yellow-400';
-    };
+  const getProgressColor = (p) => {
+    if (p === 100) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
+    if (p >= 90) return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse';
+    if (p >= 50) return 'bg-orange-500';
+    return 'bg-yellow-400';
+  };
 
-    return (
-        <div className="animate-fade-in-up pb-32">
-            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} subject={subject} />
-            <div className="flex items-center gap-4 mb-6">
-                <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
-                    <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
-                </TactileButton>
-                <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>خريطة الفصول</h2>
-            </div>
+  return (
+    <div className="animate-fade-in-up pb-32">
+      <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} subject={subject} />
+      <div className="flex items-center gap-4 mb-6">
+        <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
+          <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
+        </TactileButton>
+        <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>خريطة الفصول</h2>
+      </div>
 
-            <div className="space-y-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
-                    // الفصل 1 فقط متاح حالياً — باقي الفصول مقفولة حتى رفع بياناتها
-                    const isLocked = isGuest ? num > 1 : num > 1;
-                    const progress = isLocked ? 0 : getChapterProgress(num);
+      <div className="space-y-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => {
+          // تم فتح جميع الفصول كما طلب المستخدم
+          const isLocked = false;
+          const progress = isLocked ? 0 : getChapterProgress(num);
 
-                    return (
-                        <TactileButton
-                            key={num}
-                            onClick={() => !isLocked && handleChapterClick(num)}
-                            className={`w-full p-5 flex items-center justify-between rounded-[28px] group transition-all ${isLocked ? 'opacity-60' : ''}`}
-                            colorClass={isLocked ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-200') : (isDarkMode ? 'bg-slate-800' : 'bg-white')}
-                            borderClass={isLocked ? (isDarkMode ? 'border-slate-800' : 'border-slate-300') : (isDarkMode ? 'border-slate-700' : 'border-slate-200')}
-                        >
-                            <div className="flex items-center gap-5 w-full">
-                                <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-3xl font-black border-2 shadow-inner transform group-active:scale-90 transition-transform ${isLocked ? (isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-500' : 'bg-slate-300 border-slate-400 text-slate-500') : (isDarkMode ? 'bg-[#1E293B] border-slate-700 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-500')}`}>
-                                    {isLocked ? <Lock className="w-8 h-8" /> : num}
-                                </div>
+          return (
+            <TactileButton
+              key={num}
+              onClick={() => !isLocked && handleChapterClick(num)}
+              className={`w-full p-5 flex items-center justify-between rounded-[28px] group transition-all ${isLocked ? 'opacity-60' : ''}`}
+              colorClass={isLocked ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-200') : (isDarkMode ? 'bg-slate-800' : 'bg-white')}
+              borderClass={isLocked ? (isDarkMode ? 'border-slate-800' : 'border-slate-300') : (isDarkMode ? 'border-slate-700' : 'border-slate-200')}
+            >
+              <div className="flex items-center gap-5 w-full">
+                <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-3xl font-black border-2 shadow-inner transform group-active:scale-90 transition-transform ${isLocked ? (isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-500' : 'bg-slate-300 border-slate-400 text-slate-500') : (isDarkMode ? 'bg-[#1E293B] border-slate-700 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-500')}`}>
+                  {isLocked ? <Lock className="w-8 h-8" /> : num}
+                </div>
 
-                                <div className="flex-1 flex flex-col justify-center h-full">
-                                    <span className={`block text-xl font-black mb-2 ${isLocked ? 'text-slate-500' : (isDarkMode ? 'text-white' : 'text-slate-800')}`}>الفصل {chapterNames[num - 1]}</span>
+                <div className="flex-1 flex flex-col justify-center h-full">
+                  <span className={`block text-xl font-black mb-2 ${isLocked ? 'text-slate-500' : (isDarkMode ? 'text-white' : 'text-slate-800')}`}>الفصل {chapterNames[num - 1]}</span>
 
-                                    {!isLocked ? (
-                                        <div className="w-full max-w-[140px]">
-                                            <div className="flex justify-between items-end mb-1">
-                                                <span className={`text-[10px] font-bold ${progress >= 90 ? 'text-red-500 animate-pulse' : 'text-slate-400'}`}>
-                                                    {progress === 100 ? '✅ مكتمل!' : progress >= 90 ? '🔥 قريب!' : progress > 0 ? 'جاري...' : 'ابدأ'}
-                                                </span>
-                                                <span className={`text-xs font-black ${progress === 100 ? 'text-emerald-500' : progress >= 90 ? 'text-red-500' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                    {progress}%
-                                                </span>
-                                            </div>
-                                            <div className="h-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden shadow-inner border border-black/5 dark:border-white/5">
-                                                <div
-                                                    className={`h-full rounded-full transition-all duration-1000 ease-out ${getProgressColor(progress)}`}
-                                                    style={{ width: `${progress}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <Lock className="w-3 h-3 text-slate-400" />
-                                            <span className="text-xs font-bold text-slate-400">قريباً</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            {isLocked && <div className={`px-2 py-1 rounded text-[10px] font-bold shrink-0 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-300 text-slate-500'}`}>قريباً</div>}
-                        </TactileButton>
-                    );
-                })}
-            </div>
-        </div>
-    );
+                  {!isLocked ? (
+                    <div className="w-full max-w-[140px]">
+                      <div className="flex justify-between items-end mb-1">
+                        <span className={`text-[10px] font-bold ${progress >= 90 ? 'text-red-500 animate-pulse' : 'text-slate-400'}`}>
+                          {progress === 100 ? '✅ مكتمل!' : progress >= 90 ? '🔥 قريب!' : progress > 0 ? 'جاري...' : 'ابدأ'}
+                        </span>
+                        <span className={`text-xs font-black ${progress === 100 ? 'text-emerald-500' : progress >= 90 ? 'text-red-500' : 'text-slate-600 dark:text-slate-300'}`}>
+                          {progress}%
+                        </span>
+                      </div>
+                      <div className="h-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden shadow-inner border border-black/5 dark:border-white/5">
+                        <div
+                          className={`h-full rounded-full transition-all duration-1000 ease-out ${getProgressColor(progress)}`}
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 mt-1">
+                      <Lock className="w-3 h-3 text-slate-400" />
+                      <span className="text-xs font-bold text-slate-400">قريباً</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {isLocked && <div className={`px-2 py-1 rounded text-[10px] font-bold shrink-0 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-300 text-slate-500'}`}>قريباً</div>}
+            </TactileButton>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 // LevelsView تم نقله إلى `src/screens/LevelsView.jsx`
 
 // واجهة المراجعات
 const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, onQuestionsClick, onStartGame, subject = 'english', userProfile }) => {
-    const [expandedReview, setExpandedReview] = useState(null); // 'midyear' or 'comprehensive' or chapterId
-    const toggleReview = (id) => setExpandedReview(expandedReview === id ? null : id);
+  const [expandedReview, setExpandedReview] = useState(null); // 'midyear' or 'comprehensive' or chapterId
+  const toggleReview = (id) => setExpandedReview(expandedReview === id ? null : id);
 
-    const PARTS_COUNT = 4;
-    const partTitles = ['الجزء الأول', 'الجزء الثاني', 'الجزء الثالث', 'الجزء الرابع'];
+  const PARTS_COUNT = 4;
+  const partTitles = ['الجزء الأول', 'الجزء الثاني', 'الجزء الثالث', 'الجزء الرابع'];
 
-    // قراءة حالة إنجاز الأجزاء من localStorage
-    const getPartDone = (chNum, partNum) => {
-        try { return localStorage.getItem(`review_part_done_${subject}_ch${chNum}_p${partNum}`) === '1'; } catch { return false; }
-    };
-    const getChapterCompletions = (chNum) => {
-        try { return parseInt(localStorage.getItem(`review_ch_completions_${subject}_ch${chNum}`) || '0'); } catch { return 0; }
-    };
+  // قراءة حالة إنجاز الأجزاء من localStorage
+  const getPartDone = (chNum, partNum) => {
+    try { return localStorage.getItem(`review_part_done_${subject}_ch${chNum}_p${partNum}`) === '1'; } catch { return false; }
+  };
+  const getChapterCompletions = (chNum) => {
+    try { return parseInt(localStorage.getItem(`review_ch_completions_${subject}_ch${chNum}`) || '0'); } catch { return 0; }
+  };
 
-    // بناء مصفوفة الأجزاء ديناميكياً
-    const buildChapterParts = (chNum) => {
-        return Array.from({ length: PARTS_COUNT }, (_, i) => {
-            const partNum = i + 1;
-            const done = getPartDone(chNum, partNum);
-            const prevDone = partNum === 1 || getPartDone(chNum, partNum - 1);
-            return {
-                id: partNum,
-                title: partTitles[i],
-                done,
-                status: done ? 'completed' : prevDone ? 'unlocked' : 'locked',
-            };
-        });
-    };
+  // بناء مصفوفة الأجزاء ديناميكياً
+  const buildChapterParts = (chNum) => {
+    return Array.from({ length: PARTS_COUNT }, (_, i) => {
+      const partNum = i + 1;
+      const done = getPartDone(chNum, partNum);
+      const prevDone = partNum === 1 || getPartDone(chNum, partNum - 1);
+      return {
+        id: partNum,
+        title: partTitles[i],
+        done,
+        status: done ? 'completed' : prevDone ? 'unlocked' : 'locked',
+      };
+    });
+  };
 
-    const [ch1Parts, setCh1Parts] = useState(() => buildChapterParts(1));
-    const ch1Completions = getChapterCompletions(1);
-    const allCh1Done = ch1Parts.every(p => p.done);
+  const [ch1Parts, setCh1Parts] = useState(() => buildChapterParts(1));
+  const ch1Completions = getChapterCompletions(1);
+  const allCh1Done = ch1Parts.every(p => p.done);
 
-    const handleStartReviewPart = async (chNum, partNum) => {
-        onStartGame('review_part', subject, null, chNum, partNum);
-    };
+  const handleStartReviewPart = async (chNum, partNum) => {
+    onStartGame('review_part', subject, null, chNum, partNum);
+  };
 
-    return (
-        <div className="animate-fade-in-up pb-32">
-            <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} subject={subject} />
-            <div className="flex items-center gap-4 mb-6">
-                <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
-                    <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
-                </TactileButton>
-                <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>المراجعات</h2>
-            </div>
-            
-            {isGuest ? (
-                <div className="text-center py-20 opacity-60">
-                    <Lock className="w-16 h-16 mx-auto text-slate-400 mb-4" />
-                    <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>المراجعات للمشتركين فقط</h3>
-                    <p className="text-sm text-slate-500 mb-6">سجل دخولك لتتمتع بكافة المميزات</p>
-                    <TactileButton onClick={onShowLogin} className="w-48 mx-auto p-3 rounded-xl" colorClass="bg-yellow-400" borderClass="border-yellow-600">
-                        <span className="font-bold text-yellow-900">تسجيل الدخول</span>
-                    </TactileButton>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {/* الفصل 1 — متاح بأجزاء مقفولة */}
-                    <div className="transition-all duration-300">
-                        <TactileButton
-                            onClick={() => toggleReview(1)}
-                            className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${expandedReview === 1 ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
-                            colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
-                            borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${allCh1Done ? 'bg-yellow-100 border-yellow-300 text-yellow-600' : 'bg-indigo-100 border-indigo-200 text-indigo-500'}`}>
-                                    <Crown className="w-7 h-7 fill-current" />
-                                </div>
-                                <div className="text-right">
-                                    <div className="flex items-center gap-2">
-                                        <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل 1</span>
-                                        {ch1Completions > 0 && (
-                                            <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-0.5 rounded-full">
-                                                👑 ×{ch1Completions}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="text-xs text-slate-400">
-                                        {expandedReview === 1 ? 'اختر الجزء للمراجعة' : `${ch1Parts.filter(p=>p.done).length}/${PARTS_COUNT} أجزاء`}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'} ${expandedReview === 1 ? '-rotate-90' : ''}`}>
-                                <ChevronLeft className="w-5 h-5" />
-                            </div>
-                        </TactileButton>
-                        {expandedReview === 1 && (
-                            <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
-                                {ch1Parts.map((part) => (
-                                    <TactileButton
-                                        onClick={() => part.status !== 'locked' && handleStartReviewPart(1, part.id)}
-                                        key={part.id}
-                                        disabled={part.status === 'locked'}
-                                        className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`}
-                                        colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')}
-                                        borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}
-                                    >
-                                        <div className="flex items-center gap-4 z-10">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
-                                                {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
-                                            </div>
-                                            <div className="text-right">
-                                                <span className={`block font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{part.title}</span>
-                                                <span className={`text-[10px] font-bold ${part.status === 'completed' ? 'text-emerald-500' : 'text-slate-400'}`}>{part.status === 'completed' ? 'مكتمل ✓' : part.status === 'locked' ? 'مغلق' : 'متاح الآن'}</span>
-                                            </div>
-                                        </div>
-                                        {part.status === 'unlocked' && <Play className="w-6 h-6 text-indigo-500 fill-indigo-500 animate-pulse" />}
-                                    </TactileButton>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+  return (
+    <div className="animate-fade-in-up pb-32">
+      <StatsHUD isDarkMode={isDarkMode} compact={true} onFlameClick={onFlameClick} onQuestionsClick={onQuestionsClick} isGuest={isGuest} userProfile={userProfile} subject={subject} />
+      <div className="flex items-center gap-4 mb-6">
+        <TactileButton onClick={() => onBack('home')} className="w-12 h-12 rounded-xl" colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'} borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-200'}>
+          <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
+        </TactileButton>
+        <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>المراجعات</h2>
+      </div>
 
-                    {/* الفصول 2-8 — مقفولة مع "قريباً" */}
-                    {[2, 3, 4, 5, 6, 7, 8].map((chapterNum) => (
-                        <div key={chapterNum} className="opacity-50">
-                            <div className={`w-full p-5 flex items-center justify-between rounded-[24px] ${isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'}`}>
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${isDarkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-100 border-slate-200'}`}>
-                                        <Lock className="w-6 h-6 text-slate-400" />
-                                    </div>
-                                    <div className="text-right">
-                                        <span className={`block text-xl font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>الفصل {chapterNum}</span>
-                                        <span className="text-xs text-slate-400 font-bold">قريباً</span>
-                                    </div>
-                                </div>
-                                <Lock className="w-5 h-5 text-slate-400" />
-                            </div>
-                        </div>
-                    ))}
-
-                    {/* المراجعة الشاملة — مقفولة */}
-                    <div className="opacity-50">
-                        <div className={`w-full p-5 flex items-center justify-between rounded-[28px] ${isDarkMode ? 'bg-slate-700 border border-slate-600' : 'bg-slate-200 border border-slate-300'}`}>
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-300 dark:bg-slate-600 border-2 border-slate-400">
-                                    <Lock className="w-7 h-7 text-slate-500" />
-                                </div>
-                                <div className="text-right">
-                                    <span className={`block text-xl font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>المراجعة الشاملة</span>
-                                    <span className="text-xs text-slate-400 font-bold">قريباً</span>
-                                </div>
-                            </div>
-                            <Lock className="w-5 h-5 text-slate-400" />
-                        </div>
-                    </div>
-                </div>
-            )}
+      {isGuest ? (
+        <div className="text-center py-20 opacity-60">
+          <Lock className="w-16 h-16 mx-auto text-slate-400 mb-4" />
+          <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>المراجعات للمشتركين فقط</h3>
+          <p className="text-sm text-slate-500 mb-6">سجل دخولك لتتمتع بكافة المميزات</p>
+          <TactileButton onClick={onShowLogin} className="w-48 mx-auto p-3 rounded-xl" colorClass="bg-yellow-400" borderClass="border-yellow-600">
+            <span className="font-bold text-yellow-900">تسجيل الدخول</span>
+          </TactileButton>
         </div>
-    );
+      ) : (
+        <div className="space-y-4">
+          {/* الفصل 1 — متاح بأجزاء مقفولة */}
+          <div className="transition-all duration-300">
+            <TactileButton
+              onClick={() => toggleReview(1)}
+              className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${expandedReview === 1 ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
+              colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
+              borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${allCh1Done ? 'bg-yellow-100 border-yellow-300 text-yellow-600' : 'bg-indigo-100 border-indigo-200 text-indigo-500'}`}>
+                  <Crown className="w-7 h-7 fill-current" />
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2">
+                    <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل 1</span>
+                    {ch1Completions > 0 && (
+                      <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-0.5 rounded-full">
+                        👑 ×{ch1Completions}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {expandedReview === 1 ? 'اختر الجزء للمراجعة' : `${ch1Parts.filter(p => p.done).length}/${PARTS_COUNT} أجزاء`}
+                  </span>
+                </div>
+              </div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'} ${expandedReview === 1 ? '-rotate-90' : ''}`}>
+                <ChevronLeft className="w-5 h-5" />
+              </div>
+            </TactileButton>
+            {expandedReview === 1 && (
+              <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
+                {ch1Parts.map((part) => (
+                  <TactileButton
+                    onClick={() => part.status !== 'locked' && handleStartReviewPart(1, part.id)}
+                    key={part.id}
+                    disabled={part.status === 'locked'}
+                    className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`}
+                    colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')}
+                    borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}
+                  >
+                    <div className="flex items-center gap-4 z-10">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
+                        {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
+                      </div>
+                      <div className="text-right">
+                        <span className={`block font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{part.title}</span>
+                        <span className={`text-[10px] font-bold ${part.status === 'completed' ? 'text-emerald-500' : 'text-slate-400'}`}>{part.status === 'completed' ? 'مكتمل ✓' : part.status === 'locked' ? 'مغلق' : 'متاح الآن'}</span>
+                      </div>
+                    </div>
+                    {part.status === 'unlocked' && <Play className="w-6 h-6 text-indigo-500 fill-indigo-500 animate-pulse" />}
+                  </TactileButton>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* الفصول 2-8 — تم فتحها كما طلب المستخدم */}
+          {[2, 3, 4, 5, 6, 7, 8].map((chapterNum) => (
+            <div key={chapterNum}>
+              <TactileButton
+                onClick={() => toggleReview(chapterNum)}
+                className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${expandedReview === chapterNum ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
+                colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
+                borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 bg-indigo-100 border-indigo-200 text-indigo-500`}>
+                    <Crown className="w-7 h-7 fill-current" />
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2">
+                      <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل {chapterNum}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'}`}>
+                  <ChevronLeft className="w-5 h-5" />
+                </div>
+              </TactileButton>
+            </div>
+          ))}
+
+          {/* المراجعة الشاملة — تم فتحها */}
+          <div>
+            <TactileButton
+              className={`w-full p-5 flex items-center justify-between rounded-[28px] ${isDarkMode ? 'bg-indigo-700 border-indigo-600' : 'bg-indigo-500 border-indigo-600'}`}
+              onClick={() => onStartGame('review_part', subject, null, 0, 0)}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/20 border-2 border-white/20">
+                  <Crown className="w-7 h-7 text-white fill-current" />
+                </div>
+                <div className="text-right">
+                  <span className="block text-xl font-bold text-white">المراجعة الشاملة</span>
+                  <span className="text-xs text-white/70 font-bold">كل فصول المنهج</span>
+                </div>
+              </div>
+              <Play className="w-5 h-5 text-white fill-current" />
+            </TactileButton>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 // --- التطبيق الرئيسي ---
@@ -1301,7 +1336,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
           console.log('⚠️ User logged out, skipping profile fetch');
           return;
         }
-        
+
         // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الملف الشخصي
         const loggedOut = sessionStorage.getItem('user_logged_out');
         if (loggedOut === '1') {
@@ -1310,23 +1345,23 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
           setUserProfile(null);
           return;
         }
-        
+
         const userDbId = localStorage.getItem('user_db_id');
         const anonUserId = localStorage.getItem('anon_user_id');
-        
+
         // فحص نهائي قبل جلب الملف الشخصي
         if (sessionStorage.getItem('user_logged_out') === '1') {
           console.log('⚠️ Logout flag detected before profile fetch, aborting');
           return;
         }
-        
+
         if (userDbId && !isGuest && isLoggedIn) {
           const { data: profile } = await supabase
             .from('users')
             .select('*')
             .eq('id', userDbId)
             .single();
-          
+
           if (profile) {
             // فحص نهائي بعد جلب الملف الشخصي
             if (sessionStorage.getItem('user_logged_out') === '1') {
@@ -1335,13 +1370,13 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
               setIsLoggedIn(false);
               return;
             }
-            
+
             setUserProfile(profile);
             console.log('✅ User profile loaded from Supabase:', profile);
-            
+
             // ✅ التحقق من اكتمال الملف الشخصي (age, gender, region)
             const isProfileComplete = profile.age && profile.gender && profile.region;
-            
+
             if (!isProfileComplete && anonUserId) {
               // الملف غير مكتمل → اعرض نموذج الإكمال
               const name = profile.full_name || localStorage.getItem('user_name') || 'البطل';
@@ -1368,7 +1403,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
     try {
       const saved = localStorage.getItem('selected_subject');
       if (saved === 'biology') return { name: 'الأحياء', icon: Dna };
-    } catch {}
+    } catch { }
     return { name: 'English', icon: EnIcon };
   });
   const subject = selectedSubject.name === 'الأحياء' ? 'biology' : 'english';
@@ -1461,11 +1496,11 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
   const [showTutorial, setShowTutorial] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [seenTooltips, setSeenTooltips] = useState(() => {
-      try {
-          const saved = localStorage.getItem('seen_tooltips');
-          if (saved) return JSON.parse(saved);
-      } catch {}
-      return { monster: false, chapters: false, reviews: false, daily: false, mistakes: false, fingerprint: false, subject: false };
+    try {
+      const saved = localStorage.getItem('seen_tooltips');
+      if (saved) return JSON.parse(saved);
+    } catch { }
+    return { monster: false, chapters: false, reviews: false, daily: false, mistakes: false, fingerprint: false, subject: false };
   });
 
   const showToast = (message, type = 'info', icon = null) => {
@@ -1474,126 +1509,123 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
   };
 
   const handleLoginSuccess = async (data, guestMode = false) => {
-      // دخول ناجح → امسح علامة تسجيل الخروج حتى لا تمنع استعادة الجلسة
-      try { sessionStorage.removeItem('user_logged_out'); } catch {}
-      setIsLoggedIn(true);
-      if (onGuestModeChange) onGuestModeChange(guestMode);
-      if (!guestMode) {
-          const name = data.name || data.full_name || '';
-          setUserName(name);
-          localStorage.setItem('user_registered', 'true');
-          localStorage.setItem('user_name', name);
-          const now = new Date();
-          localStorage.setItem('last_login_date', now.toISOString());
-          // إذا مستخدم موجود أو Google → البيانات محفوظة مسبقاً، لا نكررها
-          if (!data.googleUserId && !data.existingUser) {
-              // مستخدم محلي جديد — نحفظ في local_id (نص) وليس auth_id (uuid)
-              try {
-                  const localId = localStorage.getItem('anon_user_id') || (() => {
-                      const id = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-                      localStorage.setItem('anon_user_id', id);
-                      return id;
-                  })();
-                  // تحقق هل المستخدم موجود
-                  const { data: existing } = await supabase
-                      .from('users')
-                      .select('id, login_count')
-                      .eq('local_id', localId)
-                      .maybeSingle();
-                  if (existing) {
-                      // تحديث بيانات الدخول
-                      await supabase.from('users').update({
-                          last_login: now.toISOString(),
-                          login_count: (existing.login_count || 0) + 1,
-                      }).eq('local_id', localId);
-                      localStorage.setItem('user_db_id', existing.id);
-                  } else {
-                      // إنشاء مستخدم جديد
-                      const { data: newUser } = await supabase.from('users').insert({
-                          local_id: localId,
-                          full_name: name,
-                          age: data.age ? parseInt(data.age) : null,
-                          gender: data.gender || null,
-                          region: data.governorate || data.region || null,
-                          email: data.email || null,
-                          user_type: 'local',
-                          last_login: now.toISOString(),
-                          login_count: 1,
-                      }).select('id').single();
-                      if (newUser?.id) localStorage.setItem('user_db_id', newUser.id);
-                  }
-              } catch (err) { console.warn('Supabase user save error:', err); }
+    // دخول ناجح → امسح علامة تسجيل الخروج حتى لا تمنع استعادة الجلسة
+    try { sessionStorage.removeItem('user_logged_out'); } catch { }
+    setIsLoggedIn(true);
+    if (onGuestModeChange) onGuestModeChange(guestMode);
+    if (!guestMode) {
+      const name = data.name || data.full_name || '';
+      setUserName(name);
+      localStorage.setItem('user_registered', 'true');
+      localStorage.setItem('user_name', name);
+      const now = new Date();
+      localStorage.setItem('last_login_date', now.toISOString());
+      // إذا مستخدم موجود أو Google → البيانات محفوظة مسبقاً، لا نكررها
+      if (!data.googleUserId && !data.existingUser) {
+        // مستخدم محلي جديد — نحفظ في local_id (نص) وليس auth_id (uuid)
+        try {
+          const localId = localStorage.getItem('anon_user_id') || (() => {
+            const id = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            localStorage.setItem('anon_user_id', id);
+            return id;
+          })();
+          // تحقق هل المستخدم موجود
+          const { data: existing } = await supabase
+            .from('users')
+            .select('id, login_count')
+            .eq('local_id', localId)
+            .maybeSingle();
+          if (existing) {
+            // تحديث بيانات الدخول
+            await supabase.from('users').update({
+              last_login: now.toISOString(),
+              login_count: (existing.login_count || 0) + 1,
+            }).eq('local_id', localId);
+            localStorage.setItem('user_db_id', existing.id);
+          } else {
+            // إنشاء مستخدم جديد
+            const { data: newUser } = await supabase.from('users').insert({
+              local_id: localId,
+              full_name: name,
+              age: data.age ? parseInt(data.age) : null,
+              gender: data.gender || null,
+              region: data.governorate || data.region || null,
+              email: data.email || null,
+              user_type: 'local',
+              last_login: now.toISOString(),
+              login_count: 1,
+            }).select('id').single();
+            if (newUser?.id) localStorage.setItem('user_db_id', newUser.id);
           }
-      } else {
-          showToast('أهلاً بك كضيف! جرب المرحلة الأولى مجاناً 🎁', 'info', Star);
-          // تسجيل جلسة الضيف في Supabase
-          try {
-              const guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-              localStorage.setItem('guest_session_id', guestId);
-              await supabase.from('guest_sessions').insert({ guest_id: guestId });
-          } catch {}
-          // 🎮 دخول الضيف مباشرة إلى مرحلة الديمو (5 أسئلة)
-          setTimeout(() => {
-              _onStartGame('chapter', 'english', null, 1, 0);
-          }, 500);
-          return;
+        } catch (err) { console.warn('Supabase user save error:', err); }
       }
-      // الشعلة تُحسب عند إكمال المهمة اليومية 2/2 (في handleGameExit) وليس عند الدخول
-      // لكن نُحدث last_login في Supabase
-      if (!guestMode) {
-          try {
-              const userDbId = localStorage.getItem('user_db_id');
-              if (userDbId) {
-                  supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', userDbId).catch(() => {});
-              }
-          } catch {}
-      }
+    } else {
+      showToast('أهلاً بك كضيف! جرب المرحلة الأولى مجاناً 🎁', 'info', Star);
+      // تسجيل جلسة الضيف في Supabase
+      try {
+        const guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+        localStorage.setItem('guest_session_id', guestId);
+        await supabase.from('guest_sessions').insert({ guest_id: guestId });
+      } catch { }
+      // تم إلغاء الدخول التلقائي للضيف للسماح له بتصفح المركز
+      return;
+    }
+    // الشعلة تُحسب عند إكمال المهمة اليومية 2/2 (في handleGameExit) وليس عند الدخول
+    // لكن نُحدث last_login في Supabase
+    if (!guestMode) {
+      try {
+        const userDbId = localStorage.getItem('user_db_id');
+        if (userDbId) {
+          supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', userDbId).catch(() => { });
+        }
+      } catch { }
+    }
   };
 
   const handleLogout = async () => {
-      // علم أن المستخدم طلب تسجيل الخروج (حتى بعد Reload لا نستعيد الجلسة)
-      try {
-        sessionStorage.setItem('user_logged_out', '1');
-      } catch {}
-      
-      setIsLoggedIn(false);
-      if (onGuestModeChange) onGuestModeChange(false);
-      setProfileMenuOpen(false);
-      setCurrentView('home');
-      setShowTutorial(false);
-      setUserName('');
-      setUserProfile(null);
-      setShowCompleteProfile(false);
-      setPendingGoogleUser(null);
-      // مسح كل بيانات الدخول من localStorage حتى يُطلب الإيميل من جديد
-      try {
-          localStorage.removeItem('user_registered');
-          localStorage.removeItem('user_name');
-          localStorage.removeItem('last_login_date');
-          localStorage.removeItem('anon_user_id');
-          localStorage.removeItem('user_db_id');
-          localStorage.removeItem('user_email');
-          localStorage.removeItem('user_age');
-          localStorage.removeItem('user_gender');
-          localStorage.removeItem('user_region');
-          localStorage.removeItem('seen_tooltips');
-          processedAuthUsersRef.current.clear();
-      } catch {}
-      // تسجيل خروج من Supabase Auth لمسح الجلسة من التخزين (يمنع استعادة الدخول بعد Reload)
-      try { 
-        await supabase.auth.signOut();
-        console.log('✅ Logged out successfully');
-      } catch (e) {
-        console.error('Error signing out:', e);
-      }
+    // علم أن المستخدم طلب تسجيل الخروج (حتى بعد Reload لا نستعيد الجلسة)
+    try {
+      sessionStorage.setItem('user_logged_out', '1');
+    } catch { }
+
+    setIsLoggedIn(false);
+    if (onGuestModeChange) onGuestModeChange(false);
+    setProfileMenuOpen(false);
+    setCurrentView('home');
+    setShowTutorial(false);
+    setUserName('');
+    setUserProfile(null);
+    setShowCompleteProfile(false);
+    setPendingGoogleUser(null);
+    // مسح كل بيانات الدخول من localStorage حتى يُطلب الإيميل من جديد
+    try {
+      localStorage.removeItem('user_registered');
+      localStorage.removeItem('user_name');
+      localStorage.removeItem('last_login_date');
+      localStorage.removeItem('anon_user_id');
+      localStorage.removeItem('user_db_id');
+      localStorage.removeItem('user_email');
+      localStorage.removeItem('user_age');
+      localStorage.removeItem('user_gender');
+      localStorage.removeItem('user_region');
+      localStorage.removeItem('seen_tooltips');
+      processedAuthUsersRef.current.clear();
+    } catch { }
+    // تسجيل خروج من Supabase Auth لمسح الجلسة من التخزين (يمنع استعادة الدخول بعد Reload)
+    try {
+      await supabase.auth.signOut();
+      console.log('✅ Logged out successfully');
+    } catch (e) {
+      console.error('Error signing out:', e);
+    }
   };
 
   const toggleFullscreen = () => {
-     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((e) => {});
-     } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-     }
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((e) => { });
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
   };
 
   // ── فحص الجلسة الحالية عند تحميل الصفحة (لضمان Session ثابت بعد Refresh)
@@ -1614,14 +1646,14 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
           setUserProfile(null);
           return;
         }
-        
+
         const { data: { session } } = await supabase.auth.getSession();
         // فحص إضافي: إذا كان هناك علامة تسجيل خروج، لا نستعيد الجلسة
         if (sessionStorage.getItem('user_logged_out') === '1') {
           console.log('⚠️ Logout flag detected in checkExistingSession, skipping session restore');
           return;
         }
-        
+
         if (session?.user && !processedAuthUsersRef.current.has(session.user.id)) {
           // هناك جلسة موجودة → معالجتها
           const user = session.user;
@@ -1631,7 +1663,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
             .select('id, full_name, login_count, age, gender, region')
             .eq('auth_id', user.id)
             .maybeSingle();
-          
+
           if (existing) {
             const isProfileComplete = existing.age && existing.gender && existing.region;
             processedAuthUsersRef.current.add(user.id);
@@ -1643,7 +1675,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
             localStorage.setItem('user_db_id', existing.id);
             localStorage.setItem('anon_user_id', user.id);
             localStorage.setItem('last_login_date', now.toISOString());
-            
+
             if (!isProfileComplete) {
               setPendingGoogleUser({ id: user.id, email: user.email, name, dbId: existing.id });
               setShowCompleteProfile(true);
@@ -1671,7 +1703,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
         }, 100);
       }
     };
-    
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       // إذا المستخدم سجّل خروجاً، تجاهل أي أحداث جلسة قديمة
       // لكن اسمح بحدث SIGNED_IN كجلسة جديدة تمهيداً لدخول جديد
@@ -1683,7 +1715,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
         }
         return;
       }
-      
+
       if (event === 'SIGNED_OUT') {
         // عند تسجيل الخروج، تأكد من مسح كل شيء
         setIsLoggedIn(false);
@@ -1694,16 +1726,16 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
         processedAuthUsersRef.current.clear();
         return;
       }
-      
+
       if (session?.user) {
         const user = session.user;
         // مستخدم Google جديد أو عائد
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           // دخول جديد/تحديث توكن ناجح → امسح علامة تسجيل الخروج
-          try { sessionStorage.removeItem('user_logged_out'); } catch {}
+          try { sessionStorage.removeItem('user_logged_out'); } catch { }
           // تنظيف URL بعد المصادقة الناجحة
           cleanAuthParams();
-          
+
           // تجنب معالجة نفس المستخدم مرتين
           if (processedAuthUsersRef.current.has(user.id)) {
             return;
@@ -1725,18 +1757,18 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
                 await supabase.auth.signOut();
                 return;
               }
-              
+
               // مستخدم موجود — تحقق من اكتمال الملف الشخصي
               processedAuthUsersRef.current.add(user.id); // علّم أنه تمت معالجته
-              
+
               // ✅ التحقق من اكتمال الملف الشخصي
               const isProfileComplete = existing.age && existing.gender && existing.region;
-              
+
               await supabase.from('users').update({
                 last_login: now.toISOString(),
                 login_count: (existing.login_count || 0) + 1,
               }).eq('auth_id', user.id);
-              
+
               dbId = existing.id;
               setUserProfile(existing);
               const name = existing.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'البطل';
@@ -1746,7 +1778,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
               localStorage.setItem('user_db_id', existing.id);
               localStorage.setItem('anon_user_id', user.id);
               localStorage.setItem('last_login_date', now.toISOString());
-              
+
               // إذا الملف غير مكتمل → اعرض نموذج الإكمال
               if (!isProfileComplete) {
                 setPendingGoogleUser({ id: user.id, email: user.email, name, dbId });
@@ -1798,25 +1830,25 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
   }, []);
 
   const handleFeatureClick = (featureName) => {
-      if (!seenTooltips[featureName]) {
-          setActiveTooltip(featureName);
-          setSeenTooltips(prev => {
-              const updated = { ...prev, [featureName]: true };
-              try { localStorage.setItem('seen_tooltips', JSON.stringify(updated)); } catch {}
-              return updated;
-          });
-          return false;
-      }
-      return true;
+    if (!seenTooltips[featureName]) {
+      setActiveTooltip(featureName);
+      setSeenTooltips(prev => {
+        const updated = { ...prev, [featureName]: true };
+        try { localStorage.setItem('seen_tooltips', JSON.stringify(updated)); } catch { }
+        return updated;
+      });
+      return false;
+    }
+    return true;
   };
 
   const closeTooltip = () => {
-      const tooltipName = activeTooltip;
-      setActiveTooltip(null);
-      // بعد إغلاق tooltip الوحش نفتح البطاقة مباشرة
-      if (tooltipName === 'monster') {
-          setTimeout(() => setMonsterSheetOpen(true), 150);
-      }
+    const tooltipName = activeTooltip;
+    setActiveTooltip(null);
+    // بعد إغلاق tooltip الوحش نفتح البطاقة مباشرة
+    if (tooltipName === 'monster') {
+      setTimeout(() => setMonsterSheetOpen(true), 150);
+    }
   };
 
   // قراءة أعلى نقاط لكل فصل من localStorage (تبدأ من 0)
@@ -1830,7 +1862,8 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
 
   return (
     <div dir="rtl" className={`min-h-[100dvh] font-['Cairo'] overflow-hidden selection:bg-purple-500 selection:text-white`}>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
         .font-cairo { font-family: 'Cairo', sans-serif; }
         .animate-float-slow { animation: float 10s infinite ease-in-out; }
@@ -1870,308 +1903,307 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
       <SoftBackground isDarkMode={isDarkMode} />
 
       {(!isLoggedIn || showCompleteProfile || pendingGoogleUser) ? (
-          <LoginView
-            isDarkMode={isDarkMode}
-            onLoginSuccess={handleLoginSuccess}
-            // عند وجود pendingGoogleUser نمرّره دائماً حتى لو صار there is any timing issue
-            pendingGoogleUser={pendingGoogleUser}
-            onGoogleProfileComplete={(profileData) => {
-              const name = profileData.name;
-              const age = profileData.age || null;
-              const gender = profileData.gender || null;
-              const region = profileData.region || null;
-              
-              localStorage.setItem('user_registered', 'true');
-              localStorage.setItem('user_name', name);
-              if (age) localStorage.setItem('user_age', String(age));
-              if (gender) localStorage.setItem('user_gender', gender);
-              if (region) localStorage.setItem('user_region', region);
-              
-              setUserName(name);
-              setIsLoggedIn(true);
-              setShowCompleteProfile(false);
-              setPendingGoogleUser(null);
-              if (window.gtag) window.gtag('event', 'sign_up', { method: 'Google' });
-            }}
-          />
+        <LoginView
+          isDarkMode={isDarkMode}
+          onLoginSuccess={handleLoginSuccess}
+          // عند وجود pendingGoogleUser نمرّره دائماً حتى لو صار there is any timing issue
+          pendingGoogleUser={pendingGoogleUser}
+          onGoogleProfileComplete={(profileData) => {
+            const name = profileData.name;
+            const age = profileData.age || null;
+            const gender = profileData.gender || null;
+            const region = profileData.region || null;
+
+            localStorage.setItem('user_registered', 'true');
+            localStorage.setItem('user_name', name);
+            if (age) localStorage.setItem('user_age', String(age));
+            if (gender) localStorage.setItem('user_gender', gender);
+            if (region) localStorage.setItem('user_region', region);
+
+            setUserName(name);
+            setIsLoggedIn(true);
+            setShowCompleteProfile(false);
+            setPendingGoogleUser(null);
+            if (window.gtag) window.gtag('event', 'sign_up', { method: 'Google' });
+          }}
+        />
       ) : (
-          <>
-            <ToastNotification message={toast.message} isVisible={toast.visible} type={toast.type} icon={toast.icon} />
-            
-            {activeTooltip === 'monster' && <TooltipOverlay title="مود الوحش ⚔️" text="مود الوحش! أسئلة متخلص، اتحدى صاحبك وراويه منو 'السبع' هنا 💪" onClose={closeTooltip} />}
-            {activeTooltip === 'chapters' && <TooltipOverlay title="خريطة الفصول 🗺️" text="هنا خريطتك الكاملة لكل المنهج.. فصول، مراحل، وتحديات، اكلهم أكل!" onClose={closeTooltip} />}
-            {activeTooltip === 'reviews' && <TooltipOverlay title="الزبدة هنا 🧈" text="مستعجل؟ هنا مراجعة مركزة تضمنلك الدرجة بأقل وقت. (نصف السنة + شاملة)" onClose={closeTooltip} />}
-            {activeTooltip === 'daily' && <TooltipOverlay title="قانون الالتزام ⚖️" text="لازم تختم مرحلتين كل 24 ساعة حتى ما ينكسر الستريك!" onClose={closeTooltip} />}
-            {activeTooltip === 'mistakes' && <TooltipOverlay title="حقيبة الأخطاء 🎒" text="غلطت؟ عادي! هنا نجمع أغلاطك حتى تراجعها وما تعيدها بالوزاري." onClose={closeTooltip} />}
-            {activeTooltip === 'fingerprint' && <TooltipOverlay title="بصمتك 💡" text="عندك فكرة جهنمية؟ بصمتك هنا مسموعة وتغير اللعبة." onClose={closeTooltip} />}
-            {/* تم إزالة التلميح التعليمي للمادة الدراسية (TooltipOverlay) */}
+        <>
+          <ToastNotification message={toast.message} isVisible={toast.visible} type={toast.type} icon={toast.icon} />
 
-            {/* Header */}
-            <div className="px-5 pt-6 pb-2 flex items-center justify-between z-10 relative">
-                <div className="relative">
-                    <TactileButton 
-                        onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
-                        className="w-12 h-12 rounded-xl"
-                        colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'}
-                        borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-[#E2E8F0]'}
-                    >
-                        <User className="w-5 h-5 text-indigo-500" />
-                    </TactileButton>
+          {activeTooltip === 'monster' && <TooltipOverlay title="مود الوحش ⚔️" text="مود الوحش! أسئلة متخلص، اتحدى صاحبك وراويه منو 'السبع' هنا 💪" onClose={closeTooltip} />}
+          {activeTooltip === 'chapters' && <TooltipOverlay title="خريطة الفصول 🗺️" text="هنا خريطتك الكاملة لكل المنهج.. فصول، مراحل، وتحديات، اكلهم أكل!" onClose={closeTooltip} />}
+          {activeTooltip === 'reviews' && <TooltipOverlay title="الزبدة هنا 🧈" text="مستعجل؟ هنا مراجعة مركزة تضمنلك الدرجة بأقل وقت. (نصف السنة + شاملة)" onClose={closeTooltip} />}
+          {activeTooltip === 'daily' && <TooltipOverlay title="قانون الالتزام ⚖️" text="لازم تختم مرحلتين كل 24 ساعة حتى ما ينكسر الستريك!" onClose={closeTooltip} />}
+          {activeTooltip === 'mistakes' && <TooltipOverlay title="حقيبة الأخطاء 🎒" text="غلطت؟ عادي! هنا نجمع أغلاطك حتى تراجعها وما تعيدها بالوزاري." onClose={closeTooltip} />}
+          {activeTooltip === 'fingerprint' && <TooltipOverlay title="بصمتك 💡" text="عندك فكرة جهنمية؟ بصمتك هنا مسموعة وتغير اللعبة." onClose={closeTooltip} />}
+          {/* تم إزالة التلميح التعليمي للمادة الدراسية (TooltipOverlay) */}
 
-                    {profileMenuOpen && (
-                        <div className={`absolute top-full right-0 mt-2 w-56 p-2 rounded-2xl border-2 border-b-4 shadow-xl z-50 animate-fade-in-up ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
-                            <button onClick={() => { setIsDarkMode(!isDarkMode); setProfileMenuOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                                {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-indigo-500" />}
-                                {isDarkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
-                            </button>
-                            <button onClick={() => { toggleFullscreen(); setProfileMenuOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                                {isFullscreen ? <Minimize className="w-4 h-4 text-purple-500" /> : <Maximize className="w-4 h-4 text-purple-500" />}
-                                {isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
-                            </button>
-                            <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
-                            <button onClick={handleLogout} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-sm text-red-500`}>
-                                <LogOut className="w-4 h-4" />
-                                تسجيل الخروج
-                            </button>
-                        </div>
-                    )}
+          {/* Header */}
+          <div className="px-5 pt-6 pb-2 flex items-center justify-between z-10 relative">
+            <div className="relative">
+              <TactileButton
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="w-12 h-12 rounded-xl"
+                colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'}
+                borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-[#E2E8F0]'}
+              >
+                <User className="w-5 h-5 text-indigo-500" />
+              </TactileButton>
+
+              {profileMenuOpen && (
+                <div className={`absolute top-full right-0 mt-2 w-56 p-2 rounded-2xl border-2 border-b-4 shadow-xl z-50 animate-fade-in-up ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
+                  <button onClick={() => { setIsDarkMode(!isDarkMode); setProfileMenuOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                    {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+                    {isDarkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
+                  </button>
+                  <button onClick={() => { toggleFullscreen(); setProfileMenuOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                    {isFullscreen ? <Minimize className="w-4 h-4 text-purple-500" /> : <Maximize className="w-4 h-4 text-purple-500" />}
+                    {isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
+                  </button>
+                  <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
+                  <button onClick={handleLogout} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-sm text-red-500`}>
+                    <LogOut className="w-4 h-4" />
+                    تسجيل الخروج
+                  </button>
                 </div>
-
-                <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <TactileButton 
-                            onClick={() => {
-                                if(handleFeatureClick('subject')) setSubjectOpen(!subjectOpen);
-                            }}
-                            className="h-12 px-4 rounded-xl gap-2 relative"
-                            colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'}
-                            borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-[#E2E8F0]'}
-                        >
-                            {/* تم إزالة النقطة الحمراء (التلميح التعليمي) */}
-                            <selectedSubject.icon className="w-5 h-5 text-blue-500" />
-                            <span className={`font-bold text-sm ${themeText} hidden sm:block`}>{selectedSubject.name}</span>
-                            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${subjectOpen ? 'rotate-180' : ''}`} />
-                        </TactileButton>
-                        
-                        {subjectOpen && (
-                            <div className={`absolute top-full left-0 mt-2 w-48 p-2 rounded-2xl border-2 border-b-4 shadow-xl z-50 animate-fade-in-up ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
-                                <button onClick={() => { setSelectedSubject({name:'English', icon:EnIcon}); localStorage.setItem('selected_subject','english'); setSubjectOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm ${themeText}`}>
-                                    <EnIcon className="w-4 h-4" /> English
-                                </button>
-                                <button disabled className={`w-full p-3 rounded-xl flex items-center gap-3 font-bold text-sm opacity-40 cursor-not-allowed ${themeText}`}>
-                                    <Dna className="w-4 h-4" /> الأحياء
-                                    <span className="mr-auto text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-lg">قريباً</span>
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
+              )}
             </div>
 
-            <div className="px-5 w-full max-w-lg mx-auto z-0 relative" style={{paddingBottom: 'max(10rem, calc(env(safe-area-inset-bottom, 0px) + 10rem))' }}>
-                {currentView === 'home' && (
-                    <div className="animate-fade-in-up">
-                        <div className="text-center mt-6 mb-6">
-                            <h1 onClick={handleAdminTap} className={`text-5xl font-black mb-1 tracking-tight ${themeText} select-none cursor-default`}>هلا بالبطل</h1>
-                            <p className={`text-lg font-medium opacity-60 ${themeText}`}>{isGuest ? 'نسخة التجربة (ضيف)' : 'جاهز تكسر الرقم القياسي؟'}</p>
-                        </div>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <TactileButton
+                  onClick={() => {
+                    if (handleFeatureClick('subject')) setSubjectOpen(!subjectOpen);
+                  }}
+                  className="h-12 px-4 rounded-xl gap-2 relative"
+                  colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'}
+                  borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-[#E2E8F0]'}
+                >
+                  {/* تم إزالة النقطة الحمراء (التلميح التعليمي) */}
+                  <selectedSubject.icon className="w-5 h-5 text-blue-500" />
+                  <span className={`font-bold text-sm ${themeText} hidden sm:block`}>{selectedSubject.name}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${subjectOpen ? 'rotate-180' : ''}`} />
+                </TactileButton>
 
-                        <div className="relative mt-4">
-                            {/* التيتوريال يظهر فوق الزر فقط للضيف */}
-                            {showTutorial && isGuest && (
-                                <TutorialHand text="جرب مجاناً — اضغط هنا! 🎮" />
-                            )}
-                            {(() => (
-                                <TactileButton
-                                    onClick={() => {
-                                        setShowTutorial(false);
-                                        if (isGuest) {
-                                            onStartGame('chapter', subject, null, 1, 0);
-                                        } else {
-                                            if (resumeChapter != null && resumeStage != null) {
-                                                onStartGame('chapter', subject, null, resumeChapter, resumeStage);
-                                            } else {
-                                                onStartGame('chapter', subject, null, 1, 0);
-                                            }
-                                        }
-                                    }}
-                                    className={`w-full mb-6 p-6 rounded-[32px] group border-2 relative overflow-hidden
+                {subjectOpen && (
+                  <div className={`absolute top-full left-0 mt-2 w-48 p-2 rounded-2xl border-2 border-b-4 shadow-xl z-50 animate-fade-in-up ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-[#E2E8F0]'}`}>
+                    <button onClick={() => { setSelectedSubject({ name: 'English', icon: EnIcon }); localStorage.setItem('selected_subject', 'english'); setSubjectOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm ${themeText}`}>
+                      <EnIcon className="w-4 h-4" /> English
+                    </button>
+                    <button onClick={() => { setSelectedSubject({ name: 'الأحياء', icon: Dna }); localStorage.setItem('selected_subject', 'biology'); setSubjectOpen(false); }} className={`w-full p-3 rounded-xl flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 font-bold text-sm ${themeText}`}>
+                      <Dna className="w-4 h-4" /> الأحياء
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="px-5 w-full max-w-lg mx-auto z-0 relative" style={{ paddingBottom: 'max(10rem, calc(env(safe-area-inset-bottom, 0px) + 10rem))' }}>
+            {currentView === 'home' && (
+              <div className="animate-fade-in-up">
+                <div className="text-center mt-6 mb-6">
+                  <h1 onClick={handleAdminTap} className={`text-5xl font-black mb-1 tracking-tight ${themeText} select-none cursor-default`}>هلا بالبطل</h1>
+                  <p className={`text-lg font-medium opacity-60 ${themeText}`}>{isGuest ? 'نسخة التجربة (ضيف)' : 'جاهز تكسر الرقم القياسي؟'}</p>
+                </div>
+
+                <div className="relative mt-4">
+                  {/* التيتوريال يظهر فوق الزر فقط للضيف */}
+                  {showTutorial && isGuest && (
+                    <TutorialHand text="جرب مجاناً — اضغط هنا! 🎮" />
+                  )}
+                  {(() => (
+                    <TactileButton
+                      onClick={() => {
+                        setShowTutorial(false);
+                        if (isGuest) {
+                          onStartGame('chapter', subject, null, 1, 0);
+                        } else {
+                          if (resumeChapter != null && resumeStage != null) {
+                            onStartGame('chapter', subject, null, resumeChapter, resumeStage);
+                          } else {
+                            onStartGame('chapter', subject, null, 1, 0);
+                          }
+                        }
+                      }}
+                      className={`w-full mb-6 p-6 rounded-[32px] group border-2 relative overflow-hidden
                                         ${showTutorial && isGuest ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}
                                     `}
-                                    colorClass="bg-gradient-to-br from-indigo-500 to-blue-600"
-                                    borderClass="border-indigo-700"
-                                >
-                                    <div className="w-full flex items-center justify-between z-20 relative">
-                                        <div className="flex flex-col items-start gap-1">
-                                            <span className="text-2xl font-black text-white drop-shadow-md">{isGuest ? 'جرب التحدي مجاناً 🎮' : 'تابع رحلتك 🚀'}</span>
-                                            <span className="text-sm font-bold text-indigo-100 opacity-90">
-                                                {isGuest
-                                                  ? 'العب أول مرحلة واكتشف مستواك!'
-                                                  : (resumeChapter != null ? `الفصل ${resumeChapter}` : 'ابدأ رحلتك الآن!')}
-                                            </span>
-                                        </div>
-                                        {isGuest ? (
-                                            <div className="flex flex-col items-center leading-tight">
-                                                <span className="text-3xl font-black text-white drop-shadow-lg">5</span>
-                                                <span className="text-[10px] font-bold text-yellow-300 text-center leading-tight">أسئلة<br/>سريعة</span>
-                                            </div>
-                                        ) : (
-                                            <span className="text-5xl font-black text-white drop-shadow-lg tracking-tighter" style={{ textShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
-                                                {journeyPct}<span className="text-2xl">%</span>
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="absolute bottom-0 left-0 right-0 h-3 bg-black/20">
-                                        <div className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.9)]" style={{ width: isGuest ? '0%' : `${journeyPct}%` }}></div>
-                                    </div>
-                                </TactileButton>
-                            ))()}
-                            
+                      colorClass="bg-gradient-to-br from-indigo-500 to-blue-600"
+                      borderClass="border-indigo-700"
+                    >
+                      <div className="w-full flex items-center justify-between z-20 relative">
+                        <div className="flex flex-col items-start gap-1">
+                          <span className="text-2xl font-black text-white drop-shadow-md">{isGuest ? 'جرب التحدي مجاناً 🎮' : 'تابع رحلتك 🚀'}</span>
+                          <span className="text-sm font-bold text-indigo-100 opacity-90">
+                            {isGuest
+                              ? 'العب أول مرحلة واكتشف مستواك!'
+                              : (resumeChapter != null ? `الفصل ${resumeChapter}` : 'ابدأ رحلتك الآن!')}
+                          </span>
                         </div>
-
-                        {!isGuest && (
-                            <>
-                                <StatsHUD isDarkMode={isDarkMode} isGuest={isGuest} userProfile={userProfile} subject={subject} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} /> 
-                                
-                                <div className="relative">
-                                    <MonsterCard
-                                        isDarkMode={isDarkMode}
-                                        isGuest={isGuest}
-                                        subject={subject}
-                                        playerName={userName || 'البطل'} 
-                                        onClick={() => {
-                                           if(handleFeatureClick('monster')) setMonsterSheetOpen(true);
-                                        }} 
-                                    />
-                                    {!seenTooltips.monster && <div className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce pointer-events-none"></div>}
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <TactileButton 
-                                        onClick={() => {
-                                            if(handleFeatureClick('chapters')) setCurrentView('chapters');
-                                        }}
-                                        className="aspect-square rounded-[2rem] flex flex-col items-center justify-center gap-4 group relative" colorClass={isDarkMode ? 'bg-emerald-600' : 'bg-[#6EE7B7]'} borderClass={isDarkMode ? 'border-emerald-800' : 'border-[#059669]'}>
-                                        {!seenTooltips.chapters && <div className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
-                                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transform group-active:scale-90 transition-transform bg-white/20 border-2 border-white/20`}>
-                                            <List className="w-8 h-8 text-white drop-shadow-sm" strokeWidth={3} />
-                                        </div>
-                                        <div className="text-center">
-                                            <span className={`block text-xl font-black text-white drop-shadow-md`}>الفصول</span>
-                                            <span className="text-[10px] font-bold text-emerald-900 bg-white/20 px-2 py-0.5 rounded-lg mt-1 inline-block">المنهج الكامل</span>
-                                        </div>
-                                    </TactileButton>
-
-                                    <TactileButton
-                                        onClick={() => {
-                                            if(handleFeatureClick('reviews')) setCurrentView('reviews');
-                                        }}
-                                        className="aspect-square rounded-[2rem] flex flex-col items-center justify-center gap-4 group relative" colorClass={isDarkMode ? 'bg-orange-600' : 'bg-[#FDBA74]'} borderClass={isDarkMode ? 'border-orange-800' : 'border-[#EA580C]'}>
-                                        {!seenTooltips.reviews && <div className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
-                                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transform group-active:scale-90 transition-transform bg-white/20 border-2 border-white/20`}>
-                                            <FileText className="w-8 h-8 text-white drop-shadow-sm" strokeWidth={3} />
-                                        </div>
-                                        <div className="text-center">
-                                            <span className={`block text-xl font-black text-white drop-shadow-md`}>مراجعات</span>
-                                            <span className="text-[10px] font-bold text-orange-900 bg-white/20 px-2 py-0.5 rounded-lg mt-1 inline-block">مركزة & شاملة</span>
-                                        </div>
-                                    </TactileButton>
-                                </div>
-                            </>
+                        {isGuest ? (
+                          <div className="flex flex-col items-center leading-tight">
+                            <span className="text-3xl font-black text-white drop-shadow-lg">5</span>
+                            <span className="text-[10px] font-bold text-yellow-300 text-center leading-tight">أسئلة<br />سريعة</span>
+                          </div>
+                        ) : (
+                          <span className="text-5xl font-black text-white drop-shadow-lg tracking-tighter" style={{ textShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                            {journeyPct}<span className="text-2xl">%</span>
+                          </span>
                         )}
-                    </div>
-                )}
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-3 bg-black/20">
+                        <div className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.9)]" style={{ width: isGuest ? '0%' : `${journeyPct}%` }}></div>
+                      </div>
+                    </TactileButton>
+                  ))()}
 
-                {currentView === 'chapters' && (
-                    <ChaptersView 
-                        isDarkMode={isDarkMode} 
-                        onBack={setCurrentView} 
-                        onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)}
-                        onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)}
-                        onChapterClick={(chapterNum) => {
-                            setSelectedChapterForLevels(chapterNum);
-                            setCurrentView('levels');
-                        }}
-                        isGuest={isGuest}
-                        onShowLogin={() => setShowLoginModal(true)}
-                        userProfile={userProfile}
-                        subject={subject}
-                    />
-                )}
+                </div>
 
-                {currentView === 'levels' && (
-                    <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} subject={subject} userDbId={localStorage.getItem('user_db_id')} />
-                )}
-                
-                {currentView === 'reviews' && (
-                    <ReviewsView isDarkMode={isDarkMode} onBack={setCurrentView} onStartGame={onStartGame} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} subject={subject} userProfile={userProfile} />
-                )}
+                {!isGuest && (
+                  <>
+                    <StatsHUD isDarkMode={isDarkMode} isGuest={isGuest} userProfile={userProfile} subject={subject} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} />
 
-                {currentView === 'admin' && (
-                    <AdminDashboard onBack={() => setCurrentView('home')} />
-                )}
-            </div>
-
-            {!isGuest && (
-                <>
-                    <div className="fixed bottom-28 left-5 z-50">
-                        <div className="relative">
-                            <TactileButton 
-                                onClick={() => {
-                                    if(handleFeatureClick('fingerprint')) setFeedbackOpen(true);
-                                }}
-                                className="w-12 h-12 rounded-full shadow-lg relative" colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'} borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-teal-200'}>
-                                {!seenTooltips.fingerprint && <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
-                                <Fingerprint className="w-6 h-6 text-teal-500" />
-                            </TactileButton>
-                            <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-teal-600 bg-white/80 px-2 rounded-full">بصمتك</span>
-                        </div>
-                    </div>
-
-                    <BottomDock
+                    <div className="relative">
+                      <MonsterCard
                         isDarkMode={isDarkMode}
-                        onTaskClick={(e) => handleFeatureClick('daily')}
-                        onMistakeClick={() => handleFeatureClick('mistakes')}
-                        completedToday={typeof completedToday === 'object' ? (completedToday[subject] || 0) : completedToday}
-                        onStartBagReview={onStartBagReview}
+                        isGuest={isGuest}
                         subject={subject}
-                    />
-                </>
-            )}
-
-            {showLoginModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowLoginModal(false)}></div>
-                    <div className={`relative w-full max-w-sm p-6 rounded-[2rem] border-2 shadow-2xl animate-pop-in ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-white'}`}>
-                        <button onClick={() => setShowLoginModal(false)} className="absolute top-4 left-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><X className="w-5 h-5 text-slate-400" /></button>
-                        <div className="flex flex-col items-center text-center mb-6 mt-2">
-                            <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-4 rotate-3"><LogIn className="w-8 h-8 text-yellow-600" /></div>
-                            <h3 className={`text-xl font-black mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>سجل دخولك يا بطل! 🚀</h3>
-                            <p className={`text-sm opacity-60 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>هذه الميزة متاحة فقط للأبطال المسجلين.</p>
-                        </div>
-                        <TactileButton onClick={() => { setShowLoginModal(false); handleLogout(); }} className="w-full py-4 rounded-xl gap-2" colorClass="bg-yellow-400" borderClass="border-yellow-600"><span className="font-bold text-yellow-900">تسجيل الدخول الآن</span></TactileButton>
+                        playerName={userName || 'البطل'}
+                        onClick={() => {
+                          if (handleFeatureClick('monster')) setMonsterSheetOpen(true);
+                        }}
+                      />
+                      {!seenTooltips.monster && <div className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce pointer-events-none"></div>}
                     </div>
-                </div>
-            )}
 
-            {monsterSheetOpen && <BattleArenaModal isDarkMode={isDarkMode} onClose={() => setMonsterSheetOpen(false)} chapterScores={chapterScores} playerName={userName || 'البطل'} onStartGame={onStartGame} subject={subject} onShowToast={showToast} />}
-
-            {feedbackOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setFeedbackOpen(false)}></div>
-                    <div className={`relative w-full max-w-sm p-6 rounded-[2rem] border-2 shadow-2xl animate-pop-in ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-white'}`}>
-                        <button onClick={() => setFeedbackOpen(false)} className="absolute top-4 left-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><X className="w-5 h-5 text-slate-400" /></button>
-                        <div className="flex flex-col items-center text-center mb-6 mt-2">
-                            <div className="w-16 h-16 bg-teal-50 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center mb-4 rotate-3"><Fingerprint className="w-8 h-8 text-teal-500" /></div>
-                            <h3 className={`text-xl font-black mb-1 ${themeText}`}>اللعبة تكبر بأفكاركم 💡</h3>
-                            <p className={`text-sm opacity-60 ${themeText}`}>شنو اقتراحك حتى نطورها؟</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <TactileButton
+                        onClick={() => {
+                          if (handleFeatureClick('chapters')) setCurrentView('chapters');
+                        }}
+                        className="aspect-square rounded-[2rem] flex flex-col items-center justify-center gap-4 group relative" colorClass={isDarkMode ? 'bg-emerald-600' : 'bg-[#6EE7B7]'} borderClass={isDarkMode ? 'border-emerald-800' : 'border-[#059669]'}>
+                        {!seenTooltips.chapters && <div className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
+                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transform group-active:scale-90 transition-transform bg-white/20 border-2 border-white/20`}>
+                          <List className="w-8 h-8 text-white drop-shadow-sm" strokeWidth={3} />
                         </div>
-                        <textarea value={fbText} onChange={e => setFbText(e.target.value)} className={`w-full h-32 p-4 rounded-xl border-2 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${isDarkMode ? 'bg-black/20 border-slate-700 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'}`} placeholder="اكتب فكرتك الجهنمية هنا..."></textarea>
-                        <TactileButton onClick={() => { if (!fbText.trim()) return; triggerHaptic(); setFeedbackOpen(false); setFbText(''); showToast('شكراً يا بطل! فكرتك وصلت 💡', 'info', Send); }} className="w-full py-3 rounded-xl gap-2" colorClass={fbText.trim() ? 'bg-teal-500' : 'bg-slate-300'} borderClass={fbText.trim() ? 'border-teal-700' : 'border-slate-400'}><span className="font-bold text-white">إرسال الفكرة</span><Send className="w-4 h-4 text-white" /></TactileButton>
+                        <div className="text-center">
+                          <span className={`block text-xl font-black text-white drop-shadow-md`}>الفصول</span>
+                          <span className="text-[10px] font-bold text-emerald-900 bg-white/20 px-2 py-0.5 rounded-lg mt-1 inline-block">المنهج الكامل</span>
+                        </div>
+                      </TactileButton>
+
+                      <TactileButton
+                        onClick={() => {
+                          if (handleFeatureClick('reviews')) setCurrentView('reviews');
+                        }}
+                        className="aspect-square rounded-[2rem] flex flex-col items-center justify-center gap-4 group relative" colorClass={isDarkMode ? 'bg-orange-600' : 'bg-[#FDBA74]'} borderClass={isDarkMode ? 'border-orange-800' : 'border-[#EA580C]'}>
+                        {!seenTooltips.reviews && <div className="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
+                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center transform group-active:scale-90 transition-transform bg-white/20 border-2 border-white/20`}>
+                          <FileText className="w-8 h-8 text-white drop-shadow-sm" strokeWidth={3} />
+                        </div>
+                        <div className="text-center">
+                          <span className={`block text-xl font-black text-white drop-shadow-md`}>مراجعات</span>
+                          <span className="text-[10px] font-bold text-orange-900 bg-white/20 px-2 py-0.5 rounded-lg mt-1 inline-block">مركزة & شاملة</span>
+                        </div>
+                      </TactileButton>
                     </div>
-                </div>
+                  </>
+                )}
+              </div>
             )}
-          </>
+
+            {currentView === 'chapters' && (
+              <ChaptersView
+                isDarkMode={isDarkMode}
+                onBack={setCurrentView}
+                onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)}
+                onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)}
+                onChapterClick={(chapterNum) => {
+                  setSelectedChapterForLevels(chapterNum);
+                  setCurrentView('levels');
+                }}
+                isGuest={isGuest}
+                onShowLogin={() => setShowLoginModal(true)}
+                userProfile={userProfile}
+                subject={subject}
+              />
+            )}
+
+            {currentView === 'levels' && (
+              <LevelsView isDarkMode={isDarkMode} chapterNum={selectedChapterForLevels} onStartGame={onStartGame} onBack={setCurrentView} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} subject={subject} userDbId={localStorage.getItem('user_db_id')} />
+            )}
+
+            {currentView === 'reviews' && (
+              <ReviewsView isDarkMode={isDarkMode} onBack={setCurrentView} onStartGame={onStartGame} isGuest={isGuest} onShowLogin={() => setShowLoginModal(true)} onFlameClick={() => showToast('العب 7 ايام متواصلة بدون تسخيت حتى تحصل شعلة 🔥', 'fire', Flame)} onQuestionsClick={() => showToast('المجموع الكلي لاسئلة المنهج 🎯', 'info', Target)} subject={subject} userProfile={userProfile} />
+            )}
+
+            {currentView === 'admin' && (
+              <AdminDashboard onBack={() => setCurrentView('home')} />
+            )}
+          </div>
+
+          {!isGuest && (
+            <>
+              <div className="fixed bottom-28 left-5 z-50">
+                <div className="relative">
+                  <TactileButton
+                    onClick={() => {
+                      if (handleFeatureClick('fingerprint')) setFeedbackOpen(true);
+                    }}
+                    className="w-12 h-12 rounded-full shadow-lg relative" colorClass={isDarkMode ? 'bg-[#2A2640]' : 'bg-white'} borderClass={isDarkMode ? 'border-[#3E3859]' : 'border-teal-200'}>
+                    {!seenTooltips.fingerprint && <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full z-20 animate-bounce"></div>}
+                    <Fingerprint className="w-6 h-6 text-teal-500" />
+                  </TactileButton>
+                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-teal-600 bg-white/80 px-2 rounded-full">بصمتك</span>
+                </div>
+              </div>
+
+              <BottomDock
+                isDarkMode={isDarkMode}
+                onTaskClick={(e) => handleFeatureClick('daily')}
+                onMistakeClick={() => handleFeatureClick('mistakes')}
+                completedToday={typeof completedToday === 'object' ? (completedToday[subject] || 0) : completedToday}
+                onStartBagReview={onStartBagReview}
+                subject={subject}
+              />
+            </>
+          )}
+
+          {showLoginModal && (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowLoginModal(false)}></div>
+              <div className={`relative w-full max-w-sm p-6 rounded-[2rem] border-2 shadow-2xl animate-pop-in ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-white'}`}>
+                <button onClick={() => setShowLoginModal(false)} className="absolute top-4 left-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><X className="w-5 h-5 text-slate-400" /></button>
+                <div className="flex flex-col items-center text-center mb-6 mt-2">
+                  <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-4 rotate-3"><LogIn className="w-8 h-8 text-yellow-600" /></div>
+                  <h3 className={`text-xl font-black mb-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>سجل دخولك يا بطل! 🚀</h3>
+                  <p className={`text-sm opacity-60 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>هذه الميزة متاحة فقط للأبطال المسجلين.</p>
+                </div>
+                <TactileButton onClick={() => { setShowLoginModal(false); handleLogout(); }} className="w-full py-4 rounded-xl gap-2" colorClass="bg-yellow-400" borderClass="border-yellow-600"><span className="font-bold text-yellow-900">تسجيل الدخول الآن</span></TactileButton>
+              </div>
+            </div>
+          )}
+
+          {monsterSheetOpen && <BattleArenaModal isDarkMode={isDarkMode} onClose={() => setMonsterSheetOpen(false)} chapterScores={chapterScores} playerName={userName || 'البطل'} onStartGame={onStartGame} subject={subject} onShowToast={showToast} />}
+
+          {feedbackOpen && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setFeedbackOpen(false)}></div>
+              <div className={`relative w-full max-w-sm p-6 rounded-[2rem] border-2 shadow-2xl animate-pop-in ${isDarkMode ? 'bg-[#2A2640] border-[#3E3859]' : 'bg-white border-white'}`}>
+                <button onClick={() => setFeedbackOpen(false)} className="absolute top-4 left-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><X className="w-5 h-5 text-slate-400" /></button>
+                <div className="flex flex-col items-center text-center mb-6 mt-2">
+                  <div className="w-16 h-16 bg-teal-50 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center mb-4 rotate-3"><Fingerprint className="w-8 h-8 text-teal-500" /></div>
+                  <h3 className={`text-xl font-black mb-1 ${themeText}`}>اللعبة تكبر بأفكاركم 💡</h3>
+                  <p className={`text-sm opacity-60 ${themeText}`}>شنو اقتراحك حتى نطورها؟</p>
+                </div>
+                <textarea value={fbText} onChange={e => setFbText(e.target.value)} className={`w-full h-32 p-4 rounded-xl border-2 mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${isDarkMode ? 'bg-black/20 border-slate-700 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'}`} placeholder="اكتب فكرتك الجهنمية هنا..."></textarea>
+                <TactileButton onClick={() => { if (!fbText.trim()) return; triggerHaptic(); setFeedbackOpen(false); setFbText(''); showToast('شكراً يا بطل! فكرتك وصلت 💡', 'info', Send); }} className="w-full py-3 rounded-xl gap-2" colorClass={fbText.trim() ? 'bg-teal-500' : 'bg-slate-300'} borderClass={fbText.trim() ? 'border-teal-700' : 'border-slate-400'}><span className="font-bold text-white">إرسال الفكرة</span><Send className="w-4 h-4 text-white" /></TactileButton>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -2192,29 +2224,29 @@ const ChapterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
 
   // إعدادات السرعة
   const speeds = {
-    'baby': { 
-        id: 'baby',
-        val: 0.3,
-        label: 'وضع الرضيع 👶', 
-        desc: 'رحلة الألف ميل تبدأ بخطوة', 
-        color: 'bg-blue-100 text-blue-600',
-        border: 'border-blue-200'
+    'baby': {
+      id: 'baby',
+      val: 0.3,
+      label: 'وضع الرضيع 👶',
+      desc: 'رحلة الألف ميل تبدأ بخطوة',
+      color: 'bg-blue-100 text-blue-600',
+      border: 'border-blue-200'
     },
-    'teen': { 
-        id: 'teen',
-        val: 0.5,
-        label: 'فتى (متوسط) 👱', 
-        desc: 'للناس اللي قطعت شوط (هرولة)', 
-        color: 'bg-orange-100 text-orange-600',
-        border: 'border-orange-200'
+    'teen': {
+      id: 'teen',
+      val: 0.5,
+      label: 'فتى (متوسط) 👱',
+      desc: 'للناس اللي قطعت شوط (هرولة)',
+      color: 'bg-orange-100 text-orange-600',
+      border: 'border-orange-200'
     },
-    'beast': { 
-        id: 'beast',
-        val: 0.8,
-        label: 'وضع الوحش 👹', 
-        desc: 'للأبطال اللي يمشون ميل ميل!', 
-        color: 'bg-red-100 text-red-600',
-        border: 'border-red-200'
+    'beast': {
+      id: 'beast',
+      val: 0.8,
+      label: 'وضع الوحش 👹',
+      desc: 'للأبطال اللي يمشون ميل ميل!',
+      color: 'bg-red-100 text-red-600',
+      border: 'border-red-200'
     }
   };
 
@@ -2226,113 +2258,113 @@ const ChapterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-5 font-['Cairo']">
       {/* خلفية معتمة */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onResume}></div>
-      
+
       {/* جسم القائمة */}
       <div className="relative w-full max-w-sm bg-white dark:bg-[#1E293B] p-6 rounded-[2.5rem] border-4 border-slate-200 dark:border-slate-700 shadow-2xl animate-pop-in overflow-hidden max-h-[90vh] flex flex-col">
-        
+
         {/* عنوان القائمة */}
         <div className="text-center mb-6 shrink-0 pt-2">
-            <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-1">استراحة محارب 🛑</h2>
-            <p className="text-sm font-bold text-slate-400">خذ نفس وكمل الطريق</p>
+          <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-1">استراحة محارب 🛑</h2>
+          <p className="text-sm font-bold text-slate-400">خذ نفس وكمل الطريق</p>
         </div>
 
         <div className="space-y-3 overflow-y-auto hide-scrollbar px-1 pb-2">
-            {/* 1. زر الاستئناف */}
-            <TactileButton 
-                onClick={onResume}
-                className="w-full py-4 rounded-2xl gap-3 text-lg shrink-0"
-                colorClass="bg-yellow-400"
-                borderClass="border-yellow-600"
+          {/* 1. زر الاستئناف */}
+          <TactileButton
+            onClick={onResume}
+            className="w-full py-4 rounded-2xl gap-3 text-lg shrink-0"
+            colorClass="bg-yellow-400"
+            borderClass="border-yellow-600"
+          >
+            <Play className="w-6 h-6 fill-current text-yellow-900" />
+            <span className="font-black text-yellow-900">استئناف اللعب</span>
+          </TactileButton>
+
+          {/* 2. زر التحكم بالسرعة */}
+          <div className="relative shrink-0">
+            <TactileButton
+              onClick={() => setSpeedOpen(!speedOpen)}
+              className="w-full p-4 rounded-2xl justify-between"
+              colorClass="bg-slate-50 dark:bg-slate-800"
+              borderClass="border-slate-200 dark:border-slate-700"
             >
-                <Play className="w-6 h-6 fill-current text-yellow-900" />
-                <span className="font-black text-yellow-900">استئناف اللعب</span>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${selectedSpeedConfig.color}`}>
+                  {selectedSpeedConfig.label.split(' ').pop()}
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[10px] font-bold text-slate-400">سرعة اللعبة</span>
+                  <span className="font-black text-slate-800 dark:text-white">{selectedSpeedConfig.label.replace(/ .*/, '') + ' ' + selectedSpeedConfig.label.split(' ')[1]}</span>
+                </div>
+              </div>
+              <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${speedOpen ? 'rotate-180' : ''}`} />
             </TactileButton>
 
-            {/* 2. زر التحكم بالسرعة */}
-            <div className="relative shrink-0">
-                <TactileButton 
-                    onClick={() => setSpeedOpen(!speedOpen)}
-                    className="w-full p-4 rounded-2xl justify-between"
-                    colorClass="bg-slate-50 dark:bg-slate-800"
-                    borderClass="border-slate-200 dark:border-slate-700"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${selectedSpeedConfig.color}`}>
-                            {selectedSpeedConfig.label.split(' ').pop()} 
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <span className="text-[10px] font-bold text-slate-400">سرعة اللعبة</span>
-                            <span className="font-black text-slate-800 dark:text-white">{selectedSpeedConfig.label.replace(/ .*/,'') + ' ' + selectedSpeedConfig.label.split(' ')[1]}</span>
-                        </div>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${speedOpen ? 'rotate-180' : ''}`} />
-                </TactileButton>
-
-                {/* القائمة المنسدلة */}
-                {speedOpen && (
-                    <div className="mt-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-[3px] border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden animate-slide-down">
-                        <div className="p-2 grid gap-2">
-                            {Object.values(speeds).map((s) => (
-                                <button
-                                    key={s.id}
-                                    onClick={() => { setSpeedMode(s.id); setSpeedOpen(false); triggerHaptic(); }}
-                                    className={`w-full p-3 rounded-xl flex items-start gap-3 transition-all border
-                                        ${currentSpeedMode === s.id 
-                                            ? 'bg-white dark:bg-slate-700 border-yellow-400 shadow-md ring-2 ring-yellow-400/20' 
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'}
+            {/* القائمة المنسدلة */}
+            {speedOpen && (
+              <div className="mt-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-[3px] border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden animate-slide-down">
+                <div className="p-2 grid gap-2">
+                  {Object.values(speeds).map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => { setSpeedMode(s.id); setSpeedOpen(false); triggerHaptic(); }}
+                      className={`w-full p-3 rounded-xl flex items-start gap-3 transition-all border
+                                        ${currentSpeedMode === s.id
+                          ? 'bg-white dark:bg-slate-700 border-yellow-400 shadow-md ring-2 ring-yellow-400/20'
+                          : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'}
                                     `}
-                                >
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 mt-1 ${s.color.split(' ')[0]} bg-opacity-20`}>
-                                        {s.label.split(' ').pop()}
-                                    </div>
-                                    <div className="text-right flex-1 pt-0.5">
-                                        <div className={`font-black text-base mb-0.5 ${currentSpeedMode === s.id ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                            {s.label.replace(/ .*/,'') + ' ' + (s.label.split(' ')[1] || '')}
-                                        </div>
-                                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
-                                            {s.desc}
-                                        </div>
-                                    </div>
-                                    {currentSpeedMode === s.id && <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2"></div>}
-                                </button>
-                            ))}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 mt-1 ${s.color.split(' ')[0]} bg-opacity-20`}>
+                        {s.label.split(' ').pop()}
+                      </div>
+                      <div className="text-right flex-1 pt-0.5">
+                        <div className={`font-black text-base mb-0.5 ${currentSpeedMode === s.id ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                          {s.label.replace(/ .*/, '') + ' ' + (s.label.split(' ')[1] || '')}
                         </div>
-                    </div>
-                )}
-            </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
+                          {s.desc}
+                        </div>
+                      </div>
+                      {currentSpeedMode === s.id && <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2"></div>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
-            {/* 3. صف الأزرار (صوت + وضع ليلي + خروج) */}
-            <div className="flex gap-2 shrink-0">
-                {/* زر الصوت */}
-                <TactileButton 
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass={!isMuted ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'bg-slate-100 dark:bg-slate-800'}
-                    borderClass={!isMuted ? 'border-indigo-200 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-700'}
-                >
-                    {!isMuted ? <Volume2 className="w-5 h-5 text-indigo-500" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
-                </TactileButton>
+          {/* 3. صف الأزرار (صوت + وضع ليلي + خروج) */}
+          <div className="flex gap-2 shrink-0">
+            {/* زر الصوت */}
+            <TactileButton
+              onClick={() => setIsMuted(!isMuted)}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass={!isMuted ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'bg-slate-100 dark:bg-slate-800'}
+              borderClass={!isMuted ? 'border-indigo-200 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-700'}
+            >
+              {!isMuted ? <Volume2 className="w-5 h-5 text-indigo-500" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
+            </TactileButton>
 
-                {/* زر الوضع الليلي */}
-                <TactileButton 
-                    onClick={() => setIsDark(!isDark)}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass={isDark ? 'bg-slate-700' : 'bg-orange-50'}
-                    borderClass={isDark ? 'border-slate-600' : 'border-orange-200'}
-                >
-                    {isDark ? <Moon className="w-5 h-5 text-yellow-300" /> : <Sun className="w-5 h-5 text-orange-500" />}
-                </TactileButton>
+            {/* زر الوضع الليلي */}
+            <TactileButton
+              onClick={() => setIsDark(!isDark)}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass={isDark ? 'bg-slate-700' : 'bg-orange-50'}
+              borderClass={isDark ? 'border-slate-600' : 'border-orange-200'}
+            >
+              {isDark ? <Moon className="w-5 h-5 text-yellow-300" /> : <Sun className="w-5 h-5 text-orange-500" />}
+            </TactileButton>
 
-                {/* زر الخروج */}
-                <TactileButton 
-                    onClick={onExit}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass="bg-rose-50 dark:bg-rose-900/20"
-                    borderClass="border-rose-200 dark:border-rose-800"
-                >
-                    <LogOut className="w-5 h-5 text-rose-500" />
-                </TactileButton>
-            </div>
+            {/* زر الخروج */}
+            <TactileButton
+              onClick={onExit}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass="bg-rose-50 dark:bg-rose-900/20"
+              borderClass="border-rose-200 dark:border-rose-800"
+            >
+              <LogOut className="w-5 h-5 text-rose-500" />
+            </TactileButton>
+          </div>
         </div>
       </div>
     </div>
@@ -2347,11 +2379,12 @@ const ChapterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
 
 // جلب أسئلة مرحلة معينة من Supabase
 // stageId=0 = الديمو (أول 5 أسئلة من stageno=1)
-const fetchStageQuestions = async (chapterNum, stageId) => {
+const fetchStageQuestions = async (chapterNum, stageId, subject = 'english') => {
   try {
     const isDemo = stageId === 0;
+    const tableName = subject === 'biology' ? 'biology_chapter_stages' : 'english_chapter_stages';
     const query = supabase
-      .from('english_chapter_stages')
+      .from(tableName)
       .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
       .eq('chapterno', chapterNum)
       .eq('stageno', isDemo ? 1 : stageId)
@@ -2372,10 +2405,11 @@ const fetchStageQuestions = async (chapterNum, stageId) => {
 };
 
 // جلب أسئلة تحدي السنة كاملة من Supabase
-const fetchFullYearQuestions = async (chapterNum) => {
+const fetchFullYearQuestions = async (chapterNum, subject = 'english') => {
   try {
+    const tableName = subject === 'biology' ? 'biology_fullyear_stages' : 'english_fullyear_stages';
     const { data, error } = await supabase
-      .from('english_fullyear_stages')
+      .from(tableName)
       .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
       .eq('chapterno', chapterNum)
       .order('blockno');
@@ -2393,10 +2427,11 @@ const fetchFullYearQuestions = async (chapterNum) => {
 };
 
 // جلب أسئلة جزء مراجعة من Supabase
-const fetchReviewPartQuestions = async (chapterNum, partNum) => {
+const fetchReviewPartQuestions = async (chapterNum, partNum, subject = 'english') => {
   try {
+    const tableName = subject === 'biology' ? 'biology_review_parts' : 'english_review_parts';
     const { data, error } = await supabase
-      .from('english_review_parts')
+      .from(tableName)
       .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
       .eq('chapterno', chapterNum)
       .eq('stageno', partNum)
@@ -2420,7 +2455,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
   // Game Data
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -2429,10 +2464,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   const [powerups, setPowerups] = useState({ freeze: 2, bomb: 1 });
   const [frozen, setFrozen] = useState(false);
   const [progress, setProgress] = useState(0);
-  
+
   // Settings
   const [speedMode, setSpeedMode] = useState(() => { try { return localStorage.getItem('admin_game_speed') || 'teen'; } catch { return 'teen'; } });
-  
+
   // Question State
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(null);
@@ -2440,10 +2475,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   const [qY, setQY] = useState(-20);
   const [disabledOptions, setDisabledOptions] = useState([]);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(new Set());
-  
+
   // Animation States
   const [flyingBtn, setFlyingBtn] = useState(null);
-  const [shakeScreen, setShakeScreen] = useState(0); 
+  const [shakeScreen, setShakeScreen] = useState(0);
   const [shakeQuestion, setShakeQuestion] = useState(false);
   const [showComboFire, setShowComboFire] = useState(false);
   const comboFireTimerRef = useRef(null);
@@ -2462,10 +2497,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   // Results
   const [correctAnswers, setCorrectAnswers] = useState([]);
   const [wrongAnswers, setWrongAnswers] = useState([]);
-  
+
   // Feedback
   const [feedback, setFeedback] = useState({ show: false, correct: false, message: '' });
-  
+
   // Refs - Moved here to fix ReferenceError
   const gameAreaRef = useRef(null);
   const questionRef = useRef(null);
@@ -2478,12 +2513,12 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   // Initialize/Resume Audio Context
   const initAudio = () => {
     if (!audioCtxRef.current) {
-        try {
-            audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) { console.error("Audio API not supported"); }
+      try {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) { console.error("Audio API not supported"); }
     }
     if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume();
+      audioCtxRef.current.resume();
     }
   };
 
@@ -2491,7 +2526,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   const playSound = useCallback((freq, type = 'sine', vol = 0.3, dur = 0.15) => {
     if (isMuted) return;
     initAudio();
-    
+
     if (!audioCtxRef.current) return;
 
     try {
@@ -2502,12 +2537,12 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       gain.connect(ctx.destination);
       osc.frequency.value = freq;
       osc.type = type;
-      
+
       // Punchier envelope
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01); 
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      
+
       osc.start();
       osc.stop(ctx.currentTime + dur);
     } catch (e) {
@@ -2517,11 +2552,11 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 
   const playCorrectSound = (multiplier) => {
     // 🔥 Heavy Impact Sound + Chime
-    playSound(100, 'sawtooth', 0.4, 0.1); 
+    playSound(100, 'sawtooth', 0.4, 0.1);
     setTimeout(() => {
-        const baseFreq = 600 + (multiplier * 150);
-        playSound(baseFreq, 'square', 0.15, 0.1);
-        playSound(baseFreq * 1.5, 'sine', 0.2, 0.2);
+      const baseFreq = 600 + (multiplier * 150);
+      playSound(baseFreq, 'square', 0.15, 0.1);
+      playSound(baseFreq * 1.5, 'sine', 0.2, 0.2);
     }, 50);
   };
 
@@ -2552,7 +2587,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       if (!document.fullscreenElement) {
         const elem = document.documentElement;
         const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
-        
+
         if (requestFS) {
           requestFS.call(elem)
             .then(() => setIsFullscreen(true))
@@ -2634,7 +2669,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
   // Game Loop
   useEffect(() => {
     if (gameState !== 'playing' || feedback.show || frozen) return;
-    
+
     let lastTime = performance.now();
 
     const loop = (time) => {
@@ -2688,14 +2723,14 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 
   const handleAnswer = (answer, btnIndex) => {
     if (gameState !== 'playing' || feedback.show || !currentQ || flyingBtn !== null) return;
-    
-    initAudio(); 
-    
+
+    initAudio();
+
     const isCorrect = normalizeAnswerText(answer) === normalizeAnswerText(currentQ.a);
     const btnEl = optionRefs.current[btnIndex];
     const btnRect = btnEl?.getBoundingClientRect();
     const qRect = questionRef.current?.getBoundingClientRect();
-    
+
     if (btnRect && qRect) {
       triggerHaptic(50);
       setFlyingBtn({
@@ -2714,26 +2749,26 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
     setTimeout(() => {
       if (isCorrect) {
         triggerHaptic(80);
-        
+
         const basePoints = currentQ.golden ? 20 : 10;
         let finalPoints = basePoints;
         let currentMult = streak.multiplier;
-        
+
         if (isInUpperHalf()) {
-            if (streak.active) {
-                const newMult = Math.min(streak.multiplier + 1, 5);
-                setStreak(prev => ({ ...prev, active: true, multiplier: newMult, timeLeft: 5000, maxTime: 5000 }));
-                finalPoints = basePoints * newMult;
-                currentMult = newMult;
-            } else {
-                setStreak({ active: true, multiplier: 2, timeLeft: 5000, maxTime: 5000 });
-                finalPoints = basePoints * 2;
-                currentMult = 2;
-            }
+          if (streak.active) {
+            const newMult = Math.min(streak.multiplier + 1, 5);
+            setStreak(prev => ({ ...prev, active: true, multiplier: newMult, timeLeft: 5000, maxTime: 5000 }));
+            finalPoints = basePoints * newMult;
+            currentMult = newMult;
+          } else {
+            setStreak({ active: true, multiplier: 2, timeLeft: 5000, maxTime: 5000 });
+            finalPoints = basePoints * 2;
+            currentMult = 2;
+          }
         } else {
-            if (streak.active) {
-                finalPoints = basePoints * streak.multiplier;
-            }
+          if (streak.active) {
+            finalPoints = basePoints * streak.multiplier;
+          }
         }
 
         playCorrectSound(currentMult);
@@ -2754,19 +2789,19 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         // Feedback Message Logic
         let msg = "";
         const remainingQuestions = questions.length - 1 - qIndex;
-        
-        if (remainingQuestions === 2) { 
-             msg = CH_MESSAGES.finalCountdown[3];
-        } else if (remainingQuestions === 1) { 
-             msg = CH_MESSAGES.finalCountdown[2];
-        } else if (remainingQuestions === 0) { 
-             msg = CH_MESSAGES.finalCountdown[1];
+
+        if (remainingQuestions === 2) {
+          msg = CH_MESSAGES.finalCountdown[3];
+        } else if (remainingQuestions === 1) {
+          msg = CH_MESSAGES.finalCountdown[2];
+        } else if (remainingQuestions === 0) {
+          msg = CH_MESSAGES.finalCountdown[1];
         } else {
-             if (currentMult >= 5) {
-                 msg = CH_MESSAGES.streak[Math.floor(Math.random() * CH_MESSAGES.streak.length)];
-             } else {
-                 msg = CH_MESSAGES.correct[Math.floor(Math.random() * CH_MESSAGES.correct.length)];
-             }
+          if (currentMult >= 5) {
+            msg = CH_MESSAGES.streak[Math.floor(Math.random() * CH_MESSAGES.streak.length)];
+          } else {
+            msg = CH_MESSAGES.correct[Math.floor(Math.random() * CH_MESSAGES.correct.length)];
+          }
         }
 
         showFeedbackModal(true, msg, lives, qIndex, questions.length);
@@ -2836,7 +2871,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         // تأكد من أن progress bar يكتمل 100%
         setProgress(100);
         resultStarsRef.current = stars;
-        
+
         // ✅ حفظ المرحلة المكتملة والنجوم في Supabase (مصدر حقيقي للبيانات)
         const userDbId = localStorage.getItem('user_db_id');
         if (userDbId && chapterNum > 0 && stageId >= 0) {
@@ -2848,7 +2883,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
             console.error('Error saving stage progress:', e);
           }
         }
-        
+
         giveXPForChapter(totalCorrect, totalQuestions, true, chapterNum, stageId);
         if (ERROR_BAG_ENABLED && !bagItem) saveWrongAnswersToBag(wrongAnswers, getCHQuestions(subject));
         saveSessionToSupabase(totalCorrect, totalQuestions, score, chapterNum, stageId);
@@ -2917,7 +2952,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         });
       });
       localStorage.setItem('mistakes_bag', JSON.stringify(bag));
-    } catch {}
+    } catch { }
 
     // حفظ في Supabase
     const userDbId = localStorage.getItem('user_db_id');
@@ -2948,7 +2983,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
     const pct = total > 0 ? correct / total : 0;
     const xp = pct === 1 ? 150 : pct >= 0.6 ? 100 : 50;
     const userDbId = localStorage.getItem('user_db_id');
-    
+
     // ✅ حفظ XP في Supabase (مصدر بيانات حقيقي)
     if (userDbId) {
       try {
@@ -2958,15 +2993,15 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
           .select('total_xp, total_correct_answers, total_questions_answered')
           .eq('id', userDbId)
           .single();
-        
+
         if (selectErr) {
           console.error('users select error:', selectErr.message, '- تأكد من RLS وسلامة جدول users');
           return;
         }
-        
+
         const currentXp = userData?.total_xp ?? 0;
         const currentQuestions = userData?.total_questions_answered ?? 0;
-        
+
         const { error: updateErr } = await supabase
           .from('users')
           .update({
@@ -2976,7 +3011,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
             updated_at: new Date().toISOString(),
           })
           .eq('id', userDbId);
-        
+
         if (updateErr) {
           console.error('users update error:', updateErr.message);
           return;
@@ -2986,7 +3021,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         console.error('Error updating XP in Supabase:', e);
       }
     }
-    
+
     // حفظ نسخة محلية كـ cache فقط
     try {
       const xpKey = `player_xp_${subject}`;
@@ -2995,7 +3030,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       const qKey = `questions_answered_${subject}`;
       const currentQ = parseInt(localStorage.getItem(qKey) || '0');
       localStorage.setItem(qKey, String(currentQ + correct));
-    } catch {}
+    } catch { }
   };
 
   const saveStageProgressToSupabase = async (userId, subject, chapterNum, stageId, stars) => {
@@ -3087,7 +3122,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         .eq('user_id', userId)
         .eq('subject', subject)
         .eq('chapter', chapterNum);
-      
+
       const completedStages = data?.map(d => d.stage) || [];
       const starsMap = {};
       data?.forEach(d => {
@@ -3106,9 +3141,9 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       const anonId = localStorage.getItem('anon_user_id');
       const userEmail = localStorage.getItem('user_email');
       const accuracy = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
-      
+
       console.log('saveSession - userDbId:', userDbId, 'accuracy:', accuracy, 'email:', userEmail);
-      
+
       // التحقق من وجود user_id في جدول users قبل الإدراج (لتجنب Foreign Key error)
       let validUserId = null;
       if (userDbId) {
@@ -3123,7 +3158,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
           console.warn('user_id not found in users table, using null');
         }
       }
-      
+
       // ✅ حفظ جلسة العبة مع تفاصيل كاملة (بما فيها email، chapter، stage)
       const { data: sessData, error: sessError } = await supabase.from('game_sessions').insert({
         user_id: validUserId || null,  // null إذا لم يكن موجوداً في users
@@ -3143,7 +3178,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         speed_mode: speedMode,
         created_at: new Date().toISOString(),
       }).select();
-      
+
       if (sessError) {
         console.error('game_sessions save error:', sessError.message, sessError.details);
         // إذا كان الخطأ بسبب Foreign Key، جرّب بدون user_id
@@ -3174,8 +3209,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
         throw sessError;
       }
       console.log(`✅ Session saved: ${correctCount}/${totalCount} (${accuracy}%)`);
-    } catch (e) { 
-      console.error('saveSession error:', e?.message || e); 
+    } catch (e) {
+      console.error('saveSession error:', e?.message || e);
     }
   };
 
@@ -3266,7 +3301,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 
       {/* Dynamic Background */}
       <div className={`fixed inset-0 pointer-events-none transition-all duration-300 ${isDark ? 'bg-slate-900' : 'bg-sky-50'} ${streak.active && streak.multiplier >= 5 ? 'fever-mode' : ''}`}>
-         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${isDark ? '#fff' : '#000'} 1px, transparent 1px)`, backgroundSize: '30px 30px' }}></div>
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${isDark ? '#fff' : '#000'} 1px, transparent 1px)`, backgroundSize: '30px 30px' }}></div>
       </div>
 
       {/* Particles */}
@@ -3279,7 +3314,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
           boxShadow: p.type === 'coin' ? '0 0 10px #fbbf24' : 'none',
           border: p.type === 'coin' ? '2px solid #f59e0b' : 'none'
         }}>
-            {p.type === 'coin' && <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-yellow-700">$</div>}
+          {p.type === 'coin' && <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-yellow-700">$</div>}
         </div>
       ))}
 
@@ -3296,13 +3331,13 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       {gameState === 'menu' && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
           <div className={`w-full max-w-sm p-6 rounded-[2rem] shadow-2xl border-4 ${card} relative overflow-hidden flex flex-col`}>
-            
+
             {/* الخلفية المتحركة */}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute w-32 h-32 bg-yellow-400 rounded-full blur-3xl -top-10 -right-10 animate-pulse" />
               <div className="absolute w-32 h-32 bg-blue-400 rounded-full blur-3xl -bottom-10 -left-10 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
-            
+
             <div className="relative z-10 flex-1 flex flex-col">
               {/* الشعار والعنوان */}
               <div className="text-center mb-6">
@@ -3335,8 +3370,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
               </div>
 
               {/* زر ابدأ اللعب */}
-              <button 
-                onClick={startGame} 
+              <button
+                onClick={startGame}
                 className="w-full py-4 rounded-2xl font-black text-xl text-white bg-gradient-to-r from-green-400 to-emerald-500 shadow-xl border-b-[6px] border-emerald-600 active:border-b-0 active:translate-y-[6px] transition-all duration-75 relative overflow-hidden group mt-auto"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2" style={{ fontFamily: 'Tajawal' }}>
@@ -3352,75 +3387,73 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
       {/* ============ GAME SCREEN ============ */}
       {(gameState === 'playing' || gameState === 'paused') && (
         <div className="h-[100dvh] flex flex-col relative z-10">
-          
+
           {/* HEADER (HUD) */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2 relative z-50 h-24">
-            
+
             {/* Left: Pause & Fullscreen Buttons */}
             <div className="flex gap-2 shrink-0">
-                <button 
-                    onClick={() => setGameState('paused')} 
-                    className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    <Pause className="w-6 h-6 text-slate-700 dark:text-slate-200 fill-current" />
-                </button>
-                <button 
-                    onClick={toggleFullScreen} 
-                    className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    {isFullscreen ? <Minimize className="w-6 h-6 text-slate-700 dark:text-slate-200" /> : <Maximize className="w-6 h-6 text-slate-700 dark:text-slate-200" />}
-                </button>
+              <button
+                onClick={() => setGameState('paused')}
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
+              >
+                <Pause className="w-6 h-6 text-slate-700 dark:text-slate-200 fill-current" />
+              </button>
+              <button
+                onClick={toggleFullScreen}
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
+              >
+                {isFullscreen ? <Minimize className="w-6 h-6 text-slate-700 dark:text-slate-200" /> : <Maximize className="w-6 h-6 text-slate-700 dark:text-slate-200" />}
+              </button>
             </div>
 
             {/* Center: THE BOSS PROGRESS BAR (FLEXIBLE) */}
             <div className="flex-1 mx-3 h-6 relative">
-                {/* Background adjusted to be softer/more harmonious */}
-                <div className={`w-full h-full border-2 border-slate-400/50 rounded-full relative overflow-hidden shadow-inner ${isDark ? 'bg-slate-700/50' : 'bg-slate-300/50'}`}>
-                   {/* Fill */}
-                   <div 
-                     className={`h-full transition-all duration-500 ease-out relative rounded-l-full ${
-                        progress > 80 ? 'bg-gradient-to-r from-orange-600 to-red-600 animate-pulse' :
-                        progress > 50 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+              {/* Background adjusted to be softer/more harmonious */}
+              <div className={`w-full h-full border-2 border-slate-400/50 rounded-full relative overflow-hidden shadow-inner ${isDark ? 'bg-slate-700/50' : 'bg-slate-300/50'}`}>
+                {/* Fill */}
+                <div
+                  className={`h-full transition-all duration-500 ease-out relative rounded-l-full ${progress > 80 ? 'bg-gradient-to-r from-orange-600 to-red-600 animate-pulse' :
+                      progress > 50 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
                         'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500'
-                     }`}
-                     style={{ 
-                       width: `${progress}%`,
-                       boxShadow: `0 0 15px ${progress > 80 ? '#ef4444' : progress > 50 ? '#f59e0b' : '#10b981'}`
-                     }}
-                   >
-                     {/* Shine Effect */}
-                     <div className="absolute top-0 left-0 right-0 h-[50%] bg-white/30 rounded-t-full"></div>
-                     <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white shadow-[0_0_10px_white]"></div>
-                   </div>
+                    }`}
+                  style={{
+                    width: `${progress}%`,
+                    boxShadow: `0 0 15px ${progress > 80 ? '#ef4444' : progress > 50 ? '#f59e0b' : '#10b981'}`
+                  }}
+                >
+                  {/* Shine Effect */}
+                  <div className="absolute top-0 left-0 right-0 h-[50%] bg-white/30 rounded-t-full"></div>
+                  <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-white shadow-[0_0_10px_white]"></div>
                 </div>
+              </div>
             </div>
 
             {/* Right: Score + Lives */}
             <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className={`flex items-center gap-2 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
-                    <span className="text-yellow-500 text-xs font-black">XP</span>
-                    <span className={`text-xl font-black ${text}`}>{score.toLocaleString()}</span>
-                </div>
-                {/* Lives */}
-                <div className="flex gap-0.5">
-                   {[1, 2, 3].map(i => (
-                     <span key={i} className={`text-sm transition-all duration-300 ${i <= lives ? 'text-rose-500 opacity-100' : 'text-slate-300 opacity-30'}`}>❤️</span>
-                   ))}
-                </div>
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
+                <span className="text-yellow-500 text-xs font-black">XP</span>
+                <span className={`text-xl font-black ${text}`}>{score.toLocaleString()}</span>
+              </div>
+              {/* Lives */}
+              <div className="flex gap-0.5">
+                {[1, 2, 3].map(i => (
+                  <span key={i} className={`text-sm transition-all duration-300 ${i <= lives ? 'text-rose-500 opacity-100' : 'text-slate-300 opacity-30'}`}>❤️</span>
+                ))}
+              </div>
             </div>
           </div>
 
-                    {/* Game Area - منطقة نزول السؤال */}
+          {/* Game Area - منطقة نزول السؤال */}
           <div ref={gameAreaRef} className="flex-1 relative overflow-hidden">
             {/* Falling Question */}
             {currentQ && (
               <div
                 ref={questionRef}
-                className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${
-                  frozen ? 'bg-cyan-500 border-cyan-300' :
-                  currentQ.golden ? 'bg-amber-400 border-amber-200' :
-                  (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
-                } border-b-[6px] border-x-2 border-t-2`}
+                className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${frozen ? 'bg-cyan-500 border-cyan-300' :
+                    currentQ.golden ? 'bg-amber-400 border-amber-200' :
+                      (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
+                  } border-b-[6px] border-x-2 border-t-2`}
                 style={{
                   top: qY,
                   boxShadow: '0 16px 32px -8px rgba(0,0,0,0.18)',
@@ -3428,8 +3461,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
                 }}
               >
                 <div className="absolute -top-3 left-0 right-0 flex justify-center gap-2">
-                    {currentQ.golden && <span className="bg-yellow-100 text-yellow-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-yellow-300">GOLDEN ⭐</span>}
-                    {frozen && <span className="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-cyan-300 animate-pulse">FROZEN ❄️</span>}
+                  {currentQ.golden && <span className="bg-yellow-100 text-yellow-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-yellow-300">GOLDEN ⭐</span>}
+                  {frozen && <span className="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-cyan-300 animate-pulse">FROZEN ❄️</span>}
                 </div>
                 <p className={`text-base sm:text-lg font-black leading-snug ${frozen ? 'text-white' : currentQ.golden ? 'text-amber-900' : text}`}>
                   {currentQ.q}
@@ -3468,7 +3501,7 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
             </div>
 
             {/* أزرار الإجابة — خلفية بلور */}
-            <div className="grid grid-cols-2 gap-2.5 px-3 pb-6 max-w-md mx-auto" style={{paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'}}>
+            <div className="grid grid-cols-2 gap-2.5 px-3 pb-6 max-w-md mx-auto" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))' }}>
               {currentQ?.options.map((opt, idx) => {
                 const isDisabled = disabledOptions.includes(opt);
                 const isFlying = flyingBtn?.index === idx;
@@ -3478,14 +3511,13 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
                     ref={el => optionRefs.current[idx] = el}
                     onClick={() => !isDisabled && handleAnswer(opt, idx)}
                     disabled={isDisabled || feedback.show || flyingBtn !== null}
-                    className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${
-                      isFlying ? 'opacity-0' :
-                      isDisabled
-                        ? 'opacity-30 grayscale pointer-events-none scale-90'
-                        : isDark
-                          ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
-                          : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
-                    } shadow-lg`}
+                    className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${isFlying ? 'opacity-0' :
+                        isDisabled
+                          ? 'opacity-30 grayscale pointer-events-none scale-90'
+                          : isDark
+                            ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
+                            : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
+                      } shadow-lg`}
                   >
                     {opt}
                   </button>
@@ -3497,11 +3529,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
           {/* Flying Button Animation */}
           {flyingBtn && (
             <div
-              className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${
-                flyingBtn.correct 
-                  ? 'bg-emerald-500 text-white border-emerald-600' 
+              className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${flyingBtn.correct
+                  ? 'bg-emerald-500 text-white border-emerald-600'
                   : 'bg-rose-500 text-white border-rose-600'
-              }`}
+                }`}
               style={{
                 left: flyingBtn.startX,
                 top: flyingBtn.startY,
@@ -3564,11 +3595,10 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
             shadow-2xl text-center border-4 md:border-8 
             animate-popIn 
             max-w-[90vw] /* Prevent overflow width */
-            ${
-            feedback.correct 
+            ${feedback.correct
               ? 'bg-emerald-500 border-white text-white rotate-2 md:rotate-3'
               : 'bg-rose-500 border-white text-white -rotate-2 md:-rotate-3'
-          }`}>
+            }`}>
             <div className="text-6xl md:text-8xl mb-2 md:mb-4 drop-shadow-md"> {/* Responsive emoji size */}
               {feedback.correct ? '🤩' : '😱'}
             </div>
@@ -3590,9 +3620,9 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
 // 🛠️ مكونات التصميم (UI Components)
 // =================================================================
 
-const triggerHaptic = (duration = 15) => { 
+const triggerHaptic = (duration = 15) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    navigator.vibrate(duration); 
+    navigator.vibrate(duration);
   }
 };
 
@@ -3603,29 +3633,29 @@ const MonsterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
 
   // إعدادات السرعة
   const speeds = {
-    'baby': { 
-        id: 'baby',
-        val: 0.3,
-        label: 'وضع الرضيع 👶', 
-        desc: 'رحلة الألف ميل تبدأ بخطوة', 
-        color: 'bg-blue-100 text-blue-600',
-        border: 'border-blue-200'
+    'baby': {
+      id: 'baby',
+      val: 0.3,
+      label: 'وضع الرضيع 👶',
+      desc: 'رحلة الألف ميل تبدأ بخطوة',
+      color: 'bg-blue-100 text-blue-600',
+      border: 'border-blue-200'
     },
-    'teen': { 
-        id: 'teen',
-        val: 0.5,
-        label: 'فتى (متوسط) 👱', 
-        desc: 'للناس اللي قطعت شوط (هرولة)', 
-        color: 'bg-orange-100 text-orange-600',
-        border: 'border-orange-200'
+    'teen': {
+      id: 'teen',
+      val: 0.5,
+      label: 'فتى (متوسط) 👱',
+      desc: 'للناس اللي قطعت شوط (هرولة)',
+      color: 'bg-orange-100 text-orange-600',
+      border: 'border-orange-200'
     },
-    'beast': { 
-        id: 'beast',
-        val: 0.8,
-        label: 'وضع الوحش 👹', 
-        desc: 'للأبطال اللي يمشون ميل ميل!', 
-        color: 'bg-red-100 text-red-600',
-        border: 'border-red-200'
+    'beast': {
+      id: 'beast',
+      val: 0.8,
+      label: 'وضع الوحش 👹',
+      desc: 'للأبطال اللي يمشون ميل ميل!',
+      color: 'bg-red-100 text-red-600',
+      border: 'border-red-200'
     }
   };
 
@@ -3637,113 +3667,113 @@ const MonsterPauseMenuModal = ({ isOpen, onClose, onResume, onExit, currentSpeed
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-5 font-['Cairo']">
       {/* خلفية معتمة */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onResume}></div>
-      
+
       {/* جسم القائمة */}
       <div className="relative w-full max-w-sm bg-white dark:bg-[#1E293B] p-6 rounded-[2.5rem] border-4 border-slate-200 dark:border-slate-700 shadow-2xl animate-pop-in overflow-hidden max-h-[90vh] flex flex-col">
-        
+
         {/* عنوان القائمة */}
         <div className="text-center mb-6 shrink-0 pt-2">
-            <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-1">استراحة محارب 🛑</h2>
-            <p className="text-sm font-bold text-slate-400">خذ نفس وكمل الطريق</p>
+          <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-1">استراحة محارب 🛑</h2>
+          <p className="text-sm font-bold text-slate-400">خذ نفس وكمل الطريق</p>
         </div>
 
         <div className="space-y-3 overflow-y-auto hide-scrollbar px-1 pb-2">
-            {/* 1. زر الاستئناف */}
-            <TactileButton 
-                onClick={onResume}
-                className="w-full py-4 rounded-2xl gap-3 text-lg shrink-0"
-                colorClass="bg-yellow-400"
-                borderClass="border-yellow-600"
+          {/* 1. زر الاستئناف */}
+          <TactileButton
+            onClick={onResume}
+            className="w-full py-4 rounded-2xl gap-3 text-lg shrink-0"
+            colorClass="bg-yellow-400"
+            borderClass="border-yellow-600"
+          >
+            <Play className="w-6 h-6 fill-current text-yellow-900" />
+            <span className="font-black text-yellow-900">استئناف اللعب</span>
+          </TactileButton>
+
+          {/* 2. زر التحكم بالسرعة */}
+          <div className="relative shrink-0">
+            <TactileButton
+              onClick={() => setSpeedOpen(!speedOpen)}
+              className="w-full p-4 rounded-2xl justify-between"
+              colorClass="bg-slate-50 dark:bg-slate-800"
+              borderClass="border-slate-200 dark:border-slate-700"
             >
-                <Play className="w-6 h-6 fill-current text-yellow-900" />
-                <span className="font-black text-yellow-900">استئناف اللعب</span>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${selectedSpeedConfig.color}`}>
+                  {selectedSpeedConfig.label.split(' ').pop()}
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[10px] font-bold text-slate-400">سرعة اللعبة</span>
+                  <span className="font-black text-slate-800 dark:text-white">{selectedSpeedConfig.label.replace(/ .*/, '') + ' ' + selectedSpeedConfig.label.split(' ')[1]}</span>
+                </div>
+              </div>
+              <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${speedOpen ? 'rotate-180' : ''}`} />
             </TactileButton>
 
-            {/* 2. زر التحكم بالسرعة */}
-            <div className="relative shrink-0">
-                <TactileButton 
-                    onClick={() => setSpeedOpen(!speedOpen)}
-                    className="w-full p-4 rounded-2xl justify-between"
-                    colorClass="bg-slate-50 dark:bg-slate-800"
-                    borderClass="border-slate-200 dark:border-slate-700"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${selectedSpeedConfig.color}`}>
-                            {selectedSpeedConfig.label.split(' ').pop()} 
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <span className="text-[10px] font-bold text-slate-400">سرعة اللعبة</span>
-                            <span className="font-black text-slate-800 dark:text-white">{selectedSpeedConfig.label.replace(/ .*/,'') + ' ' + selectedSpeedConfig.label.split(' ')[1]}</span>
-                        </div>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${speedOpen ? 'rotate-180' : ''}`} />
-                </TactileButton>
-
-                {/* القائمة المنسدلة */}
-                {speedOpen && (
-                    <div className="mt-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-[3px] border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden animate-slide-down">
-                        <div className="p-2 grid gap-2">
-                            {Object.values(speeds).map((s) => (
-                                <button
-                                    key={s.id}
-                                    onClick={() => { setSpeedMode(s.id); setSpeedOpen(false); triggerHaptic(); }}
-                                    className={`w-full p-3 rounded-xl flex items-start gap-3 transition-all border
-                                        ${currentSpeedMode === s.id 
-                                            ? 'bg-white dark:bg-slate-700 border-yellow-400 shadow-md ring-2 ring-yellow-400/20' 
-                                            : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'}
+            {/* القائمة المنسدلة */}
+            {speedOpen && (
+              <div className="mt-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border-[3px] border-slate-200 dark:border-slate-700 shadow-inner overflow-hidden animate-slide-down">
+                <div className="p-2 grid gap-2">
+                  {Object.values(speeds).map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => { setSpeedMode(s.id); setSpeedOpen(false); triggerHaptic(); }}
+                      className={`w-full p-3 rounded-xl flex items-start gap-3 transition-all border
+                                        ${currentSpeedMode === s.id
+                          ? 'bg-white dark:bg-slate-700 border-yellow-400 shadow-md ring-2 ring-yellow-400/20'
+                          : 'bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'}
                                     `}
-                                >
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 mt-1 ${s.color.split(' ')[0]} bg-opacity-20`}>
-                                        {s.label.split(' ').pop()}
-                                    </div>
-                                    <div className="text-right flex-1 pt-0.5">
-                                        <div className={`font-black text-base mb-0.5 ${currentSpeedMode === s.id ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                            {s.label.replace(/ .*/,'') + ' ' + (s.label.split(' ')[1] || '')}
-                                        </div>
-                                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
-                                            {s.desc}
-                                        </div>
-                                    </div>
-                                    {currentSpeedMode === s.id && <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2"></div>}
-                                </button>
-                            ))}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 mt-1 ${s.color.split(' ')[0]} bg-opacity-20`}>
+                        {s.label.split(' ').pop()}
+                      </div>
+                      <div className="text-right flex-1 pt-0.5">
+                        <div className={`font-black text-base mb-0.5 ${currentSpeedMode === s.id ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-300'}`}>
+                          {s.label.replace(/ .*/, '') + ' ' + (s.label.split(' ')[1] || '')}
                         </div>
-                    </div>
-                )}
-            </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
+                          {s.desc}
+                        </div>
+                      </div>
+                      {currentSpeedMode === s.id && <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2"></div>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
-            {/* 3. صف الأزرار (صوت + وضع ليلي + خروج) */}
-            <div className="flex gap-2 shrink-0">
-                {/* زر الصوت */}
-                <TactileButton 
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass={!isMuted ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'bg-slate-100 dark:bg-slate-800'}
-                    borderClass={!isMuted ? 'border-indigo-200 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-700'}
-                >
-                    {!isMuted ? <Volume2 className="w-5 h-5 text-indigo-500" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
-                </TactileButton>
+          {/* 3. صف الأزرار (صوت + وضع ليلي + خروج) */}
+          <div className="flex gap-2 shrink-0">
+            {/* زر الصوت */}
+            <TactileButton
+              onClick={() => setIsMuted(!isMuted)}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass={!isMuted ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'bg-slate-100 dark:bg-slate-800'}
+              borderClass={!isMuted ? 'border-indigo-200 dark:border-indigo-800' : 'border-slate-200 dark:border-slate-700'}
+            >
+              {!isMuted ? <Volume2 className="w-5 h-5 text-indigo-500" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
+            </TactileButton>
 
-                {/* زر الوضع الليلي */}
-                <TactileButton 
-                    onClick={() => setIsDark(!isDark)}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass={isDark ? 'bg-slate-700' : 'bg-orange-50'}
-                    borderClass={isDark ? 'border-slate-600' : 'border-orange-200'}
-                >
-                    {isDark ? <Moon className="w-5 h-5 text-yellow-300" /> : <Sun className="w-5 h-5 text-orange-500" />}
-                </TactileButton>
+            {/* زر الوضع الليلي */}
+            <TactileButton
+              onClick={() => setIsDark(!isDark)}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass={isDark ? 'bg-slate-700' : 'bg-orange-50'}
+              borderClass={isDark ? 'border-slate-600' : 'border-orange-200'}
+            >
+              {isDark ? <Moon className="w-5 h-5 text-yellow-300" /> : <Sun className="w-5 h-5 text-orange-500" />}
+            </TactileButton>
 
-                {/* زر الخروج */}
-                <TactileButton 
-                    onClick={onExit}
-                    className="flex-1 p-3 rounded-2xl gap-1"
-                    colorClass="bg-rose-50 dark:bg-rose-900/20"
-                    borderClass="border-rose-200 dark:border-rose-800"
-                >
-                    <LogOut className="w-5 h-5 text-rose-500" />
-                </TactileButton>
-            </div>
+            {/* زر الخروج */}
+            <TactileButton
+              onClick={onExit}
+              className="flex-1 p-3 rounded-2xl gap-1"
+              colorClass="bg-rose-50 dark:bg-rose-900/20"
+              borderClass="border-rose-200 dark:border-rose-800"
+            >
+              <LogOut className="w-5 h-5 text-rose-500" />
+            </TactileButton>
+          </div>
         </div>
       </div>
     </div>
@@ -3972,7 +4002,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
   // Game Data
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(10); // START WITH 10 LIVES
@@ -3981,10 +4011,10 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   const [powerups, setPowerups] = useState({ freeze: 2, bomb: 1 });
   const [frozen, setFrozen] = useState(false);
   // const [progress, setProgress] = useState(0); // Progress not needed for infinite mode visual
-  
+
   // Settings
   const [speedMode, setSpeedMode] = useState(() => { try { return localStorage.getItem('admin_game_speed') || 'teen'; } catch { return 'teen'; } });
-  
+
   // Question State
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(null);
@@ -3992,10 +4022,10 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   const [qY, setQY] = useState(-20);
   const [disabledOptions, setDisabledOptions] = useState([]);
   const [answeredCorrectly, setAnsweredCorrectly] = useState(new Set());
-  
+
   // Animation States
   const [flyingBtn, setFlyingBtn] = useState(null);
-  const [shakeScreen, setShakeScreen] = useState(0); 
+  const [shakeScreen, setShakeScreen] = useState(0);
   const [shakeQuestion, setShakeQuestion] = useState(false);
   const [showComboFire, setShowComboFire] = useState(false);
   const comboFireTimerRef = useRef(null);
@@ -4014,10 +4044,10 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   // Results
   const [correctAnswers, setCorrectAnswers] = useState([]);
   const [wrongAnswers, setWrongAnswers] = useState([]);
-  
+
   // Feedback
   const [feedback, setFeedback] = useState({ show: false, correct: false, message: '' });
-  
+
   // Refs - Moved here to fix ReferenceError
   const gameAreaRef = useRef(null);
   const questionRef = useRef(null);
@@ -4030,12 +4060,12 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   // Initialize/Resume Audio Context
   const initAudio = () => {
     if (!audioCtxRef.current) {
-        try {
-            audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) { console.error("Audio API not supported"); }
+      try {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) { console.error("Audio API not supported"); }
     }
     if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume();
+      audioCtxRef.current.resume();
     }
   };
 
@@ -4043,7 +4073,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   const playSound = useCallback((freq, type = 'sine', vol = 0.3, dur = 0.15) => {
     if (isMuted) return;
     initAudio();
-    
+
     if (!audioCtxRef.current) return;
 
     try {
@@ -4054,12 +4084,12 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       gain.connect(ctx.destination);
       osc.frequency.value = freq;
       osc.type = type;
-      
+
       // Punchier envelope
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01); 
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-      
+
       osc.start();
       osc.stop(ctx.currentTime + dur);
     } catch (e) {
@@ -4069,11 +4099,11 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
 
   const playCorrectSound = (multiplier) => {
     // 🔥 Heavy Impact Sound + Chime
-    playSound(100, 'sawtooth', 0.4, 0.1); 
+    playSound(100, 'sawtooth', 0.4, 0.1);
     setTimeout(() => {
-        const baseFreq = 600 + (multiplier * 150);
-        playSound(baseFreq, 'square', 0.15, 0.1);
-        playSound(baseFreq * 1.5, 'sine', 0.2, 0.2);
+      const baseFreq = 600 + (multiplier * 150);
+      playSound(baseFreq, 'square', 0.15, 0.1);
+      playSound(baseFreq * 1.5, 'sine', 0.2, 0.2);
     }, 50);
   };
 
@@ -4104,7 +4134,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       if (!document.fullscreenElement) {
         const elem = document.documentElement;
         const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
-        
+
         if (requestFS) {
           requestFS.call(elem)
             .then(() => setIsFullscreen(true))
@@ -4173,7 +4203,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
   // Game Loop
   useEffect(() => {
     if (gameState !== 'playing' || feedback.show || frozen) return;
-    
+
     let lastTime = performance.now();
 
     const loop = (time) => {
@@ -4234,7 +4264,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
     const btnEl = optionRefs.current[btnIndex];
     const btnRect = btnEl?.getBoundingClientRect();
     const qRect = questionRef.current?.getBoundingClientRect();
-    
+
     if (btnRect && qRect) {
       triggerHaptic(50);
       setFlyingBtn({
@@ -4253,29 +4283,29 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
     setTimeout(() => {
       if (isCorrect) {
         triggerHaptic(80);
-        
+
         const basePoints = currentQ.golden ? 20 : 10;
         let finalPoints = basePoints;
         let currentMult = streak.multiplier;
-        
+
         if (isInUpperHalf()) {
-            if (streak.active) {
-                // Already active: increase multiplier up to 5, reset timer
-                const newMult = Math.min(streak.multiplier + 1, 5);
-                setStreak(prev => ({ ...prev, active: true, multiplier: newMult, timeLeft: 5000, maxTime: 5000 }));
-                finalPoints = basePoints * newMult;
-                currentMult = newMult;
-            } else {
-                // Start new streak: 2x multiplier
-                setStreak({ active: true, multiplier: 2, timeLeft: 5000, maxTime: 5000 });
-                finalPoints = basePoints * 2;
-                currentMult = 2;
-            }
+          if (streak.active) {
+            // Already active: increase multiplier up to 5, reset timer
+            const newMult = Math.min(streak.multiplier + 1, 5);
+            setStreak(prev => ({ ...prev, active: true, multiplier: newMult, timeLeft: 5000, maxTime: 5000 }));
+            finalPoints = basePoints * newMult;
+            currentMult = newMult;
+          } else {
+            // Start new streak: 2x multiplier
+            setStreak({ active: true, multiplier: 2, timeLeft: 5000, maxTime: 5000 });
+            finalPoints = basePoints * 2;
+            currentMult = 2;
+          }
         } else {
-            // Lower half: apply current multiplier but let timer run
-            if (streak.active) {
-                finalPoints = basePoints * streak.multiplier;
-            }
+          // Lower half: apply current multiplier but let timer run
+          if (streak.active) {
+            finalPoints = basePoints * streak.multiplier;
+          }
         }
 
         playCorrectSound(currentMult);
@@ -4296,11 +4326,11 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
         // --- 🤖 Feedback Message Logic (Infinite Mode) ---
         let msg = "";
         // No final countdown logic here
-        
+
         if (currentMult >= 5) {
-             msg = MN_MESSAGES.streak[Math.floor(Math.random() * MN_MESSAGES.streak.length)];
+          msg = MN_MESSAGES.streak[Math.floor(Math.random() * MN_MESSAGES.streak.length)];
         } else {
-             msg = MN_MESSAGES.correct[Math.floor(Math.random() * MN_MESSAGES.correct.length)];
+          msg = MN_MESSAGES.correct[Math.floor(Math.random() * MN_MESSAGES.correct.length)];
         }
 
         showFeedbackModal(true, msg);
@@ -4311,21 +4341,21 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
         playWrongSound();
         setLives(prev => prev - 1);
         setCombo(0);
-        setStreak({ active: false, multiplier: 1, timeLeft: 0, maxTime: 5000 }); 
+        setStreak({ active: false, multiplier: 1, timeLeft: 0, maxTime: 5000 });
         setShowComboFire(false);
-        
+
         // RE-QUEUE WRONG QUESTION (Retry logic)
         if (!answeredCorrectly.has(currentQ.id)) {
           setQuestions(prev => [...prev, currentQ]);
         }
-        
+
         setWrongAnswers(prev => [...prev, { question: currentQ, userAnswer: answer }]);
         if (qRect) spawnParticles(qRect.left + qRect.width / 2, qRect.top + qRect.height / 2, 'confetti', 20);
-        
+
         const msg = MN_MESSAGES.wrong[Math.floor(Math.random() * MN_MESSAGES.wrong.length)];
         showFeedbackModal(false, msg);
       }
-      
+
       setTimeout(() => {
         setShakeQuestion(false);
         setShakeScreen(0);
@@ -4344,12 +4374,12 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
     setCombo(0);
     setStreak({ active: false, multiplier: 1, timeLeft: 0, maxTime: 5000 });
     setShowComboFire(false);
-    
+
     // RE-QUEUE MISSED QUESTION
     if (!answeredCorrectly.has(currentQ.id)) {
       setQuestions(prev => [...prev, currentQ]);
     }
-    
+
     setWrongAnswers(prev => [...prev, { question: currentQ, userAnswer: null }]);
     showFeedbackModal(false, "⏰ خلص الوقت!");
     setTimeout(() => setShakeScreen(0), 500);
@@ -4451,7 +4481,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
         });
       });
       localStorage.setItem('mistakes_bag', JSON.stringify(bag));
-    } catch {}
+    } catch { }
 
     const userDbId = localStorage.getItem('user_db_id');
     const anonId = localStorage.getItem('anon_user_id');
@@ -4467,7 +4497,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
           next_play_at: new Date().toISOString(),
         }));
         await supabase.from('mistakes_bag').insert(rows);
-      } catch {}
+      } catch { }
     }
   };
 
@@ -4495,48 +4525,48 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
     // Since we append wrong/missed questions to the end, the array grows.
     // If we truly cleared everything, we might want to restart with full shuffle.
     // But basic infinite here means: keep going until lives run out.
-    
+
     if (nextIdx >= questions.length) {
-       // If all answered correctly and array ended (unlikely with retry logic unless perfect)
-       // Let's reshuffle and restart index to keep it going "Infinite"
-       const reShuffled = getMNQuestions(subject).map(q => ({
-          ...q,
-          options: [...q.options].sort(() => Math.random() - 0.5) 
-       })).sort(() => Math.random() - 0.5); // Shuffle order too
-       
-       setQuestions(prev => [...prev, ...reShuffled]); // Append new batch
-       // qIndex continues to increment
+      // If all answered correctly and array ended (unlikely with retry logic unless perfect)
+      // Let's reshuffle and restart index to keep it going "Infinite"
+      const reShuffled = getMNQuestions(subject).map(q => ({
+        ...q,
+        options: [...q.options].sort(() => Math.random() - 0.5)
+      })).sort(() => Math.random() - 0.5); // Shuffle order too
+
+      setQuestions(prev => [...prev, ...reShuffled]); // Append new batch
+      // qIndex continues to increment
     }
-    
+
     setQIndex(nextIdx);
     // Safety check if nextIdx is valid
     if (questions[nextIdx]) {
-        setCurrentQ(questions[nextIdx]);
+      setCurrentQ(questions[nextIdx]);
     } else {
-        // Fallback if needed, though append logic above handles it
-        // If we are here, we might need to set currentQ from the newly appended items
-        // but react state update is async. For this simple logic, let's trust the effect or simple loop
+      // Fallback if needed, though append logic above handles it
+      // If we are here, we might need to set currentQ from the newly appended items
+      // but react state update is async. For this simple logic, let's trust the effect or simple loop
     }
-    
+
     // Actually, simpler infinite logic for this demo without complex pagination:
     // Just wrap around if we exceed length, but we want unique randomized experience.
     // The append logic above is fine.
-    
+
     // We need to set currentQ from the updated state, which is tricky in one go.
     // Let's use a simpler approach: If nextIdx >= length, grab from start (modulo) but re-randomize options?
     // Or just rely on the re-queue logic.
-    
+
     // Correct approach for infinite stream:
     // When near end, append more.
     if (nextIdx >= questions.length - 1) {
-         const moreQuestions = getMNQuestions(subject).map(q => ({
-            ...q,
-            id: q.id + Date.now(), // Unique ID
-            options: [...q.options].sort(() => Math.random() - 0.5) 
-         }));
-         setQuestions(prev => [...prev, ...moreQuestions]);
+      const moreQuestions = getMNQuestions(subject).map(q => ({
+        ...q,
+        id: q.id + Date.now(), // Unique ID
+        options: [...q.options].sort(() => Math.random() - 0.5)
+      }));
+      setQuestions(prev => [...prev, ...moreQuestions]);
     }
-    
+
     setCurrentQ(questions[nextIdx] || questions[0]); // Fallback
     setQY(-20);
     setDisabledOptions([]);
@@ -4618,7 +4648,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
 
       {/* Dynamic Background */}
       <div className={`fixed inset-0 pointer-events-none transition-all duration-300 ${isDark ? 'bg-slate-900' : 'bg-sky-50'} ${streak.active && streak.multiplier >= 5 ? 'fever-mode' : ''}`}>
-         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${isDark ? '#fff' : '#000'} 1px, transparent 1px)`, backgroundSize: '30px 30px' }}></div>
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${isDark ? '#fff' : '#000'} 1px, transparent 1px)`, backgroundSize: '30px 30px' }}></div>
       </div>
 
       {/* Particles */}
@@ -4631,7 +4661,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
           boxShadow: p.type === 'coin' ? '0 0 10px #fbbf24' : 'none',
           border: p.type === 'coin' ? '2px solid #f59e0b' : 'none'
         }}>
-            {p.type === 'coin' && <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-yellow-700">$</div>}
+          {p.type === 'coin' && <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-yellow-700">$</div>}
         </div>
       ))}
 
@@ -4648,13 +4678,13 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       {gameState === 'menu' && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
           <div className={`w-full max-w-sm p-6 rounded-[2rem] shadow-2xl border-4 ${card} relative overflow-hidden flex flex-col`}>
-            
+
             {/* الخلفية المتحركة */}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute w-32 h-32 bg-yellow-400 rounded-full blur-3xl -top-10 -right-10 animate-pulse" />
               <div className="absolute w-32 h-32 bg-blue-400 rounded-full blur-3xl -bottom-10 -left-10 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
-            
+
             <div className="relative z-10 flex-1 flex flex-col">
               {/* الشعار والعنوان */}
               <div className="text-center mb-6">
@@ -4687,8 +4717,8 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
               </div>
 
               {/* زر ابدأ اللعب */}
-              <button 
-                onClick={startGame} 
+              <button
+                onClick={startGame}
                 className="w-full py-4 rounded-2xl font-black text-xl text-white bg-gradient-to-r from-green-400 to-emerald-500 shadow-xl border-b-[6px] border-emerald-600 active:border-b-0 active:translate-y-[6px] transition-all duration-75 relative overflow-hidden group mt-auto"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2" style={{ fontFamily: 'Tajawal' }}>
@@ -4704,51 +4734,50 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       {/* ============ GAME SCREEN ============ */}
       {(gameState === 'playing' || gameState === 'paused') && (
         <div className="h-[100dvh] flex flex-col relative z-10">
-          
+
           {/* HEADER (HUD) */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2 relative z-50 h-24">
-            
+
             {/* Left: Pause & Fullscreen Buttons */}
             <div className="flex gap-2 shrink-0">
-                <button 
-                    onClick={() => setGameState('paused')} 
-                    className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    <Pause className="w-6 h-6 text-slate-700 dark:text-slate-200 fill-current" />
-                </button>
-                <button 
-                    onClick={toggleFullScreen} 
-                    className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    {isFullscreen ? <Minimize className="w-6 h-6 text-slate-700 dark:text-slate-200" /> : <Maximize className="w-6 h-6 text-slate-700 dark:text-slate-200" />}
-                </button>
+              <button
+                onClick={() => setGameState('paused')}
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
+              >
+                <Pause className="w-6 h-6 text-slate-700 dark:text-slate-200 fill-current" />
+              </button>
+              <button
+                onClick={toggleFullScreen}
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-md flex items-center justify-center border-b-4 border-slate-200 dark:border-slate-700 active:border-b-0 active:translate-y-1 transition-all"
+              >
+                {isFullscreen ? <Minimize className="w-6 h-6 text-slate-700 dark:text-slate-200" /> : <Maximize className="w-6 h-6 text-slate-700 dark:text-slate-200" />}
+              </button>
             </div>
 
             {/* Right: Score + Lives */}
             <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className={`flex items-center gap-2 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
-                    <span className="text-yellow-500 text-xs font-black">XP</span>
-                    <span className={`text-xl font-black ${text}`}>{score.toLocaleString()}</span>
-                </div>
-                {/* Lives (Single Heart with Number) */}
-                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
-                    <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                    <span className={`text-lg font-black ${text}`}>{lives}</span>
-                </div>
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
+                <span className="text-yellow-500 text-xs font-black">XP</span>
+                <span className={`text-xl font-black ${text}`}>{score.toLocaleString()}</span>
+              </div>
+              {/* Lives (Single Heart with Number) */}
+              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border-2 ${isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'} shadow-sm`}>
+                <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
+                <span className={`text-lg font-black ${text}`}>{lives}</span>
+              </div>
             </div>
           </div>
 
-                    {/* Game Area - منطقة نزول السؤال */}
+          {/* Game Area - منطقة نزول السؤال */}
           <div ref={gameAreaRef} className="flex-1 relative overflow-hidden">
             {/* Falling Question */}
             {currentQ && (
               <div
                 ref={questionRef}
-                className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${
-                  frozen ? 'bg-cyan-500 border-cyan-300' :
-                  currentQ.golden ? 'bg-amber-400 border-amber-200' :
-                  (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
-                } border-b-[6px] border-x-2 border-t-2`}
+                className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${frozen ? 'bg-cyan-500 border-cyan-300' :
+                    currentQ.golden ? 'bg-amber-400 border-amber-200' :
+                      (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
+                  } border-b-[6px] border-x-2 border-t-2`}
                 style={{
                   top: qY,
                   boxShadow: '0 16px 32px -8px rgba(0,0,0,0.18)',
@@ -4756,8 +4785,8 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
                 }}
               >
                 <div className="absolute -top-3 left-0 right-0 flex justify-center gap-2">
-                    {currentQ.golden && <span className="bg-yellow-100 text-yellow-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-yellow-300">GOLDEN ⭐</span>}
-                    {frozen && <span className="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-cyan-300 animate-pulse">FROZEN ❄️</span>}
+                  {currentQ.golden && <span className="bg-yellow-100 text-yellow-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-yellow-300">GOLDEN ⭐</span>}
+                  {frozen && <span className="bg-cyan-100 text-cyan-800 text-[10px] font-black px-2 py-0.5 rounded-full border border-cyan-300 animate-pulse">FROZEN ❄️</span>}
                 </div>
                 <p className={`text-base sm:text-lg font-black leading-snug ${frozen ? 'text-white' : currentQ.golden ? 'text-amber-900' : text}`}>
                   {currentQ.q}
@@ -4796,7 +4825,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
             </div>
 
             {/* أزرار الإجابة — خلفية بلور */}
-            <div className="grid grid-cols-2 gap-2.5 px-3 pb-6 max-w-md mx-auto" style={{paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'}}>
+            <div className="grid grid-cols-2 gap-2.5 px-3 pb-6 max-w-md mx-auto" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))' }}>
               {currentQ?.options.map((opt, idx) => {
                 const isDisabled = disabledOptions.includes(opt);
                 const isFlying = flyingBtn?.index === idx;
@@ -4806,14 +4835,13 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
                     ref={el => optionRefs.current[idx] = el}
                     onClick={() => !isDisabled && handleAnswer(opt, idx)}
                     disabled={isDisabled || feedback.show || flyingBtn !== null}
-                    className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${
-                      isFlying ? 'opacity-0' :
-                      isDisabled
-                        ? 'opacity-30 grayscale pointer-events-none scale-90'
-                        : isDark
-                          ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
-                          : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
-                    } shadow-lg`}
+                    className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${isFlying ? 'opacity-0' :
+                        isDisabled
+                          ? 'opacity-30 grayscale pointer-events-none scale-90'
+                          : isDark
+                            ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
+                            : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
+                      } shadow-lg`}
                   >
                     {opt}
                   </button>
@@ -4825,11 +4853,10 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
           {/* Flying Button Animation */}
           {flyingBtn && (
             <div
-              className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${
-                flyingBtn.correct 
-                  ? 'bg-emerald-500 text-white border-emerald-600' 
+              className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${flyingBtn.correct
+                  ? 'bg-emerald-500 text-white border-emerald-600'
                   : 'bg-rose-500 text-white border-rose-600'
-              }`}
+                }`}
               style={{
                 left: flyingBtn.startX,
                 top: flyingBtn.startY,
@@ -4848,7 +4875,7 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
       )}
 
       {/* ============ PAUSE MENU MODAL (Using the New Component) ============ */}
-      <MonsterPauseMenuModal 
+      <MonsterPauseMenuModal
         isOpen={gameState === 'paused'}
         onClose={() => setGameState('playing')}
         onResume={() => setGameState('playing')}
@@ -4863,52 +4890,52 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
 
       {/* ============ RESULTS SCREEN ============ */}
       {gameState === 'results' && (
-         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-popIn">
-            <div className={`w-full max-w-sm p-6 rounded-[2rem] shadow-2xl border-2 ${card}`}>
-                <div className="text-center mb-6">
-                    <span className="text-6xl block mb-2">{score > 50 ? '👑' : '😎'}</span>
-                    <h2 className={`text-3xl font-black ${text}`} style={{ fontFamily: "'Cairo', sans-serif" }}>النتيجة النهائية</h2>
-                </div>
-                
-                {/* Total Score */}
-                <div className="bg-slate-200 p-6 rounded-2xl mb-6 text-center shadow-inner">
-                    <span className="text-sm text-slate-500 font-bold uppercase tracking-widest">Total Score</span>
-                    <div className="text-6xl font-black text-slate-800 mt-2">{score}</div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="bg-green-100 p-3 rounded-xl text-center border-2 border-green-200">
-                        <span className="block text-xs font-bold text-green-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات صحيحة</span>
-                        <span className="text-3xl font-black text-green-600">{correctAnswers.length}</span>
-                    </div>
-                    <div className="bg-red-100 p-3 rounded-xl text-center border-2 border-red-200">
-                        <span className="block text-xs font-bold text-red-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات خاطئة</span>
-                        <span className="text-3xl font-black text-red-600">{wrongAnswers.length}</span>
-                    </div>
-                </div>
-
-                {/* Error Review with Explanation */}
-                {wrongAnswers.length > 0 && (
-                    <div className="mb-4 max-h-40 overflow-y-auto bg-white rounded-xl p-3 border border-slate-200">
-                        <h3 className="font-bold text-red-500 mb-2 text-base text-right font-black" style={{ fontFamily: "'Cairo', sans-serif" }}>الأخطاء ({wrongAnswers.length})</h3>
-                        {wrongAnswers.map((item, i) => (
-                            <div key={i} className="text-right text-sm border-b border-slate-100 last:border-0 py-3">
-                                <p className="font-black mb-1 text-slate-800 text-base">{item.question.q}</p>
-                                <div className="flex justify-end gap-2 mb-1">
-                                    <span className="text-green-600 font-black text-sm bg-green-100 px-2 py-0.5 rounded">{item.question.a} ✓</span>
-                                    <span className="text-red-500 font-bold line-through opacity-70">{item.userAnswer || 'وقت'}</span>
-                                </div>
-                                <p className="text-slate-600 italic bg-slate-50 p-2 rounded font-bold text-xs" style={{ fontFamily: "'Cairo', sans-serif" }}>💡 {item.question.explanation || 'لا يوجد شرح متاح.'}</p>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                
-                <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>إعادة المرحلة</button>
-                <button onClick={() => { if (onExit) onExit(); else setGameState('menu'); }} className={`w-full py-4 rounded-xl font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>العودة</button>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-popIn">
+          <div className={`w-full max-w-sm p-6 rounded-[2rem] shadow-2xl border-2 ${card}`}>
+            <div className="text-center mb-6">
+              <span className="text-6xl block mb-2">{score > 50 ? '👑' : '😎'}</span>
+              <h2 className={`text-3xl font-black ${text}`} style={{ fontFamily: "'Cairo', sans-serif" }}>النتيجة النهائية</h2>
             </div>
-         </div>
+
+            {/* Total Score */}
+            <div className="bg-slate-200 p-6 rounded-2xl mb-6 text-center shadow-inner">
+              <span className="text-sm text-slate-500 font-bold uppercase tracking-widest">Total Score</span>
+              <div className="text-6xl font-black text-slate-800 mt-2">{score}</div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-green-100 p-3 rounded-xl text-center border-2 border-green-200">
+                <span className="block text-xs font-bold text-green-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات صحيحة</span>
+                <span className="text-3xl font-black text-green-600">{correctAnswers.length}</span>
+              </div>
+              <div className="bg-red-100 p-3 rounded-xl text-center border-2 border-red-200">
+                <span className="block text-xs font-bold text-red-700 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>إجابات خاطئة</span>
+                <span className="text-3xl font-black text-red-600">{wrongAnswers.length}</span>
+              </div>
+            </div>
+
+            {/* Error Review with Explanation */}
+            {wrongAnswers.length > 0 && (
+              <div className="mb-4 max-h-40 overflow-y-auto bg-white rounded-xl p-3 border border-slate-200">
+                <h3 className="font-bold text-red-500 mb-2 text-base text-right font-black" style={{ fontFamily: "'Cairo', sans-serif" }}>الأخطاء ({wrongAnswers.length})</h3>
+                {wrongAnswers.map((item, i) => (
+                  <div key={i} className="text-right text-sm border-b border-slate-100 last:border-0 py-3">
+                    <p className="font-black mb-1 text-slate-800 text-base">{item.question.q}</p>
+                    <div className="flex justify-end gap-2 mb-1">
+                      <span className="text-green-600 font-black text-sm bg-green-100 px-2 py-0.5 rounded">{item.question.a} ✓</span>
+                      <span className="text-red-500 font-bold line-through opacity-70">{item.userAnswer || 'وقت'}</span>
+                    </div>
+                    <p className="text-slate-600 italic bg-slate-50 p-2 rounded font-bold text-xs" style={{ fontFamily: "'Cairo', sans-serif" }}>💡 {item.question.explanation || 'لا يوجد شرح متاح.'}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button onClick={startGame} className="w-full py-4 rounded-xl font-black text-xl text-white bg-emerald-500 shadow-lg shadow-emerald-500/30 mb-3 hover:scale-105 transition-transform" style={{ fontFamily: "'Cairo', sans-serif" }}>إعادة المرحلة</button>
+            <button onClick={() => { if (onExit) onExit(); else setGameState('menu'); }} className={`w-full py-4 rounded-xl font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>العودة</button>
+          </div>
+        </div>
       )}
 
       {/* ============ FEEDBACK OVERLAY ============ */}
@@ -4923,11 +4950,10 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
             shadow-2xl text-center border-4 md:border-8 
             animate-popIn 
             max-w-[90vw] /* Prevent overflow width */
-            ${
-            feedback.correct 
+            ${feedback.correct
               ? 'bg-emerald-500 border-white text-white rotate-2 md:rotate-3'
               : 'bg-rose-500 border-white text-white -rotate-2 md:-rotate-3'
-          }`}>
+            }`}>
             <div className="text-6xl md:text-8xl mb-2 md:mb-4 drop-shadow-md"> {/* Responsive emoji size */}
               {feedback.correct ? '🤩' : '😱'}
             </div>
