@@ -838,31 +838,30 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
             );
           })}
         </div>
-        <div className="relative w-full mt-2">
-          <TactileButton
-            className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none ${isDarkMode ? 'bg-indigo-600' : 'bg-indigo-500'}`}
-            onClick={() => onStartGame('monster', subject, null, 0)}
-          >
-            <div className="w-full p-5 flex items-center justify-between z-10 relative">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                  <Swords className="w-7 h-7 text-white" />
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-2 mb-1">
+        {/* تم إخفاء التحدي الشامل بناءً على طلب المستخدم */}
+        {false && (
+          <div className="relative w-full mt-2">
+            <TactileButton
+              className={`w-full p-0 !rounded-[28px] overflow-hidden group border-none ${isDarkMode ? 'bg-indigo-600' : 'bg-indigo-500'}`}
+              onClick={() => onStartGame('monster', subject, null, 0)}
+            >
+              <div className="p-6 relative">
+                <div className="relative z-10 flex items-center justify-between">
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-white/20 text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full text-white/90">Monster Class</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+                    </div>
                     <span className="text-xl font-black text-white">التحدي الشامل</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-white/90">
-                    <span className="text-xs font-bold text-white/70">كل المنهج</span>
+                  <div className="w-16 h-16 rounded-[22px] bg-white/10 border-2 border-white/20 flex items-center justify-center relative overflow-hidden group-hover:bg-white/20 transition-all duration-300">
+                    <Crown className="w-8 h-8 text-white fill-current/20 scale-110 group-hover:scale-125 transition-transform" />
                   </div>
                 </div>
               </div>
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white">
-                <Play className="w-5 h-5 fill-current" />
-              </div>
-            </div>
-          </TactileButton>
-        </div>
+            </TactileButton>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1020,7 +1019,9 @@ const BottomDock = ({ isDarkMode, onTaskClick, onMistakeClick, completedToday = 
 
 // واجهة الفصول (ChaptersView)
 const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onChapterClick, isGuest, onShowLogin, userProfile, subject = 'english' }) => {
-  const chapterNames = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
+  const chapterNames = subject === 'biology'
+    ? ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس']
+    : ['الأول', 'الثاني', 'الثالث', 'القطع الأدبية', 'الخامس', 'السادس', 'السابع', 'الثامن'];
   const STAGES_PER_CHAPTER = 12; // للفصول 2-8
 
   const handleChapterClick = (num) => {
@@ -1265,24 +1266,26 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
             );
           })}
 
-          {/* المراجعة الشاملة — تم فتحها */}
-          <div>
-            <TactileButton
-              className={`w-full p-5 flex items-center justify-between rounded-[28px] ${isDarkMode ? 'bg-indigo-700 border-indigo-600' : 'bg-indigo-500 border-indigo-600'}`}
-              onClick={() => onStartGame('review_part', subject, null, 0, 0)}
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/20 border-2 border-white/20">
-                  <Crown className="w-7 h-7 text-white fill-current" />
+          {/* المراجعة الشاملة — تم إخفاؤها بناءً على طلب المستخدم */}
+          {false && (
+            <div>
+              <TactileButton
+                className={`w-full p-5 flex items-center justify-between rounded-[28px] ${isDarkMode ? 'bg-indigo-700 border-indigo-600' : 'bg-indigo-500 border-indigo-600'}`}
+                onClick={() => onStartGame('review_part', subject, null, 0, 0)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/20 border-2 border-white/20">
+                    <Crown className="w-7 h-7 text-white fill-current" />
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-xl font-bold text-white">المراجعة الشاملة</span>
+                    <span className="text-xs text-white/70 font-bold">كل فصول المنهج</span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="block text-xl font-bold text-white">المراجعة الشاملة</span>
-                  <span className="text-xs text-white/70 font-bold">كل فصول المنهج</span>
-                </div>
-              </div>
-              <Play className="w-5 h-5 text-white fill-current" />
-            </TactileButton>
-          </div>
+                <Play className="w-5 h-5 text-white fill-current" />
+              </TactileButton>
+            </div>
+          )}
         </div>
       )}
     </div>
