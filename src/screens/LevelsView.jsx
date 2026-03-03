@@ -75,19 +75,29 @@ export default function LevelsView({
   // الفصل 1: الديمو مفتوح دائماً + المرحلة 1 مفتوحة دائماً بعد تسجيل الدخول
   // المراحل التالية تُفتح بالتسلسل اعتماداً على Supabase
   // الفصل 2-8: مرحلة 1 مفتوحة دائماً — المرحلة N تُفتح بعد إكمال N-1
-  // تم فتح جميع المراحل للأبطال حسب طلب العميل
-  const isLevelUnlocked = (stageId) => true;
+  // منطق الفتح:
+  // المرحلة 0 (ديمو) والمرحلة 1 مفتوحة دائماً لكل الفصول
+  // المراحل التالية تُفتح بالتسلسل اعتماداً على إكمال المرحلة السابقة
+  const isLevelUnlocked = (stageId) => {
+    if (stageId === 0 || stageId === 1) return true;
+    return completedStages.includes(stageId - 1);
+  };
 
   let levelsList = Array.from({ length: STAGES_COUNT }, (_, i) => {
     const id = i + 1;
-    return { id, locked: false, stars: getStageStars(id) };
+    const locked = !isLevelUnlocked(id);
+    return { id, locked, stars: getStageStars(id) };
   });
 
   if (hasDemo) {
-    levelsList = [{ id: 0, isDemo: true, locked: false, stars: getStageStars(0) }, ...levelsList];
+    levelsList = [{ id: 0, isDemo: true, locked: !isLevelUnlocked(0), stars: getStageStars(0) }, ...levelsList];
   }
 
   const handleLevelClick = (level) => {
+    if (level.locked) {
+      onShowLogin();
+      return;
+    }
     onStartGame('chapter', subject, null, chapterNum, level.id);
   };
 

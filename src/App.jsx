@@ -1197,88 +1197,72 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
         </div>
       ) : (
         <div className="space-y-4">
-          {/* الفصل 1 — متاح بأجزاء مقفولة */}
-          <div className="transition-all duration-300">
-            <TactileButton
-              onClick={() => toggleReview(1)}
-              className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${expandedReview === 1 ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
-              colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
-              borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${allCh1Done ? 'bg-yellow-100 border-yellow-300 text-yellow-600' : 'bg-indigo-100 border-indigo-200 text-indigo-500'}`}>
-                  <Crown className="w-7 h-7 fill-current" />
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-2">
-                    <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل 1</span>
-                    {ch1Completions > 0 && (
-                      <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-0.5 rounded-full">
-                        👑 ×{ch1Completions}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-slate-400">
-                    {expandedReview === 1 ? 'اختر الجزء للمراجعة' : `${ch1Parts.filter(p => p.done).length}/${PARTS_COUNT} أجزاء`}
-                  </span>
-                </div>
-              </div>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'} ${expandedReview === 1 ? '-rotate-90' : ''}`}>
-                <ChevronLeft className="w-5 h-5" />
-              </div>
-            </TactileButton>
-            {expandedReview === 1 && (
-              <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
-                {ch1Parts.map((part) => (
-                  <TactileButton
-                    onClick={() => part.status !== 'locked' && handleStartReviewPart(1, part.id)}
-                    key={part.id}
-                    disabled={part.status === 'locked'}
-                    className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`}
-                    colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')}
-                    borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}
-                  >
-                    <div className="flex items-center gap-4 z-10">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
-                        {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
-                      </div>
-                      <div className="text-right">
-                        <span className={`block font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{part.title}</span>
-                        <span className={`text-[10px] font-bold ${part.status === 'completed' ? 'text-emerald-500' : 'text-slate-400'}`}>{part.status === 'completed' ? 'مكتمل ✓' : part.status === 'locked' ? 'مغلق' : 'متاح الآن'}</span>
-                      </div>
-                    </div>
-                    {part.status === 'unlocked' && <Play className="w-6 h-6 text-indigo-500 fill-indigo-500 animate-pulse" />}
-                  </TactileButton>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* الفصول 1-8 — تم فتحها مع عرض الأجزاء بالتسلسل */}
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((chapterNum) => {
+            const parts = buildChapterParts(chapterNum);
+            const completions = getChapterCompletions(chapterNum);
+            const allDone = parts.every(p => p.done);
+            const isExpanded = expandedReview === chapterNum;
 
-          {/* الفصول 2-8 — تم فتحها كما طلب المستخدم */}
-          {[2, 3, 4, 5, 6, 7, 8].map((chapterNum) => (
-            <div key={chapterNum}>
-              <TactileButton
-                onClick={() => toggleReview(chapterNum)}
-                className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${expandedReview === chapterNum ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
-                colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
-                borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 bg-indigo-100 border-indigo-200 text-indigo-500`}>
-                    <Crown className="w-7 h-7 fill-current" />
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل {chapterNum}</span>
+            return (
+              <div key={chapterNum} className="transition-all duration-300">
+                <TactileButton
+                  onClick={() => toggleReview(chapterNum)}
+                  className={`w-full p-5 flex items-center justify-between rounded-[24px] z-10 relative ${isExpanded ? (isDarkMode ? 'bg-slate-800' : 'bg-indigo-50 border-indigo-200') : ''}`}
+                  colorClass={isDarkMode ? 'bg-slate-800' : 'bg-white'}
+                  borderClass={isDarkMode ? 'border-slate-700' : 'border-slate-100'}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${allDone ? 'bg-yellow-100 border-yellow-300 text-yellow-600' : 'bg-indigo-100 border-indigo-200 text-indigo-500'}`}>
+                      <Crown className="w-7 h-7 fill-current" />
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-2">
+                        <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل {chapterNum}</span>
+                        {completions > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-0.5 rounded-full">
+                            👑 ×{completions}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {isExpanded ? 'اختر الجزء للمراجعة' : `${parts.filter(p => p.done).length}/${PARTS_COUNT} أجزاء`}
+                      </span>
                     </div>
                   </div>
-                </div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'}`}>
-                  <ChevronLeft className="w-5 h-5" />
-                </div>
-              </TactileButton>
-            </div>
-          ))}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-50 text-slate-400'} ${isExpanded ? '-rotate-90' : ''}`}>
+                    <ChevronLeft className="w-5 h-5" />
+                  </div>
+                </TactileButton>
+
+                {isExpanded && (
+                  <div className="mt-3 grid grid-cols-1 gap-3 pl-2 animate-slide-up">
+                    {parts.map((part) => (
+                      <TactileButton
+                        onClick={() => part.status !== 'locked' && handleStartReviewPart(chapterNum, part.id)}
+                        key={part.id}
+                        disabled={part.status === 'locked'}
+                        className={`w-full p-4 flex items-center justify-between rounded-xl relative overflow-hidden ${part.status === 'locked' ? 'opacity-60 grayscale' : ''}`}
+                        colorClass={part.status === 'completed' ? (isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-50') : part.status === 'locked' ? (isDarkMode ? 'bg-slate-900' : 'bg-slate-100') : (isDarkMode ? 'bg-indigo-900/30' : 'bg-white')}
+                        borderClass={part.status === 'completed' ? 'border-emerald-200' : part.status === 'locked' ? 'border-slate-200' : 'border-indigo-200'}
+                      >
+                        <div className="flex items-center gap-4 z-10">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 ${part.status === 'completed' ? 'bg-emerald-500 border-emerald-600 text-white' : part.status === 'locked' ? 'bg-slate-200 border-slate-300 text-slate-400' : 'bg-white border-indigo-200 text-indigo-500'}`}>
+                            {part.status === 'completed' ? <CheckCircle2 className="w-6 h-6" /> : part.status === 'locked' ? <Lock className="w-6 h-6" /> : <span className="font-black text-xl">{part.id}</span>}
+                          </div>
+                          <div className="text-right">
+                            <span className={`block font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{part.title}</span>
+                            <span className={`text-[10px] font-bold ${part.status === 'completed' ? 'text-emerald-500' : 'text-slate-400'}`}>{part.status === 'completed' ? 'مكتمل ✓' : part.status === 'locked' ? 'مغلق' : 'متاح الآن'}</span>
+                          </div>
+                        </div>
+                        {part.status === 'unlocked' && <Play className="w-6 h-6 text-indigo-500 fill-indigo-500 animate-pulse" />}
+                      </TactileButton>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {/* المراجعة الشاملة — تم فتحها */}
           <div>
@@ -3414,8 +3398,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
                 {/* Fill */}
                 <div
                   className={`h-full transition-all duration-500 ease-out relative rounded-l-full ${progress > 80 ? 'bg-gradient-to-r from-orange-600 to-red-600 animate-pulse' :
-                      progress > 50 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
-                        'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500'
+                    progress > 50 ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                      'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500'
                     }`}
                   style={{
                     width: `${progress}%`,
@@ -3451,8 +3435,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
               <div
                 ref={questionRef}
                 className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${frozen ? 'bg-cyan-500 border-cyan-300' :
-                    currentQ.golden ? 'bg-amber-400 border-amber-200' :
-                      (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
+                  currentQ.golden ? 'bg-amber-400 border-amber-200' :
+                    (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
                   } border-b-[6px] border-x-2 border-t-2`}
                 style={{
                   top: qY,
@@ -3512,11 +3496,11 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
                     onClick={() => !isDisabled && handleAnswer(opt, idx)}
                     disabled={isDisabled || feedback.show || flyingBtn !== null}
                     className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${isFlying ? 'opacity-0' :
-                        isDisabled
-                          ? 'opacity-30 grayscale pointer-events-none scale-90'
-                          : isDark
-                            ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
-                            : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
+                      isDisabled
+                        ? 'opacity-30 grayscale pointer-events-none scale-90'
+                        : isDark
+                          ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
+                          : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
                       } shadow-lg`}
                   >
                     {opt}
@@ -3530,8 +3514,8 @@ function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem =
           {flyingBtn && (
             <div
               className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${flyingBtn.correct
-                  ? 'bg-emerald-500 text-white border-emerald-600'
-                  : 'bg-rose-500 text-white border-rose-600'
+                ? 'bg-emerald-500 text-white border-emerald-600'
+                : 'bg-rose-500 text-white border-rose-600'
                 }`}
               style={{
                 left: flyingBtn.startX,
@@ -4775,8 +4759,8 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
               <div
                 ref={questionRef}
                 className={`absolute left-1/2 -translate-x-1/2 w-[92%] max-w-md px-4 py-5 rounded-3xl text-center ${shakeQuestion ? 'animate-shakeQ' : ''} ${frozen ? 'bg-cyan-500 border-cyan-300' :
-                    currentQ.golden ? 'bg-amber-400 border-amber-200' :
-                      (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
+                  currentQ.golden ? 'bg-amber-400 border-amber-200' :
+                    (isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200')
                   } border-b-[6px] border-x-2 border-t-2`}
                 style={{
                   top: qY,
@@ -4836,11 +4820,11 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
                     onClick={() => !isDisabled && handleAnswer(opt, idx)}
                     disabled={isDisabled || feedback.show || flyingBtn !== null}
                     className={`relative py-4 px-2 rounded-2xl font-black text-base tracking-wide transition-all border-b-[5px] active:border-b-0 active:translate-y-[5px] active:scale-95 duration-75 backdrop-blur-sm ${isFlying ? 'opacity-0' :
-                        isDisabled
-                          ? 'opacity-30 grayscale pointer-events-none scale-90'
-                          : isDark
-                            ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
-                            : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
+                      isDisabled
+                        ? 'opacity-30 grayscale pointer-events-none scale-90'
+                        : isDark
+                          ? 'bg-slate-700/70 text-white border-slate-900 shadow-slate-900/50'
+                          : 'bg-white/70 text-slate-800 border-slate-300/80 shadow-slate-200'
                       } shadow-lg`}
                   >
                     {opt}
@@ -4854,8 +4838,8 @@ function MonsterGameScreen({ onExit, subject = 'english', userProfile, chapterNu
           {flyingBtn && (
             <div
               className={`fixed z-[300] rounded-2xl font-black text-lg flex items-center justify-center border-4 ${flyingBtn.correct
-                  ? 'bg-emerald-500 text-white border-emerald-600'
-                  : 'bg-rose-500 text-white border-rose-600'
+                ? 'bg-emerald-500 text-white border-emerald-600'
+                : 'bg-rose-500 text-white border-rose-600'
                 }`}
               style={{
                 left: flyingBtn.startX,
