@@ -8,13 +8,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>ختمتها</title>
-    <!-- Google Analytics GA4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C7WL5ZFQLT"></script>
+    <!-- Google Analytics GA4 — يُحمّل عند الاتصال فقط؛ عند الفشل أو عدم الاتصال gtag يصبح no-op -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-C7WL5ZFQLT');
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-C7WL5ZFQLT';
+        s.onerror = function(){ window.gtag = function(){}; };
+        document.head.appendChild(s);
+        gtag('js', new Date());
+        gtag('config', 'G-C7WL5ZFQLT');
+      } else {
+        window.gtag = function(){};
+      }
     </script>
   </head>
   <body>

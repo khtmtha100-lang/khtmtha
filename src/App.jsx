@@ -2414,27 +2414,53 @@ const fetchFullYearQuestions = async (chapterNum, subject = 'english') => {
   } catch { return null; }
 };
 
-// جلب أسئلة جزء مراجعة من Supabase
+// جلب أسئلة جزء مراجعة من Supabase (كل فصل/جزء له أسئلته من الجدول)
 const fetchReviewPartQuestions = async (chapterNum, partNum, subject = 'english') => {
   try {
-    const tableName = subject === 'biology' ? 'biology_review_parts' : 'english_review_parts';
-    const { data, error } = await supabase
+    const isBiology = subject === 'biology';
+    const tableName = isBiology ? 'biology_reviews_parts' : 'english_review_parts';
+
+    // أعمدة الأحياء حسب الجدول الفعلي (بدون question_requirement و isgolden إن لم تكونا موجودتين)
+    const selectFields = isBiology
+      ? 'id,question_number,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation'
+      : 'questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation';
+
+    const query = supabase
       .from(tableName)
-      .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
-      .eq('chapterno', chapterNum)
-      .eq('stageno', partNum)
-      .order('blockno');
-    if (error || !data || data.length === 0) return null;
+      .select(selectFields)
+      .eq('chapterno', chapterNum);
+
+    // فلترة حسب الجزء: الأحياء = part، الإنجليزية = stageno
+    if (isBiology) {
+      query.eq('part', partNum);
+    } else {
+      query.eq('stageno', partNum);
+    }
+
+    query.order(isBiology ? 'question_number' : 'blockno');
+
+    const { data, error } = await query;
+    if (error) {
+      console.warn('fetchReviewPartQuestions error:', error.message, { subject, chapterNum, partNum });
+      return null;
+    }
+    if (!data || data.length === 0) return null;
+
     return data.map(r => ({
-      id: r.questioncode,
-      q: r.questiontext,
-      requirement: r.question_requirement,
-      options: [r.optiona, r.optionb, r.optionc, r.optiond],
-      a: r.correctanswer,
-      golden: r.isgolden,
+      id: isBiology ? (r.id || r.question_number) : r.questioncode,
+      q: isBiology ? r.question_text : r.questiontext,
+      requirement: isBiology ? undefined : r.question_requirement,
+      options: isBiology
+        ? [r.option_a, r.option_b, r.option_c, r.option_d].filter(Boolean)
+        : [r.optiona, r.optionb, r.optionc, r.optiond],
+      a: isBiology ? r.correct_answer : r.correctanswer,
+      golden: isBiology ? false : (r.isgolden ?? false),
       explanation: r.explanation,
     }));
-  } catch { return null; }
+  } catch (e) {
+    console.warn('fetchReviewPartQuestions exception:', e);
+    return null;
+  }
 };
 
 function ChapterGameScreen({ onExit, subject = 'english', userProfile, bagItem = null, onBagItemCompleted, chapterNum = 0, stageId = 0, gameMode = 'chapter', isGuest = false, onStartGame = null }) {
