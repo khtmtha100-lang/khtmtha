@@ -18,6 +18,9 @@ export default function LevelsView({
   const [completedStages, setCompletedStages] = useState([]);
   const [starsMap, setStarsMap] = useState({});
   const [loading, setLoading] = useState(false);
+  const [totalStages, setTotalStages] = useState(12);
+
+  const isLiteraryPieces = subject === 'english' && chapterNum === 4;
 
   // قراءة المراحل المكتملة من Supabase فقط (لا local cache)
   useEffect(() => {
@@ -37,6 +40,7 @@ export default function LevelsView({
 
       setLoading(true);
       try {
+        // 1. Fetch stage progress
         const { data, error } = await supabase
           .from('stage_progress')
           .select('stage, stars')
@@ -55,6 +59,19 @@ export default function LevelsView({
         setCompletedStages(stages);
         setStarsMap(stars);
         console.log(`✅ Loaded ${stages.length} completed stages for Ch${chapterNum} (Supabase)`);
+
+        // 2. Fetch total stage count dynamically
+        const tableName = subject === 'biology' ? 'biology_chapter_stages' : 'english_chapter_stages';
+        const { data: countData, error: countError } = await supabase
+          .from(tableName)
+          .select('stageno')
+          .eq('chapterno', chapterNum)
+          .order('stageno', { ascending: false })
+          .limit(1);
+
+        if (!countError && countData && countData.length > 0) {
+          setTotalStages(Number(countData[0].stageno));
+        }
       } catch (e) {
         console.warn('⚠️ LevelsView Supabase error:', e?.message || e);
         setCompletedStages([]);
@@ -69,7 +86,7 @@ export default function LevelsView({
   const getStageStars = (stageId) => starsMap[stageId] || 0;
 
   // عدد المراحل حسب الفصل (الفصل 1 = 28 مرحلة من Supabase)
-  const STAGES_COUNT = chapterNum === 1 ? 29 : 12;
+  const STAGES_COUNT = chapterNum === 1 ? 29 : totalStages;
 
   // منطق الفتح:
   // الفصل 1: الديمو مفتوح دائماً + المرحلة 1 مفتوحة دائماً بعد تسجيل الدخول
@@ -79,6 +96,7 @@ export default function LevelsView({
   // المرحلة 0 (ديمو) والمرحلة 1 مفتوحة دائماً لكل الفصول
   // المراحل التالية تُفتح بالتسلسل اعتماداً على إكمال المرحلة السابقة
   const isLevelUnlocked = (stageId) => {
+    if (isLiteraryPieces) return true;
     if (stageId === 0 || stageId === 1) return true;
     return completedStages.includes(stageId - 1);
   };
@@ -113,9 +131,11 @@ export default function LevelsView({
           <ArrowLeft className={isDarkMode ? 'text-white' : 'text-slate-700'} />
         </TactileButton>
         <div>
-          <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>الفصل {chapterNum}</h2>
+          <h2 className={`text-3xl font-black ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+            {isLiteraryPieces ? 'القطع الأدبية' : `الفصل ${chapterNum}`}
+          </h2>
           <p className="text-sm font-bold text-slate-400">
-            {isGuest ? 'يرجى تسجيل الدخول' : loading ? '⏳ جاري التحميل...' : 'أكمل المراحل لفتح التحدي'}
+            {isGuest ? 'يرجى تسجيل الدخول' : loading ? '⏳ جاري التحميل...' : isLiteraryPieces ? 'استكشف القطع الأدبية الممتعة' : 'أكمل المراحل لفتح التحدي'}
           </p>
         </div>
       </div>

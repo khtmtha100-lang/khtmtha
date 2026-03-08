@@ -804,7 +804,9 @@ const BattleArenaModal = ({ isDarkMode, onClose, chapterScores, playerName, onSt
               <div key={num} className="relative group h-28">
                 <TactileButton onClick={() => { setSelectedChapter(num); onStartGame('monster', subject, null, num); }} className={`w-full h-full flex-col !gap-0 !rounded-[20px] border-none transition-all ${isSelected ? `${primaryColor} text-white shadow-lg shadow-blue-500/30 translate-y-[-4px]` : (isDarkMode ? 'bg-[#334155] hover:bg-[#475569]' : 'bg-slate-100 hover:bg-slate-200')}`}>
                   <div className="flex-1 flex flex-col items-center justify-center w-full">
-                    <span className={`text-[10px] font-bold mb-0.5 opacity-80`}>الفصل</span>
+                    <span className={`text-[10px] font-bold mb-0.5 opacity-80`}>
+                      {subject === 'english' && num === 4 ? 'الأدب' : 'الفصل'}
+                    </span>
                     <span className={`text-3xl font-black leading-none mb-1`}>{num}</span>
                     <div className="mt-2 h-5 flex items-center justify-center">
                       {hasScore ? (
@@ -1100,8 +1102,10 @@ const ChaptersView = ({ isDarkMode, onBack, onFlameClick, onQuestionsClick, onCh
                   {isLocked ? <Lock className="w-8 h-8" /> : num}
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center h-full">
-                  <span className={`block text-xl font-black mb-2 ${isLocked ? 'text-slate-500' : (isDarkMode ? 'text-white' : 'text-slate-800')}`}>الفصل {chapterNames[num - 1]}</span>
+                <div className="flex-1 flex flex-col justify-center h-full text-right">
+                  <span className={`block text-xl font-black mb-2 ${isLocked ? 'text-slate-500' : (isDarkMode ? 'text-white' : 'text-slate-800')}`}>
+                    {subject === 'english' && num === 4 ? 'القطع الأدبية' : `الفصل ${chapterNames[num - 1]}`}
+                  </span>
 
                   {!isLocked ? (
                     <div className="w-full max-w-[140px]">
@@ -1160,12 +1164,13 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
     return Array.from({ length: PARTS_COUNT }, (_, i) => {
       const partNum = i + 1;
       const done = getPartDone(chNum, partNum);
+      const isLiteraryPieces = subject === 'english' && chNum === 4;
       const prevDone = partNum === 1 || getPartDone(chNum, partNum - 1);
       return {
         id: partNum,
         title: partTitles[i],
         done,
-        status: done ? 'completed' : prevDone ? 'unlocked' : 'locked',
+        status: (done || isLiteraryPieces) ? 'completed' : prevDone ? 'unlocked' : 'locked',
       };
     });
   };
@@ -1220,7 +1225,9 @@ const ReviewsView = ({ isDarkMode, onBack, isGuest, onShowLogin, onFlameClick, o
                     </div>
                     <div className="text-right">
                       <div className="flex items-center gap-2">
-                        <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>الفصل {chapterNum}</span>
+                        <span className={`block text-xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-700'}`}>
+                          {subject === 'english' && chapterNum === 4 ? 'القطع الأدبية' : `الفصل ${chapterNum}`}
+                        </span>
                         {completions > 0 && (
                           <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-0.5 rounded-full">
                             👑 ×{completions}
@@ -2027,7 +2034,7 @@ function HubScreen({ onStartGame: _onStartGame, onStartBagReview, completedToday
                           <span className="text-sm font-bold text-indigo-100 opacity-90">
                             {isGuest
                               ? 'العب أول مرحلة واكتشف مستواك!'
-                              : (resumeChapter != null ? `الفصل ${resumeChapter}` : 'ابدأ رحلتك الآن!')}
+                              : (resumeChapter != null ? (subject === 'english' && resumeChapter === 4 ? 'القطع الأدبية' : `الفصل ${resumeChapter}`) : 'ابدأ رحلتك الآن!')}
                           </span>
                         </div>
                         {isGuest ? (
