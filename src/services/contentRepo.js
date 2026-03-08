@@ -47,7 +47,7 @@ export async function fetchEnglishFullYearQuestions({ chapterNum }) {
 
 export async function fetchEnglishReviewPartQuestions({ chapterNum, partNum }) {
   const { data, error } = await supabase
-    .from('english_review_parts')
+    .from('english_reviews_parts')
     .select('questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation')
     .eq('chapterno', chapterNum)
     .eq('stageno', partNum)

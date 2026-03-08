@@ -2421,49 +2421,78 @@ const fetchFullYearQuestions = async (chapterNum, subject = 'english') => {
   } catch { return null; }
 };
 
-// جلب أسئلة جزء مراجعة من Supabase (كل فصل/جزء له أسئلته من الجدول)
+// جلب أسئلة جزء مراجعة من Supabase (يتعامل مع شكلين مختلفين للأعمدة)
 const fetchReviewPartQuestions = async (chapterNum, partNum, subject = 'english') => {
   try {
     const isBiology = subject === 'biology';
-    const tableName = isBiology ? 'biology_reviews_parts' : 'english_review_parts';
+    const tableName = isBiology ? 'biology_reviews_parts' : 'english_reviews_parts';
 
-    // أعمدة الأحياء حسب الجدول الفعلي (بدون question_requirement و isgolden إن لم تكونا موجودتين)
-    const selectFields = isBiology
-      ? 'id,question_number,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation'
-      : 'questioncode,questiontext,question_requirement,optiona,optionb,optionc,optiond,correctanswer,isgolden,explanation';
-
-    const query = supabase
+    // نطلب كل الأعمدة ثم نحدد الشكل (questioncode/optiona vs question_number/option_a)
+    const { data, error } = await supabase
       .from(tableName)
-      .select(selectFields)
+      .select('*')
       .eq('chapterno', chapterNum);
 
-    // فلترة حسب الجزء: الأحياء = part، الإنجليزية = stageno
-    if (isBiology) {
-      query.eq('part', partNum);
-    } else {
-      query.eq('stageno', partNum);
-    }
-
-    query.order(isBiology ? 'question_number' : 'blockno');
-
-    const { data, error } = await query;
     if (error) {
       console.warn('fetchReviewPartQuestions error:', error.message, { subject, chapterNum, partNum });
       return null;
     }
-    if (!data || data.length === 0) return null;
+    if (!data || data.length === 0) {
+      console.warn('fetchReviewPartQuestions empty:', { subject, chapterNum, partNum });
+      return null;
+    }
 
-    return data.map(r => ({
-      id: isBiology ? (r.id || r.question_number) : r.questioncode,
-      q: isBiology ? r.question_text : r.questiontext,
-      requirement: isBiology ? undefined : r.question_requirement,
-      options: isBiology
+    // فلترة حسب رقم الجزء: نجرّب أولاً 'part' ثم 'stageno'، وإذا لم يوجد شيء نأخذ الكل
+    const filtered = data.filter((r) => {
+      if (typeof r.part !== 'undefined') {
+        return Number(r.part) === Number(partNum);
+      }
+      if (typeof r.stageno !== 'undefined') {
+        return Number(r.stageno) === Number(partNum);
+      }
+      return true;
+    });
+
+    const rows = filtered.length > 0 ? filtered : data;
+
+    // ترتيب: نفضّل question_number، ثم blockno، وإلا نترك الترتيب كما هو
+    rows.sort((a, b) => {
+      const qa = a.question_number ?? a.blockno ?? 0;
+      const qb = b.question_number ?? b.blockno ?? 0;
+      return qa - qb;
+    });
+
+    const mapped = rows.map((r, idx) => {
+      const usesUnderscore = typeof r.question_number !== 'undefined' || typeof r.question_text !== 'undefined' || typeof r.option_a !== 'undefined';
+
+      const id =
+        r.id ??
+        (usesUnderscore ? (r.question_number ?? idx + 1) : (r.questioncode ?? idx + 1));
+
+      const q =
+        (usesUnderscore ? r.question_text : r.questiontext) ??
+        r.q ??
+        '';
+
+      const options = usesUnderscore
         ? [r.option_a, r.option_b, r.option_c, r.option_d].filter(Boolean)
-        : [r.optiona, r.optionb, r.optionc, r.optiond],
-      a: isBiology ? r.correct_answer : r.correctanswer,
-      golden: isBiology ? false : (r.isgolden ?? false),
-      explanation: r.explanation,
-    }));
+        : [r.optiona, r.optionb, r.optionc, r.optiond].filter(Boolean);
+
+      const a = (usesUnderscore ? r.correct_answer : r.correctanswer) ?? '';
+
+      return {
+        id,
+        q,
+        requirement: undefined,
+        options,
+        a,
+        golden: false,
+        explanation: r.explanation,
+      };
+    });
+
+    console.log('✅ fetchReviewPartQuestions', { subject, chapterNum, partNum, rows: mapped.length });
+    return mapped;
   } catch (e) {
     console.warn('fetchReviewPartQuestions exception:', e);
     return null;
